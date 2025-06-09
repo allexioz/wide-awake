@@ -228,11 +228,24 @@
 <script>
 class ModernProductPage {
   constructor() {
-    this.initImageGallery();
-    this.initQuantitySelector();
-    this.initVariantSelector();
-    this.initProductForm();
-    this.initReadingProgress();
+    // Wait for AddToCartComponent to be available before initializing
+    this.waitForAddToCartComponent(() => {
+      this.initImageGallery();
+      this.initQuantitySelector();
+      this.initVariantSelector();
+      this.initProductForm();
+      this.initReadingProgress();
+    });
+  }
+
+  waitForAddToCartComponent(callback) {
+    if (window.addToCartComponent) {
+      console.log('✅ AddToCartComponent detected for product page');
+      callback();
+    } else {
+      console.log('⏳ Waiting for AddToCartComponent...');
+      setTimeout(() => this.waitForAddToCartComponent(callback), 100);
+    }
   }
 
   initImageGallery() {
@@ -415,74 +428,15 @@ class ModernProductPage {
   }
 
   initProductForm() {
+    // CartManager now handles all form submissions automatically
+    // Just ensure the form has proper structure
     const form = document.querySelector('.product-form');
-    const addToCartBtn = document.querySelector('.add-to-cart-btn');
-    const btnText = addToCartBtn?.querySelector('.btn-text');
-    const spinner = addToCartBtn?.querySelector('.loading-spinner');
-
-    if (form && addToCartBtn) {
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const originalHTML = btnText.innerHTML;
-        
-        // Show loading state with spinner animation
-        btnText.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-icon"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>';
-        addToCartBtn.disabled = true;
-
-        // Submit form data
-        const formData = new FormData(form);
-        
-        fetch('/cart/add.js', {
-          method: 'POST',
-          body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-          // Success animation sequence
-          this.playSuccessAnimation(addToCartBtn, btnText);
-          
-          // Update cart count
-          this.updateCartCount();
-          
-          // Show toast notification
-          this.showToast('Added to cart!', 'success');
-          
-          // Create success particles
-          this.createSuccessParticles(addToCartBtn);
-          
-          setTimeout(() => {
-            btnText.innerHTML = originalHTML;
-            addToCartBtn.disabled = false;
-            // Reset to original blue button
-            addToCartBtn.style.background = '#5CBFEE';
-            addToCartBtn.style.animation = 'none';
-            addToCartBtn.style.color = 'var(--color-white)';
-            addToCartBtn.style.border = 'none';
-            addToCartBtn.style.textShadow = 'none';
-            addToCartBtn.style.transform = '';
-            addToCartBtn.style.boxShadow = '';
-            addToCartBtn.style.transition = 'all var(--transition-base)';
-          }, 2500);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          
-          // Error animation
-          btnText.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>';
-          addToCartBtn.style.background = '#dc3545';
-          
-          this.showToast('Failed to add to cart', 'error');
-          
-          setTimeout(() => {
-            btnText.innerHTML = originalHTML;
-            addToCartBtn.disabled = false;
-            addToCartBtn.style.background = '';
-          }, 2000);
-        });
-      });
+    if (form) {
+      console.log('✅ Product form found - CartManager will handle submissions');
     }
   }
+
+  // Legacy methods removed - CartManager handles everything now
 
   playSuccessAnimation(btn, btnText) {
     // Success icon
@@ -571,10 +525,22 @@ class ModernProductPage {
     fetch('/cart.js')
       .then(response => response.json())
       .then(cart => {
-        const cartCount = document.querySelector('.cart-count');
-        if (cartCount) {
-          cartCount.textContent = cart.item_count;
-        }
+        // Update all cart badges
+        const cartBadges = document.querySelectorAll('[data-cart-count]');
+        const cartIndicators = document.querySelectorAll('[data-cart-indicator]');
+        
+        cartBadges.forEach(badge => {
+          badge.textContent = cart.item_count;
+          badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+        });
+        
+        // Add animation to cart indicators
+        cartIndicators.forEach(indicator => {
+          indicator.classList.add('cart-updated');
+          setTimeout(() => {
+            indicator.classList.remove('cart-updated');
+          }, 1000);
+        });
       });
   }
 
@@ -1630,8 +1596,8 @@ if (document.readyState === 'loading') {
 
 .related-products .product-card:hover {
   border-color: var(--color-primary);
-  box-shadow: var(--shadow-large);
-  transform: translateY(-4px);
+  /* REMOVED EXPENSIVE BOX-SHADOW */
+  transform: translateY(-2px);
 }
 
 .related-products .product-image {
@@ -1645,11 +1611,13 @@ if (document.readyState === 'loading') {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-base);
+  /* FAST SCALING TRANSITION */
+  transition: transform 0.08s ease;
 }
 
 .related-products .product-card:hover .product-image img {
-  transform: scale(1.05);
+  /* MINIMAL PERFORMANCE-FRIENDLY SCALE */
+  transform: scale(1.015);
 }
 
 .related-products .product-info {
@@ -2377,6 +2345,9 @@ document.addEventListener('click', function(e) {
   }
 });
 </script>
+
+{% comment %} Include the simplified cart manager {% endcomment %}
+{% render 'cart-manager' %}
 
 {% comment %} Include standardized product card styles {% endcomment %}
 {% render 'product-card-styles' %}

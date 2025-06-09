@@ -320,6 +320,9 @@
   </div>
 </section>
 
+{% comment %} Include the simplified cart manager {% endcomment %}
+{% render 'cart-manager' %}
+
 {% comment %} Include standardized product card styles {% endcomment %}
 {% render 'product-card-styles' %}
 
@@ -1035,10 +1038,7 @@
     }
   }
 
-  /* Cart count animation */
-  .cart-count {
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  }
+  /* Cart indicator animations are now in the cart-indicator snippet */
 
   /* Improved button interactions */
   .quick-add-btn:active {
@@ -1063,7 +1063,6 @@
     .quick-add-btn .btn-loading,
     .quick-add-btn .btn-success,
     .quick-add-btn .btn-error,
-    .cart-count,
     .cart-toast {
       transition: none !important;
       animation: none !important;
@@ -1416,18 +1415,21 @@
     animation: shimmer 1.5s infinite;
   }
 
-  /* Container queries for better responsive performance */
-  @container (max-width: 400px) {
+  /* OPTIMIZED MOBILE PERFORMANCE */
+  @media (max-width: 400px) {
     .product-card {
-      transition-duration: 0.15s;
+      /* INSTANT MOBILE FEEDBACK */
+      transition-duration: 0.05s;
     }
     
     .product-card:hover {
-      transform: translate3d(0, -8px, 0);
+      /* MINIMAL MOBILE MOVEMENT */
+      transform: translateY(-1px);
     }
     
     .product-card:hover .product-image img {
-      transform: scale3d(1.03, 1.03, 1);
+      /* TINY ZOOM FOR MOBILE PERFORMANCE */
+      transform: scale(1.01);
     }
   }
 
@@ -1739,7 +1741,6 @@
 
 <!-- Performance Optimized Quick View JavaScript -->
 <script>
-
 function openQuickView(productData) {
   const modal = document.getElementById('quickViewModal');
   
