@@ -1737,140 +1737,87 @@
   }
 {% endstylesheet %}
 
+<!-- Performance Optimized Quick View JavaScript -->
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  // Ensure icons are properly initialized after page load
-  setTimeout(() => {
-    if (window.ensureIconsWork) {
-      window.ensureIconsWork();
-    }
-    if (window.refreshIcons) {
-      window.refreshIcons();
-    }
-  }, 100);
+
+function openQuickView(productData) {
+  const modal = document.getElementById('quickViewModal');
   
-  // Re-initialize icons when products are filtered/loaded
-  document.addEventListener('productsFiltered', function() {
+  if (!modal) {
+    window.location.href = productData.url;
+    return;
+  }
+  
+  // Batch DOM updates
+  const titleElement = document.getElementById('quickViewTitle');
+  const imageElement = document.getElementById('quickViewImage');
+  const linkElement = document.getElementById('quickViewDetailsLink');
+  const priceElement = document.querySelector('#quickViewPrice .price-current');
+  
+  if (titleElement) titleElement.textContent = productData.title || 'Product Name';
+  if (imageElement) {
+    imageElement.src = productData.image || '';
+    imageElement.alt = productData.title || 'Product';
+  }
+  if (linkElement) linkElement.href = productData.url || '#';
+  if (priceElement) {
+    priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
+  }
+  
+  // Simple modal display
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.classList.remove('closing');
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQuickView() {
+  const modal = document.getElementById('quickViewModal');
+  if (modal) {
+    modal.classList.add('closing');
+    modal.classList.remove('active');
+    
     setTimeout(() => {
-      if (window.refreshIcons) {
-        window.refreshIcons();
-      }
-      if (window.ensureIconsWork) {
-        window.ensureIconsWork();
-      }
-    }, 50);
-  });
+      modal.style.display = 'none';
+      modal.classList.remove('closing');
+      document.body.style.overflow = '';
+    }, 200);
+  }
+}
+
+function updateQuantity(change) {
+  const input = document.getElementById('quickViewQuantity');
+  if (input) {
+    const currentValue = parseInt(input.value) || 1;
+    const newValue = Math.max(1, Math.min(99, currentValue + change));
+    input.value = newValue;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('quickViewModal');
+  const modalContent = modal?.querySelector('.quick-view-modal');
   
-  // Handle success state with proper icon display
-  document.addEventListener('click', function(e) {
-    if (e.target.closest('.quick-add-btn')) {
-      const button = e.target.closest('.quick-add-btn');
-      
-      setTimeout(() => {
-        if (button.classList.contains('success')) {
-          const successSpan = button.querySelector('.btn-success');
-          if (successSpan) {
-            // Force icon refresh for this specific element
-            if (window.refreshIcons) {
-              window.refreshIcons();
-            }
-            
-            // Fallback check
-            setTimeout(() => {
-              const hasIcon = successSpan.querySelector('svg');
-              const fallback = successSpan.querySelector('.btn-success-fallback');
-              const lucideIcon = successSpan.querySelector('.btn-success-icon');
-              
-              if (!hasIcon && fallback && lucideIcon) {
-                fallback.style.display = 'inline';
-                lucideIcon.style.display = 'none';
-              } else if (hasIcon && fallback) {
-                fallback.style.display = 'none';
-              }
-            }, 100);
-          }
-        }
-      }, 10);
-    }
-  });
-
-  // Quick View Functionality
-  window.openQuickView = function(productData) {
-    const modal = document.getElementById('quickViewModal');
-    
-    if (!modal) {
-      window.location.href = productData.url;
-      return;
-    }
-    
-    // Update modal content
-    const titleElement = document.getElementById('quickViewTitle');
-    const imageElement = document.getElementById('quickViewImage');
-    const linkElement = document.getElementById('quickViewDetailsLink');
-    const priceElement = document.querySelector('#quickViewPrice .price-current');
-    
-    if (titleElement) titleElement.textContent = productData.title || 'Product Name';
-    if (imageElement) {
-      imageElement.src = productData.image || '';
-      imageElement.alt = productData.title || 'Product';
-    }
-    if (linkElement) linkElement.href = productData.url || '#';
-    if (priceElement) {
-      priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
-    }
-    
-    // Show modal
-    modal.style.display = 'flex';
-    modal.style.visibility = 'visible';
-    modal.classList.remove('closing');
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  };
-
-  window.closeQuickView = function() {
-    const modal = document.getElementById('quickViewModal');
-    if (modal) {
-      modal.classList.add('closing');
-      modal.classList.remove('active');
-      
-      setTimeout(() => {
-        modal.style.display = 'none';
-        modal.classList.remove('closing');
-        document.body.style.overflow = '';
-      }, 300);
-    }
-  };
-
-  window.updateQuantity = function(change) {
-    const input = document.getElementById('quickViewQuantity');
-    if (input) {
-      const currentValue = parseInt(input.value) || 1;
-      const newValue = Math.max(1, Math.min(99, currentValue + change));
-      input.value = newValue;
-    }
-  };
-
-  // Event listeners for quick view
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-      const modal = document.getElementById('quickViewModal');
-      if (modal?.classList.contains('active')) {
-        closeQuickView();
-      }
-    }
-  });
-
-  document.addEventListener('click', function(e) {
-    const modal = document.getElementById('quickViewModal');
-    const modalContent = modal?.querySelector('.quick-view-modal');
-    
-    if (e.target === modal) {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
       closeQuickView();
     }
+  });
+  
+  if (modal && modalContent) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeQuickView();
+    });
     
-    // Handle quick view button clicks
+    modalContent.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
+  
+  document.addEventListener('click', function(e) {
     const button = e.target.closest('.quick-view-btn');
-    if (button && button.dataset.productId) {
+    if (button) {
       e.preventDefault();
       
       openQuickView({
@@ -1885,6 +1832,36 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   });
+});
+
+// ================================================
+// SIMPLIFIED HOMEPAGE CONTROLS
+// Works with existing ProductDiscovery system
+// ================================================
+
+// Initialize simplified homepage controls with ProductDiscovery
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Product Discovery Hero initialized');
+  
+  // Wait for ProductDiscovery to be available and create instance
+  function initializeProductDiscovery() {
+    if (typeof ProductDiscovery !== 'undefined') {
+      console.log('✅ ProductDiscovery class available');
+      
+      // Create ProductDiscovery instance to handle add to cart
+      if (!window.productDiscovery) {
+        window.productDiscovery = new ProductDiscovery();
+        console.log('✅ ProductDiscovery instance created and initialized');
+      }
+      
+    } else {
+      console.log('⏳ Waiting for ProductDiscovery class to load...');
+      setTimeout(initializeProductDiscovery, 100);
+    }
+  }
+  
+  // Start initialization
+  initializeProductDiscovery();
 });
 </script>
 
