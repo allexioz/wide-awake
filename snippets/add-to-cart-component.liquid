@@ -1,0 +1,500 @@
+{% comment %}
+  Reusable Add to Cart Component
+  
+  Robust, performant add to cart functionality with rainbow animation
+  Based on the proven implementation from product.liquid
+  
+  Usage:
+  {% render 'add-to-cart-component' %}
+  
+  This will expose:
+  - window.AddToCartComponent class
+  - Pre-defined CSS animations (gradientFlow, particleExplode)
+  - Consistent UX patterns across all add to cart buttons
+{% endcomment %}
+
+<style>
+  /* Add to Cart Component Styles */
+  .loading-icon {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Rainbow Gradient Flow Animation - The signature effect */
+  @keyframes gradientFlow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Success Particle Explosion Animation */
+  @keyframes particleExplode {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--end-x), var(--end-y)) scale(0);
+    }
+  }
+
+  /* Toast Animation */
+  @keyframes toastSlideIn {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Success particle styles */
+  .success-particle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: linear-gradient(45deg, #5CBFEE, #FF6B6B);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    animation: particleExplode 0.8s ease-out forwards;
+  }
+
+  /* Toast notification styles */
+  .cart-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    min-width: 300px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+  }
+
+  .cart-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+    animation: toastSlideIn 0.3s ease;
+  }
+
+  .cart-toast.success {
+    border-left-color: #28a745;
+  }
+
+  .cart-toast.error {
+    border-left-color: #dc3545;
+  }
+
+  .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    font-family: var(--font-primary--family), sans-serif;
+  }
+
+  .toast-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .toast-text {
+    font-weight: 500;
+    color: #2c1810;
+    flex: 1;
+  }
+
+  .toast-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+
+  .toast-close:hover {
+    background-color: #f0f0f0;
+  }
+
+  @media screen and (max-width: 480px) {
+    .cart-toast {
+      right: 10px;
+      left: 10px;
+      min-width: auto;
+    }
+  }
+</style>
+
+<script>
+/**
+ * AddToCartComponent - Robust, reusable add to cart functionality
+ * 
+ * Features:
+ * - Rainbow gradient animation on success
+ * - Particle explosion effect
+ * - Loading states with spinner
+ * - Error handling with user feedback
+ * - Toast notifications
+ * - Cart count updates
+ * - Automatic button state reset
+ * 
+ * Usage:
+ * const addToCart = new AddToCartComponent();
+ * addToCart.handleSubmit(variantId, quantity, buttonElement, productTitle);
+ */
+class AddToCartComponent {
+  constructor() {
+    this.isProcessing = false;
+    console.log('🛒 AddToCartComponent initialized');
+  }
+
+  /**
+   * Main method to handle add to cart submission
+   * @param {string|number} variantId - Shopify variant ID
+   * @param {number} quantity - Quantity to add (default: 1)
+   * @param {HTMLElement} buttonElement - The button to animate
+   * @param {string} productTitle - Product name for notifications
+   * @returns {Promise} - Resolves on success, rejects on error
+   */
+  async handleSubmit(variantId, quantity = 1, buttonElement, productTitle = 'Product') {
+    if (this.isProcessing || !variantId || !buttonElement) {
+      console.warn('AddToCart: Invalid parameters or already processing');
+      return Promise.reject('Invalid parameters');
+    }
+
+    this.isProcessing = true;
+    const originalState = this.captureButtonState(buttonElement);
+
+    try {
+      // Show loading state
+      this.showLoadingState(buttonElement);
+
+      // Submit to Shopify
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: quantity
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(this.getErrorMessage(response.status, errorData));
+      }
+
+      const data = await response.json();
+
+      // Success sequence
+      await this.playSuccessSequence(buttonElement, productTitle);
+      await this.updateCartCount();
+
+      // Reset button after delay
+      setTimeout(() => {
+        this.resetButtonState(buttonElement, originalState);
+        this.isProcessing = false;
+      }, 2500);
+
+      return data;
+
+    } catch (error) {
+      console.error('AddToCart error:', error);
+      this.playErrorSequence(buttonElement, error.message);
+
+      // Reset button after shorter delay for errors
+      setTimeout(() => {
+        this.resetButtonState(buttonElement, originalState);
+        this.isProcessing = false;
+      }, 2000);
+
+      throw error;
+    }
+  }
+
+  /**
+   * Capture button's original state for restoration
+   */
+  captureButtonState(button) {
+    return {
+      innerHTML: button.innerHTML,
+      disabled: button.disabled,
+      background: button.style.background,
+      animation: button.style.animation,
+      color: button.style.color,
+      border: button.style.border,
+      textShadow: button.style.textShadow,
+      transform: button.style.transform,
+      boxShadow: button.style.boxShadow,
+      transition: button.style.transition
+    };
+  }
+
+  /**
+   * Show loading spinner animation
+   */
+  showLoadingState(button) {
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-icon"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>';
+    button.disabled = true;
+    button.classList.add('loading');
+  }
+
+  /**
+   * Play the signature rainbow success animation
+   */
+  async playSuccessSequence(button, productTitle) {
+    // Success icon
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    button.classList.remove('loading');
+    button.classList.add('success');
+
+    // Apply the beautiful rainbow gradient animation
+    button.style.background = 'linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B)';
+    button.style.backgroundSize = '400% 400%';
+    button.style.animation = 'gradientFlow 3s ease infinite';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.2)';
+
+    // Scale animation with bounce
+    button.style.transform = 'scale(1.05) translateY(-2px)';
+    button.style.transition = 'transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    button.style.boxShadow = '0 8px 30px rgba(255, 107, 107, 0.4)';
+
+    // Bounce back after initial scale
+    setTimeout(() => {
+      button.style.transform = 'scale(1) translateY(-2px)';
+    }, 300);
+
+    // Create particle explosion
+    this.createSuccessParticles(button);
+
+    // Show toast notification
+    this.showToast(`${productTitle} added to cart!`, 'success');
+  }
+
+  /**
+   * Play error animation
+   */
+  playErrorSequence(button, errorMessage) {
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+    button.classList.remove('loading');
+    button.classList.add('error');
+    button.style.background = '#dc3545';
+    
+    this.showToast(errorMessage, 'error');
+  }
+
+  /**
+   * Create magical particle explosion effect
+   */
+  createSuccessParticles(button) {
+    const rect = button.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    for (let i = 0; i < 8; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'success-particle';
+      particle.style.cssText = `
+        position: fixed;
+        left: ${centerX}px;
+        top: ${centerY}px;
+        width: 6px;
+        height: 6px;
+        background: linear-gradient(45deg, #5CBFEE, #FF6B6B);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 10000;
+        animation: particleExplode 0.8s ease-out forwards;
+        transform-origin: center;
+      `;
+      
+      const angle = (i * 45) * Math.PI / 180;
+      const distance = 40 + Math.random() * 20;
+      const endX = Math.cos(angle) * distance;
+      const endY = Math.sin(angle) * distance;
+      
+      particle.style.setProperty('--end-x', `${endX}px`);
+      particle.style.setProperty('--end-y', `${endY}px`);
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(() => {
+        if (particle.parentNode) {
+          particle.remove();
+        }
+      }, 800);
+    }
+  }
+
+  /**
+   * Show toast notification
+   */
+  showToast(message, type = 'success') {
+    // Remove existing toasts
+    document.querySelectorAll('.cart-toast').forEach(toast => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    });
+
+    const toast = document.createElement('div');
+    toast.className = `cart-toast ${type}`;
+    toast.innerHTML = `
+      <div class="toast-content">
+        <div class="toast-icon">${type === 'success' ? '✅' : '❌'}</div>
+        <div class="toast-text">${message}</div>
+        <button class="toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Show with animation
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        toast.classList.add('show');
+      }, 10);
+    });
+    
+    // Auto-remove
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.remove();
+        }
+      }, 300);
+    }, 4000);
+
+    // Announce to screen readers
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'visually-hidden';
+    announcement.textContent = message;
+    document.body.appendChild(announcement);
+    
+    setTimeout(() => {
+      announcement.remove();
+    }, 1000);
+  }
+
+  /**
+   * Update cart count in UI
+   */
+  async updateCartCount() {
+    try {
+      const response = await fetch('/cart.js');
+      const cart = await response.json();
+      
+      // Update all cart badges
+      const cartBadges = document.querySelectorAll('[data-cart-count]');
+      const cartIndicators = document.querySelectorAll('[data-cart-indicator]');
+      
+      cartBadges.forEach(badge => {
+        badge.textContent = cart.item_count;
+        badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+      });
+      
+      // Add animation to cart indicators
+      cartIndicators.forEach(indicator => {
+        indicator.classList.add('cart-updated');
+        setTimeout(() => {
+          indicator.classList.remove('cart-updated');
+        }, 1000);
+      });
+
+      // Update cart totals if present
+      const cartTotals = document.querySelectorAll('[data-cart-total]');
+      cartTotals.forEach(total => {
+        total.textContent = this.formatMoney(cart.total_price);
+      });
+
+      // Dispatch custom event for other components
+      document.dispatchEvent(new CustomEvent('cart:updated', {
+        detail: { cart: cart }
+      }));
+
+    } catch (error) {
+      console.error('Error updating cart count:', error);
+    }
+  }
+
+  /**
+   * Reset button to original state
+   */
+  resetButtonState(button, originalState) {
+    button.innerHTML = originalState.innerHTML;
+    button.disabled = originalState.disabled;
+    button.classList.remove('loading', 'success', 'error');
+    
+    // Reset all styles
+    button.style.background = originalState.background;
+    button.style.animation = originalState.animation;
+    button.style.color = originalState.color;
+    button.style.border = originalState.border;
+    button.style.textShadow = originalState.textShadow;
+    button.style.transform = originalState.transform;
+    button.style.boxShadow = originalState.boxShadow;
+    button.style.transition = originalState.transition;
+  }
+
+  /**
+   * Get user-friendly error message
+   */
+  getErrorMessage(status, errorData) {
+    switch (status) {
+      case 422:
+        return errorData?.description || 'Product is unavailable';
+      case 404:
+        return 'Product not found';
+      case 400:
+        return 'Invalid product selection';
+      default:
+        return status >= 500 ? 'Server error. Please try again.' : 'Failed to add to cart';
+    }
+  }
+
+  /**
+   * Format money for display
+   */
+  formatMoney(cents) {
+    return new Intl.NumberFormat('en-PH', {
+      style: 'currency',
+      currency: 'PHP',
+      minimumFractionDigits: 2
+    }).format(cents / 100);
+  }
+}
+
+// Make it globally available
+window.AddToCartComponent = AddToCartComponent;
+
+// Create a global instance for immediate use
+window.addToCartComponent = new AddToCartComponent();
+
+console.log('🛒 AddToCartComponent loaded and ready');
+</script> 

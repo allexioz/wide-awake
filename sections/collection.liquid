@@ -73,7 +73,7 @@
                         Name: A to Z
                       </div>
                       <div class="sort-option" data-sort="title-z">
-                        <i data-lucide="z-arrow-down" class="option-icon"></i>
+                        <i data-lucide="arrow-down" class="option-icon"></i>
                         Name: Z to A
                       </div>
                       <div class="sort-option" data-sort="created-new">
@@ -288,7 +288,7 @@
             <label class="quantity-label">Quantity</label>
             <div class="quantity-controls">
               <button type="button" class="quantity-btn quantity-decrease" onclick="updateQuantity(-1)" aria-label="Decrease quantity">−</button>
-              <input type="number" class="quantity-input" id="quickViewQuantity" value="1" min="1" max="99">
+              <input type="number" class="quantity-input" id="quickViewQuantity" name="quantity" value="1" min="1" max="99">
               <button type="button" class="quantity-btn quantity-increase" onclick="updateQuantity(1)" aria-label="Increase quantity">+</button>
             </div>
           </div>
@@ -296,8 +296,10 @@
           <!-- Action Buttons -->
           <div class="quick-view-actions quick-view-buttons">
             <button type="submit" class="btn-add-to-cart quick-view-btn btn-primary" id="quickViewAddToCart">
-              <i data-lucide="shopping-cart" class="btn-icon"></i>
-              ADD TO CART
+              <span class="btn-text">
+                <i data-lucide="shopping-cart" class="btn-icon"></i>
+                ADD TO CART
+              </span>
             </button>
             <button type="button" class="btn-buy-now quick-view-btn btn-secondary" id="quickViewBuyNow">
               BUY IT NOW
@@ -1328,7 +1330,7 @@ function getDate(card) {
 <!-- Performance Optimized Quick View JavaScript -->
 <script>
 
-function openQuickView(productData) {
+async function openQuickView(productData) {
   const modal = document.getElementById('quickViewModal');
   
   if (!modal) {
@@ -1336,8 +1338,54 @@ function openQuickView(productData) {
     return;
   }
   
-  // Batch DOM updates
+  // Show loading state first
   const titleElement = document.getElementById('quickViewTitle');
+  if (titleElement) titleElement.textContent = 'Loading...';
+  
+  // Show modal immediately
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.classList.remove('closing');
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  
+  try {
+    // Fetch full product data if we have a handle
+    if (productData.handle) {
+      const response = await fetch(`/products/${productData.handle}.js`);
+      const fullProduct = await response.json();
+      window.currentQuickViewProduct = fullProduct;
+      console.log('🔍 Loaded full product data for quick view:', fullProduct);
+      
+      // Add hidden variant input to form
+      const form = document.getElementById('quickViewForm');
+      if (form && fullProduct.variants && fullProduct.variants.length > 0) {
+        // Remove any existing variant input
+        const existingInput = form.querySelector('input[name="id"]');
+        if (existingInput) {
+          existingInput.remove();
+        }
+        
+        // Add new variant input for the first available variant
+        const firstVariant = fullProduct.variants.find(v => v.available) || fullProduct.variants[0];
+        const variantInput = document.createElement('input');
+        variantInput.type = 'hidden';
+        variantInput.name = 'id';
+        variantInput.value = firstVariant.id;
+        form.appendChild(variantInput);
+        
+        console.log('📝 Added variant input to quick view form:', firstVariant.id);
+        console.log('🔍 Form inputs after adding variant:', Array.from(form.querySelectorAll('input')).map(input => ({ name: input.name, value: input.value, type: input.type })));
+      }
+    } else {
+      window.currentQuickViewProduct = null;
+    }
+  } catch (error) {
+    console.warn('⚠️ Could not load full product data:', error);
+    window.currentQuickViewProduct = null;
+  }
+  
+  // Batch DOM updates
   const imageElement = document.getElementById('quickViewImage');
   const linkElement = document.getElementById('quickViewDetailsLink');
   const priceElement = document.querySelector('#quickViewPrice .price-current');
@@ -1351,13 +1399,6 @@ function openQuickView(productData) {
   if (priceElement) {
     priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
   }
-  
-  // Simple modal display
-  modal.style.display = 'flex';
-  modal.style.visibility = 'visible';
-  modal.classList.remove('closing');
-  modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
 }
 
 function closeQuickView() {
@@ -1405,7 +1446,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   document.addEventListener('click', function(e) {
     const button = e.target.closest('.quick-view-btn');
-    if (button) {
+    if (button && !button.id) {
       e.preventDefault();
       
       openQuickView({
@@ -1420,6 +1461,101 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     }
   });
+  
+  // Handle quick view form submission
+  document.addEventListener('submit', function(e) {
+    if (e.target && e.target.id === 'quickViewForm') {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🎯 Quick view form submitted in collection');
+      
+      const form = e.target;
+      
+      // Get form data like product page does
+      const formData = new FormData(form);
+      const variantId = formData.get('id');
+      const quantity = parseInt(formData.get('quantity')) || 1;
+      const productTitle = document.getElementById('quickViewTitle')?.textContent || 'Product';
+      const addToCartBtn = document.getElementById('quickViewAddToCart');
+      const btnText = addToCartBtn?.querySelector('.btn-text');
+      
+      console.log('🛒 Quick view form data:', { variantId, quantity, productTitle });
+      console.log('🔍 Debug - addToCartBtn element:', addToCartBtn);
+      console.log('🔍 Debug - btnText element:', btnText);
+      console.log('🔍 Debug - variantId type:', typeof variantId, 'value:', variantId);
+      
+      // Validate that we have everything needed
+      if (!variantId) {
+        console.error('❌ No variant ID found in form data. Form inputs:', Array.from(form.querySelectorAll('input')).map(input => ({ name: input.name, value: input.value })));
+        return;
+      }
+      
+      if (!addToCartBtn) {
+        console.error('❌ Add to cart button not found');
+        return;
+      }
+      
+      // Use the robust AddToCartComponent exactly like product page
+      if (window.addToCartComponent) {
+        console.log('✅ Using AddToCartComponent for quick view form');
+        window.addToCartComponent.handleSubmit(variantId, quantity, addToCartBtn, productTitle)
+          .then(data => {
+            console.log('✅ Quick view add to cart successful:', data);
+            // Close modal after successful add with a delay to show the animation
+            setTimeout(() => {
+              closeQuickView();
+            }, 3000);
+          })
+          .catch(error => {
+            console.error('❌ Quick view add to cart failed:', error);
+          });
+      } else {
+        console.warn('⚠️ AddToCartComponent not available, falling back to legacy method');
+        // Use a simplified legacy method for quick view
+        legacyQuickViewAddToCart(formData, addToCartBtn, btnText, productTitle);
+      }
+    }
+  });
+  
+  // Legacy fallback method for quick view (simplified version of product page method)
+  function legacyQuickViewAddToCart(formData, addToCartBtn, btnText, productTitle) {
+    // If btnText doesn't exist, use the button itself
+    const targetElement = btnText || addToCartBtn;
+    const originalHTML = targetElement.innerHTML;
+    
+    // Show loading state with spinner animation
+    targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-icon"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>';
+    addToCartBtn.disabled = true;
+
+    // Submit form data
+    fetch('/cart/add.js', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      // Success feedback
+      targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>ADDED!';
+      addToCartBtn.style.background = 'linear-gradient(135deg, #2ECC71 0%, #27AE60 100%)';
+      
+      // Close modal after delay
+      setTimeout(() => {
+        closeQuickView();
+      }, 1500);
+      
+    })
+    .catch(error => {
+      console.error('Error adding to cart:', error);
+      targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>ERROR';
+      addToCartBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #e74c3c)';
+      
+      setTimeout(() => {
+        addToCartBtn.disabled = false;
+        targetElement.innerHTML = originalHTML;
+        addToCartBtn.style.background = '';
+      }, 2000);
+    });
+  }
 });
 
 // ================================================
@@ -2854,6 +2990,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 {% endstylesheet %}
+
+{% comment %} Include the simplified cart manager {% endcomment %}
+{% render 'cart-manager' %}
 
 {% schema %}
 {

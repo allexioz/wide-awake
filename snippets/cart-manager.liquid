@@ -1,0 +1,506 @@
+{% comment %}
+  Unified Cart Manager - Simplified and Robust Add to Cart System
+  
+  This replaces the complex AddToCartComponent system with a simpler,
+  more reliable approach that eliminates race conditions and dependency issues.
+  
+  Usage: {% render 'cart-manager' %}
+  
+  Features:
+  - No dependency waiting/race conditions
+  - Unified API for all add to cart operations
+  - Built-in error handling and animations
+  - Automatic cart count updates
+  - Toast notifications
+{% endcomment %}
+
+<style>
+  /* Cart Manager Styles */
+  .cart-loading-icon {
+    animation: cart-spin 1s linear infinite;
+  }
+
+  @keyframes cart-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Rainbow Success Animation */
+  @keyframes cart-rainbow-flow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Success Particles */
+  @keyframes cart-particle-explode {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--end-x), var(--end-y)) scale(0);
+    }
+  }
+
+  .cart-success-particle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: linear-gradient(45deg, #5CBFEE, #FF6B6B);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10000;
+    animation: cart-particle-explode 0.8s ease-out forwards;
+  }
+
+  /* Toast Notifications */
+  .cart-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    min-width: 300px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+  }
+
+  .cart-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .cart-toast.success {
+    border-left-color: #28a745;
+  }
+
+  .cart-toast.error {
+    border-left-color: #dc3545;
+  }
+
+  .cart-toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    font-family: var(--font-primary--family), sans-serif;
+  }
+
+  .cart-toast-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .cart-toast-text {
+    font-weight: 500;
+    color: #2c1810;
+    flex: 1;
+  }
+
+  .cart-toast-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+
+  .cart-toast-close:hover {
+    background-color: #f0f0f0;
+  }
+
+  @media screen and (max-width: 480px) {
+    .cart-toast {
+      right: 10px;
+      left: 10px;
+      min-width: auto;
+    }
+  }
+</style>
+
+<script>
+/**
+ * CartManager - Simplified, robust cart management
+ * No dependency waiting, no race conditions, just works.
+ */
+class CartManager {
+  constructor() {
+    this.isProcessing = false;
+    this.lastRequestTime = 0;
+    this.minRequestInterval = 1000; // Minimum 1 second between requests
+    this.rateLimitCooldown = 5000; // 5 second cooldown after rate limit
+    this.isRateLimited = false;
+    this.init();
+  }
+
+  init() {
+    console.log('🛒 CartManager initialized');
+    this.bindEvents();
+  }
+
+  bindEvents() {
+    // Handle all add to cart button clicks with event delegation
+    document.addEventListener('click', (e) => {
+      const button = e.target.closest('[data-add-to-cart], .add-to-cart-btn, .quick-add-btn, .btn-add-to-cart');
+      if (button && !this.isProcessing) {
+        e.preventDefault();
+        this.handleAddToCart(button);
+      }
+    });
+
+    // Handle form submissions
+    document.addEventListener('submit', (e) => {
+      if (e.target.matches('.product-form, [action*="/cart/add"]')) {
+        e.preventDefault();
+        const button = e.target.querySelector('[data-add-to-cart], .add-to-cart-btn, .btn-add-to-cart, [type="submit"]');
+        if (button && !this.isProcessing) {
+          this.handleFormSubmit(e.target, button);
+        }
+      }
+    });
+  }
+
+  async handleAddToCart(button) {
+    // Get variant ID from multiple possible sources
+    const variantId = button.dataset.addToCart || 
+                     button.dataset.variantId || 
+                     button.form?.querySelector('[name="id"]')?.value ||
+                     document.querySelector('[name="id"]')?.value;
+                     
+    const quantity = parseInt(button.dataset.quantity) || 
+                    parseInt(button.form?.querySelector('[name="quantity"]')?.value) ||
+                    parseInt(document.querySelector('[name="quantity"]')?.value) || 1;
+                    
+    const productTitle = button.dataset.productTitle || 
+                        document.querySelector('.product-title, .product__title, [data-product-title]')?.textContent || 
+                        'Product';
+
+    console.log('🛒 handleAddToCart called:', { variantId, quantity, productTitle, button });
+
+    if (!variantId) {
+      console.error('❌ No variant ID found');
+      this.showToast('Please select a product variant', 'error');
+      return;
+    }
+
+    await this.addToCart(variantId, quantity, button, productTitle);
+  }
+
+  async handleFormSubmit(form, button) {
+    const formData = new FormData(form);
+    const variantId = formData.get('id');
+    const quantity = parseInt(formData.get('quantity')) || 1;
+    const productTitle = document.querySelector('.product-title')?.textContent || 'Product';
+
+    if (!variantId) {
+      console.error('❌ No variant ID in form');
+      this.showToast('Please select a product variant', 'error');
+      return;
+    }
+
+    await this.addToCart(variantId, quantity, button, productTitle);
+  }
+
+  async addToCart(variantId, quantity, button, productTitle) {
+    if (this.isProcessing) return;
+    
+    // Check rate limiting
+    const now = Date.now();
+    if (this.isRateLimited) {
+      this.showToast('Please wait before trying again', 'error');
+      return;
+    }
+    
+    if (now - this.lastRequestTime < this.minRequestInterval) {
+      this.showToast('Please wait a moment between requests', 'error');
+      return;
+    }
+    
+    this.isProcessing = true;
+    this.lastRequestTime = now;
+    const originalState = this.captureButtonState(button);
+
+    console.log('🛒 Starting add to cart process:', {
+      variantId,
+      quantity,
+      productTitle,
+      buttonClass: button.className,
+      isProcessing: this.isProcessing
+    });
+
+    try {
+      // Show loading state
+      this.showLoadingState(button);
+
+      // Make API call
+      const requestBody = {
+        id: variantId,
+        quantity: quantity
+      };
+      
+      console.log('📤 Sending request to /cart/add.js:', requestBody);
+
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      console.log('📥 Response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ API Error Response:', errorData);
+        
+        // Handle rate limiting specifically
+        if (response.status === 429) {
+          this.handleRateLimit();
+          throw new Error('Too many requests. Please wait a moment and try again.');
+        }
+        
+        throw new Error(this.getErrorMessage(response.status, errorData));
+      }
+
+      const data = await response.json();
+      console.log('✅ Added to cart successfully:', data);
+
+      // Success sequence
+      await this.playSuccessSequence(button, productTitle);
+      await this.updateCartCount();
+
+      // Reset button after delay
+      setTimeout(() => {
+        this.resetButton(button, originalState);
+        this.isProcessing = false;
+      }, 2500);
+
+    } catch (error) {
+      console.error('❌ Cart error:', error);
+      this.playErrorSequence(button, error.message);
+
+      // Reset button after shorter delay for errors
+      setTimeout(() => {
+        this.resetButton(button, originalState);
+        this.isProcessing = false;
+      }, 2000);
+    }
+  }
+
+  captureButtonState(button) {
+    return {
+      innerHTML: button.innerHTML,
+      disabled: button.disabled,
+      className: button.className,
+      style: button.style.cssText
+    };
+  }
+
+  showLoadingState(button) {
+    const loadingIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cart-loading-icon"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>';
+    
+    if (button.querySelector('.btn-text')) {
+      button.querySelector('.btn-text').innerHTML = loadingIcon;
+    } else {
+      button.innerHTML = loadingIcon;
+    }
+    
+    button.disabled = true;
+    button.classList.add('loading');
+  }
+
+  async playSuccessSequence(button, productTitle) {
+    // Success icon
+    const successIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+    
+    if (button.querySelector('.btn-text')) {
+      button.querySelector('.btn-text').innerHTML = successIcon;
+    } else {
+      button.innerHTML = successIcon;
+    }
+
+    button.classList.remove('loading');
+    button.classList.add('success');
+
+    // Rainbow animation
+    button.style.background = 'linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B)';
+    button.style.backgroundSize = '400% 400%';
+    button.style.animation = 'cart-rainbow-flow 3s ease infinite';
+    button.style.color = 'white';
+    button.style.border = 'none';
+    button.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.2)';
+    button.style.transform = 'scale(1.05)';
+    button.style.transition = 'transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+    button.style.boxShadow = '0 8px 30px rgba(255, 107, 107, 0.4)';
+
+    // Bounce back
+    setTimeout(() => {
+      button.style.transform = 'scale(1)';
+    }, 300);
+
+    // Effects
+    this.createParticles(button);
+    this.showToast(`${productTitle} added to cart!`, 'success');
+  }
+
+  playErrorSequence(button, message) {
+    const errorIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+    
+    if (button.querySelector('.btn-text')) {
+      button.querySelector('.btn-text').innerHTML = errorIcon;
+    } else {
+      button.innerHTML = errorIcon;
+    }
+
+    button.classList.remove('loading');
+    button.classList.add('error');
+    button.style.background = '#dc3545';
+    
+    this.showToast(message, 'error');
+  }
+
+  createParticles(button) {
+    const rect = button.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    
+    for (let i = 0; i < 8; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'cart-success-particle';
+      particle.style.left = `${centerX}px`;
+      particle.style.top = `${centerY}px`;
+      
+      const angle = (i * 45) * Math.PI / 180;
+      const distance = 40 + Math.random() * 20;
+      const endX = Math.cos(angle) * distance;
+      const endY = Math.sin(angle) * distance;
+      
+      particle.style.setProperty('--end-x', `${endX}px`);
+      particle.style.setProperty('--end-y', `${endY}px`);
+      
+      document.body.appendChild(particle);
+      
+      setTimeout(() => particle.remove(), 800);
+    }
+  }
+
+  showToast(message, type = 'success') {
+    // Remove existing toasts
+    document.querySelectorAll('.cart-toast').forEach(toast => toast.remove());
+
+    const toast = document.createElement('div');
+    toast.className = `cart-toast ${type}`;
+    toast.innerHTML = `
+      <div class="cart-toast-content">
+        <div class="cart-toast-icon">${type === 'success' ? '✅' : '❌'}</div>
+        <div class="cart-toast-text">${message}</div>
+        <button class="cart-toast-close" onclick="this.parentElement.parentElement.remove()">×</button>
+      </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
+  async updateCartCount() {
+    try {
+      const response = await fetch('/cart.js');
+      const cart = await response.json();
+      
+      // Update cart badges
+      document.querySelectorAll('[data-cart-count]').forEach(badge => {
+        badge.textContent = cart.item_count;
+        badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+      });
+      
+      // Animate cart indicators
+      document.querySelectorAll('[data-cart-indicator]').forEach(indicator => {
+        indicator.classList.add('cart-updated');
+        setTimeout(() => indicator.classList.remove('cart-updated'), 1000);
+      });
+
+      // Dispatch event for other components
+      document.dispatchEvent(new CustomEvent('cart:updated', {
+        detail: { cart }
+      }));
+
+    } catch (error) {
+      console.error('❌ Failed to update cart count:', error);
+    }
+  }
+
+  resetButton(button, originalState) {
+    button.innerHTML = originalState.innerHTML;
+    button.disabled = originalState.disabled;
+    button.className = originalState.className;
+    button.style.cssText = originalState.style;
+    button.classList.remove('loading', 'success', 'error');
+  }
+
+  handleRateLimit() {
+    this.isRateLimited = true;
+    console.warn('⚠️ Rate limited - implementing cooldown');
+    
+    // Reset rate limit after cooldown period
+    setTimeout(() => {
+      this.isRateLimited = false;
+      console.log('✅ Rate limit cooldown finished');
+    }, this.rateLimitCooldown);
+  }
+
+  getErrorMessage(status, errorData) {
+    switch (status) {
+      case 422:
+        return errorData?.description || 'Product is unavailable';
+      case 404:
+        return 'Product not found';
+      case 400:
+        return 'Invalid product selection';
+      case 429:
+        return 'Too many requests. Please wait a moment and try again.';
+      default:
+        return status >= 500 ? 'Server error. Please try again.' : 'Failed to add to cart';
+    }
+  }
+}
+
+// Initialize immediately - no waiting, no dependencies
+document.addEventListener('DOMContentLoaded', () => {
+  window.cartManager = new CartManager();
+});
+
+// Also initialize if DOM is already loaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.cartManager) {
+      window.cartManager = new CartManager();
+    }
+  });
+} else {
+  window.cartManager = new CartManager();
+}
+</script> 

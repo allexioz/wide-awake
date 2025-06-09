@@ -17,8 +17,9 @@
     {%- comment -%} Load Google Fonts - Poppins + Special Gothic Expanded One {%- endcomment -%}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
     
-    {%- comment -%} Lucide Icons {%- endcomment -%}
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    {%- comment -%} Lucide Icons with fallback {%- endcomment -%}
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" 
+            onerror="console.warn('Lucide icons blocked or failed to load. Using fallbacks.')"></script>
     
     <title>
       {{ page_title }}
