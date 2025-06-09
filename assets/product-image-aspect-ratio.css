@@ -1,0 +1,100 @@
+/* 
+ * Product Image 1:1 Aspect Ratio - Wide Awake Theme
+ * This file ensures all product images throughout the theme maintain a 1:1 aspect ratio
+ * Created: 2025
+ */
+
+/* Core Product Image Containers */
+.product-image,
+.main-image-container,
+.cart-item-image,
+.recommendation-image,
+.collection-product__image,
+.featured-product-image,
+.related-image {
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+}
+
+/* Product Image Elements */
+.product-image img,
+.main-image-container img,
+.main-image,
+.cart-item-image img,
+.recommendation-image img,
+.collection-product__image img,
+.featured-product-image img,
+.related-image img,
+.thumbnail img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Cart Item Images */
+.cart-item img,
+.cart__item img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+}
+
+/* Thumbnail Images */
+.thumbnail,
+.product-thumbnail {
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+}
+
+/* Collection and Grid Images */
+.product-card .product-image,
+.collection-product .product-image,
+.products-grid .product-image {
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Search Results and Quick View */
+.search-result-image,
+.quick-view-image,
+.product-modal-image {
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+}
+
+.search-result-image img,
+.quick-view-image img,
+.product-modal-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Ensure compatibility with image snippet */
+.image.product__image,
+.image.collection-product__image {
+  aspect-ratio: 1 / 1 !important;
+}
+
+.image.product__image img,
+.image.collection-product__image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .product-image,
+  .main-image-container {
+    aspect-ratio: 1 / 1 !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .product-image,
+  .main-image-container,
+  .cart-item-image {
+    border: 2px solid currentColor;
+  }
+} 

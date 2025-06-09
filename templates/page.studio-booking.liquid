@@ -1,0 +1,251 @@
+{{ 'studio-booking.css' | asset_url | stylesheet_tag }}
+
+<div class="booking-page">
+  <!-- Hero Section -->
+  <section class="booking-hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-eyebrow">Coffee Experience</span>
+        <h1 class="hero-title">{{ page.title | default: "Wide Awake Studio Sessions" }}</h1>
+        <p class="hero-subtitle">{{ page.content | strip_html | truncate: 150 | default: "An immersive coffee journey exploring the art and science of specialty coffee" }}</p>
+        
+        <div class="hero-highlights">
+          <div class="highlight">
+            <strong>3 Drinks</strong>
+            <span>Curated selections</span>
+          </div>
+          <div class="highlight">
+            <strong>3 Courses</strong>
+            <span>Food pairings</span>
+          </div>
+          <div class="highlight">
+            <strong>₱2,500</strong>
+            <span>per person</span>
+          </div>
+          <div class="highlight">
+            <strong>2 Hours</strong>
+            <span>Experience</span>
+          </div>
+        </div>
+        
+        <div class="hero-actions">
+          <a href="#booking-calendar" class="btn-primary">
+            <i data-lucide="calendar" class="btn-icon"></i>
+            Book Now
+          </a>
+          <a href="#details" class="btn-outline">
+            <i data-lucide="info" class="btn-icon"></i>
+            Learn More
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience Details -->
+  <section id="details" class="experience-details">
+    <div class="container">
+      <div class="details-content">
+        <h2>Your Coffee Journey</h2>
+        <p class="section-intro">Join us for an intimate coffee experience that goes beyond just tasting. Our studio sessions are designed to deepen your appreciation for specialty coffee through guided exploration of flavors, origins, and brewing techniques.</p>
+        
+        <div class="journey-steps">
+          <div class="step">
+            <div class="step-number">01</div>
+            <div class="step-content">
+              <h3>Welcome & Introduction</h3>
+              <p>Begin with a warm welcome as we introduce you to Wide Awake's philosophy and the day's coffee selections. Learn about the origins and processing methods of each coffee.</p>
+            </div>
+          </div>
+          
+          <div class="step">
+            <div class="step-number">02</div>
+            <div class="step-content">
+              <h3>First Coffee & Course</h3>
+              <p>Start with a bright, light roast paired with a complementary appetizer. Explore the nuances of acidity, sweetness, and origin characteristics through guided tasting.</p>
+            </div>
+          </div>
+          
+          <div class="step">
+            <div class="step-number">03</div>
+            <div class="step-content">
+              <h3>Second Coffee & Course</h3>
+              <p>Progress to a medium roast with balanced complexity, accompanied by a carefully selected main course that enhances the coffee's flavor profile.</p>
+            </div>
+          </div>
+          
+          <div class="step">
+            <div class="step-number">04</div>
+            <div class="step-content">
+              <h3>Third Coffee & Dessert</h3>
+              <p>Conclude with a rich, full-bodied coffee paired with a dessert that brings out the coffee's deeper notes and provides a perfect ending to your journey.</p>
+            </div>
+          </div>
+          
+          <div class="step">
+            <div class="step-number">05</div>
+            <div class="step-content">
+              <h3>Take-Home & Resources</h3>
+              <p>Leave with sample bags of the coffees you've tasted, brewing guides, and tasting notes to continue your coffee exploration at home.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="pricing-sidebar">
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3>Studio Session</h3>
+            <div class="price">
+              <span class="currency">₱</span>
+              <span class="amount">2,500</span>
+              <span class="period">per person</span>
+            </div>
+          </div>
+          
+          <div class="pricing-features">
+            <h4>What's Included:</h4>
+            <ul class="features-list">
+              <li><i data-lucide="coffee" class="feature-icon"></i> 3 Specialty coffee tastings</li>
+              <li><i data-lucide="utensils" class="feature-icon"></i> 3 Artfully paired food courses</li>
+              <li><i data-lucide="user" class="feature-icon"></i> Expert coffee educator</li>
+              <li><i data-lucide="book-open" class="feature-icon"></i> Comprehensive tasting notes</li>
+              <li><i data-lucide="gift" class="feature-icon"></i> Take-home coffee samples</li>
+              <li><i data-lucide="camera" class="feature-icon"></i> Photo opportunities</li>
+            </ul>
+          </div>
+          
+          <div class="pricing-action">
+            <a href="#booking-calendar" class="btn-book">
+              Book Your Session
+            </a>
+          </div>
+        </div>
+        
+        <div class="session-info">
+          <h4>Session Details</h4>
+          <div class="info-items">
+            <div class="info-item">
+              <i data-lucide="clock" class="info-icon"></i>
+              <div>
+                <strong>Duration</strong>
+                <span>Approximately 2 hours</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <i data-lucide="users" class="info-icon"></i>
+              <div>
+                <strong>Group Size</strong>
+                <span>Maximum 8 people</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <i data-lucide="map-pin" class="info-icon"></i>
+              <div>
+                <strong>Location</strong>
+                <span>Wide Awake Coffee Studio</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <i data-lucide="calendar" class="info-icon"></i>
+              <div>
+                <strong>Availability</strong>
+                <span>Tuesday - Sunday</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Calendar -->
+  <section id="booking-calendar" class="booking-calendar-section">
+    <div class="container">
+      <div class="calendar-header">
+        <h2>Book Your Studio Session</h2>
+        <p>Select your preferred date and time below. We'll send you a confirmation email with all the details.</p>
+      </div>
+      
+      <div class="calendar-container">
+        <!-- Calendly inline widget -->
+        <div class="calendly-inline-widget" data-url="https://calendly.com/wideawake-studio/coffee-session" style="min-width:320px;height:700px;"></div>
+        <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+      </div>
+      
+      <div class="booking-note">
+        <div class="note-content">
+          <i data-lucide="info" class="note-icon"></i>
+          <div>
+            <h4>Important Notes</h4>
+            <ul>
+              <li>Sessions require a minimum 24-hour advance booking</li>
+              <li>Full payment is required at the time of booking</li>
+              <li>Cancellations must be made at least 12 hours in advance for a full refund</li>
+              <li>Private group sessions (6-8 people) can be arranged upon request</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="faq-section">
+    <div class="container">
+      <h2>Frequently Asked Questions</h2>
+      
+      <div class="faq-grid">
+        <div class="faq-item">
+          <h3>Do I need coffee experience to attend?</h3>
+          <p>Not at all! Our sessions are designed for all experience levels, from coffee newcomers to enthusiasts. Our educators will guide you through everything.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>What if I have dietary restrictions?</h3>
+          <p>Please let us know about any dietary restrictions when booking. We can accommodate most dietary needs and will ensure suitable food pairings for your session.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Can I book for a group?</h3>
+          <p>Yes! We accommodate groups up to 8 people. For private group sessions or corporate events, please contact us directly to discuss arrangements.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>What should I bring?</h3>
+          <p>Just bring yourself and an open mind! We provide everything needed for the session, including notebooks for taking notes if you'd like.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Is parking available?</h3>
+          <p>Yes, we have dedicated parking spaces for our studio session guests. Detailed location information will be provided in your confirmation email.</p>
+        </div>
+        
+        <div class="faq-item">
+          <h3>Can I purchase coffee afterward?</h3>
+          <p>Absolutely! We offer exclusive discounts on any coffees featured in your session, and our full retail selection is available for purchase.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section class="contact-cta">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Have Questions?</h2>
+        <p>We're here to help make your coffee experience perfect. Get in touch with any questions about our studio sessions.</p>
+        <div class="cta-actions">
+          <a href="/pages/contact" class="btn-primary">
+            <i data-lucide="message-circle" class="btn-icon"></i>
+            Contact Us
+          </a>
+          <a href="tel:+639123456789" class="btn-outline">
+            <i data-lucide="phone" class="btn-icon"></i>
+            Call Us
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div> 

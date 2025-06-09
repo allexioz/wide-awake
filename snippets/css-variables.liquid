@@ -1,18 +1,96 @@
 {% style %}
-  {% # Loads all font variantions with display: swap %}
-  {{ settings.type_primary_font | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'weight', 'bold' | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
-  {{ settings.type_primary_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}
-
   :root {
-    --font-primary--family: {{ settings.type_primary_font.family }}, {{ settings.type_primary_font.fallback_families }};
-    --font-primary--style: {{ settings.type_primary_font.style }};
-    --font-primary--weight: {{ settings.type_primary_font.weight }};
-    --page-width: {{ settings.max_page_width }};
-    --page-margin: {{ settings.min_page_margin }}px;
-    --color-background: {{ settings.background_color }};
-    --color-foreground: {{ settings.foreground_color }};
-    --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
+    /* Wide Awake Colorful Studio Colors */
+    --color-primary: #5CBFEE; /* Ocean Blue - trust & freshness */
+    --color-secondary: #2c1810; /* Coffee brown - Wide Awake brand */
+    --color-accent: #E6983B; /* Sunrise Orange - warmth & creativity */
+    --color-background: #ffffff; /* Pure White background */
+    --color-foreground: #2c1810; /* Coffee brown text */
+    --color-muted: #7F8C8D; /* Cool gray muted text */
+    --color-light: #ECF0F1; /* Light gray background alternative */
+    --color-white: #ffffff;
+    --color-border: #BDC3C7; /* Subtle gray border */
+    
+    /* Vibrant Studio Colors */
+    --color-purple: #9B59B6; /* Lavender Purple */
+    --color-coral: #FF6B7A; /* Coral Pink */
+    --color-yellow: #F1C40F; /* Golden Yellow */
+    --color-mint: #1ABC9C; /* Mint Turquoise */
+    --color-rose: #E74C3C; /* Vibrant Rose */
+    --color-indigo: #3498DB; /* Bright Indigo */
+    
+    /* Typography - POPPINS ONLY */
+    --font-primary--family: 'Poppins';
+    --font-heading--family: 'Special Gothic Expanded One';
+    
+    /* Font sizes - Fluid typography using clamp() */
+    --font-size-h1: clamp(2rem, 5vw, 3.5rem);
+    --font-size-h2: clamp(1.75rem, 4vw, 2.5rem);
+    --font-size-h3: clamp(1.5rem, 3vw, 2rem);
+    --font-size-h4: clamp(1.25rem, 2.5vw, 1.5rem);
+    --font-size-body: clamp(1rem, 2vw, 1.125rem);
+    --font-size-small: clamp(0.875rem, 1.5vw, 1rem);
+    --line-height-base: 1.6;
+    --line-height-heading: 1.2;
+    
+    /* Spacing Scale */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-2xl: 4rem;
+    
+    /* Layout */
+    --page-width: 120rem;
+    --page-margin: 2rem;
+    --container-max-width: 1200px;
+    --border-radius: 8px;
+    --border-radius-large: 12px;
+    --border-radius-small: 4px;
+    
+    /* Colorful Shadows - Vibrant and modern */
+    --shadow-small: 0 2px 4px rgba(92, 191, 238, 0.15);
+    --shadow-medium: 0 4px 20px rgba(92, 191, 238, 0.12);
+    --shadow-large: 0 8px 30px rgba(155, 89, 182, 0.15);
+    --shadow-hero: 0 20px 40px rgba(230, 152, 59, 0.25);
+    
+    /* Transitions */
+    --transition-base: 0.3s ease;
+    --transition-fast: 0.15s ease;
+    --transition-slow: 0.5s ease;
+    
+    /* Z-index scale */
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-tooltip: 600;
+    
+    /* Content grid system */
+    --content-grid: 1fr min(var(--container-max-width), 100% - 2rem) 1fr;
+  }
+  
+  /* Responsive adjustments */
+  @media screen and (max-width: 749px) {
+    :root {
+      --page-margin: 1.5rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-2xl: 2.5rem;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    :root {
+      --page-margin: 1rem;
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 0.75rem;
+      --spacing-lg: 1rem;
+      --spacing-xl: 1.5rem;
+      --spacing-2xl: 2rem;
+    }
   }
 {% endstyle %}

@@ -1,0 +1,80 @@
+{% comment %}
+  Premium Filter Tabs - Coffee Categories with First Image Styling
+  
+  Parameters:
+  - all_count: Number for "All Coffee" tab
+  - smooth_count: Number for "Smooth & Sweet" taste profile
+  - bright_count: Number for "Light & Bright" taste profile
+  - complex_count: Number for "Complex & Expressive" taste profile
+{% endcomment %}
+
+<!-- Premium Filter Tabs -->
+<div class="filter-section" role="group" aria-label="Coffee filters">
+  <div class="filter-tabs" role="tablist">
+    <button 
+      class="filter-tab active" 
+      data-filter="all" 
+      data-analytics="filter_all"
+      role="tab"
+      aria-selected="true"
+      tabindex="0"
+      id="tab-all"
+      aria-controls="products-all">
+      <div class="tab-content">
+        <i data-lucide="coffee" class="tab-icon" aria-hidden="true"></i>
+        <div class="tab-text-group">
+          <span class="tab-text">All Coffee</span>
+          <span class="tab-count">{{ all_count | default: 0 }}</span>
+        </div>
+      </div>
+    </button>
+    
+    <button 
+      class="filter-tab" 
+      data-vibe="smooth-sweet" 
+      data-analytics="vibe_smooth"
+      aria-pressed="false"
+      title="Rich, low acidity coffee with chocolate and caramel notes"
+      aria-label="Filter by smooth and sweet taste profile">
+      <div class="tab-content">
+        <i data-lucide="droplets" class="tab-icon"></i>
+        <div class="tab-text-group">
+          <span class="tab-text">Smooth & Sweet</span>
+          <span class="tab-count">{{ smooth_count | default: 0 }}</span>
+        </div>
+      </div>
+    </button>
+    
+    <button 
+      class="filter-tab" 
+      data-vibe="light-bright" 
+      data-analytics="vibe_bright"
+      aria-pressed="false"
+      title="Crisp, high acidity with floral and citrus notes"
+      aria-label="Filter by light and bright taste profile">
+      <div class="tab-content">
+        <i data-lucide="sun" class="tab-icon"></i>
+        <div class="tab-text-group">
+          <span class="tab-text">Light & Bright</span>
+          <span class="tab-count">{{ bright_count | default: 0 }}</span>
+        </div>
+      </div>
+    </button>
+    
+    <button 
+      class="filter-tab" 
+      data-vibe="complex-expressive" 
+      data-analytics="vibe_complex"
+      aria-pressed="false"
+      title="Balanced, layered with unique processing notes"
+      aria-label="Filter by complex and expressive taste profile">
+      <div class="tab-content">
+        <i data-lucide="layers" class="tab-icon"></i>
+        <div class="tab-text-group">
+          <span class="tab-text">Complex & Expressive</span>
+          <span class="tab-count">{{ complex_count | default: 0 }}</span>
+        </div>
+      </div>
+    </button>
+  </div>
+</div> 

@@ -1,37 +1,94 @@
 /** Critical CSS for the theme. This file is included on every page. */
 
-/* Reset styles inspired by https://www.joshwcomeau.com/css/custom-css-reset/ */
-* {
-  box-sizing: border-box;
+/** 
+ * Wide Awake Theme - Critical CSS
+ * Following Shopify 2024 best practices for performance and accessibility
+ */
+
+/* Modern CSS Reset - Eliminates browser default margins and padding */
+*,
+*::before,
+*::after {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  display: flex;
-  flex-direction: column;
   margin: 0;
-  min-height: 100svh;
+  padding: 0;
+  border: 0;
+  outline: 0;
+}
+
+
+
+/* Font System - Poppins for body text, Special Gothic for headings */
+html,
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Headings use Special Gothic */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Special Gothic Expanded One', Impact, 'Arial Black', sans-serif;
+}
+
+/* CSS Reset based on modern CSS reset and Shopify recommendations */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html:focus-within {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 html:has(dialog[scroll-lock][open], details[scroll-lock][open]) {
   overflow: hidden;
 }
 
+/* Media elements */
 img,
 picture,
 video,
 canvas,
 svg {
-  display: block;
   max-width: 100%;
+  display: block;
   height: auto;
 }
 
+/* Form elements */
 input,
+button,
 textarea,
 select {
   font: inherit;
-  border-radius: var(--style-border-radius-inputs);
+  border-radius: var(--style-border-radius-inputs, 4px);
 }
 
 select {
@@ -39,14 +96,36 @@ select {
   color: currentcolor;
 }
 
-dialog {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
+/* Interactive elements */
+button {
+  cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
+/* Remove all animations, transitions and smooth scroll for people that prefer not to see them */
+@media (prefers-reduced-motion: reduce) {
+  html:focus-within {
+   scroll-behavior: auto;
+  }
+  
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Typography improvements */
 p {
   text-wrap: pretty;
 }
+
 p,
 h1,
 h2,
@@ -71,47 +150,518 @@ p:empty {
   margin-block-end: 0;
 }
 
-/** Theme styles below */
-body {
-  font-family: var(--font-primary--family);
+/* Dialog styles */
+dialog {
   background-color: var(--color-background);
   color: var(--color-foreground);
 }
 
-/** Section layout utilities */
+/* Product Image Aspect Ratio - 1:1 for all product images */
+.product-image {
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+}
 
-/**
- * Setup a grid that enables both full-width and constrained layouts
- * depending on the class of the child elements.
- *
- * By default, a minimum content margin is set on the left and right
- * sides of the section and the content is centered in the viewport to
- * not exceed the maximum page width.
- *
- * When a child element is given the `full-width` class, it will span
- * the entire viewport.
- */
+.product-image img,
+.main-image-container img,
+.main-image,
+.related-image img,
+.thumbnail img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Specific targeting for main product containers */
+.main-image-container {
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Ensure cart item images also follow 1:1 ratio */
+.cart-item img,
+.cart__item img {
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+}
+
+/* Collection and grid product images */
+.product-card .product-image,
+.collection-product-image,
+.featured-product-image {
+  aspect-ratio: 1 / 1 !important;
+}
+
+/* Accessibility improvements */
+.visually-hidden:not(:focus):not(:active) {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.skip-to-content-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  z-index: 9999;
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  padding: 8px;
+  text-decoration: none;
+  transition: top 0.3s;
+}
+
+.skip-to-content-link:focus {
+  top: 6px;
+}
+
+.focus-none {
+  outline: none;
+}
+
+/* Section layout utilities - Enhanced for better responsive behavior */
 .shopify-section {
   --content-width: min(
-    calc(var(--page-width) - var(--page-margin) * 2),
-    calc(100% - var(--page-margin) * 2)
+    calc(var(--page-width, 120rem) - var(--page-margin, 2rem) * 2),
+    calc(100% - var(--page-margin, 2rem) * 2)
   );
-  --content-margin: minmax(var(--page-margin), 1fr);
+  --content-margin: minmax(var(--page-margin, 2rem), 1fr);
   --content-grid: var(--content-margin) var(--content-width) var(--content-margin);
 
-  /* This is required to make <img> elements work as background images */
   position: relative;
-  grid-template-columns: var(--content-grid);
   display: grid;
+  grid-template-columns: var(--content-grid);
   width: 100%;
 }
 
-/* Child elements, by default, are constrained to the central column of the grid. */
 .shopify-section > * {
   grid-column: 2;
 }
 
-/* Child elements that use the full-width utility class span the entire viewport. */
 .shopify-section > .full-width {
   grid-column: 1 / -1;
 }
+
+/* Wide Awake Brand Design System */
+:root {
+  /* Brand Colors - Wide Awake Coffee */
+  --color-primary: #5CBFEE; /* Brand Blue */
+  --color-secondary: #2c1810; /* Dark coffee brown */
+  --color-accent: #d4574c; /* Accent red for promotions */
+  --color-background: #faf9f7; /* Light cream background */
+  --color-foreground: #2c1810; /* Dark text */
+  --color-muted: #666666; /* Muted text */
+  --color-light: #f4f4f4; /* Light background alternative */
+  --color-white: #ffffff;
+  --color-border: #e0e0e0; /* Light border color */
+  
+  /* Typography - Wide Awake Brand Fonts */
+  --font-primary--family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-heading--family: 'Special Gothic Expanded One', 'Arial Black', Arial, sans-serif;
+  
+  /* Font sizes - Fluid typography */
+  --font-size-h1: clamp(2rem, 5vw, 3.5rem);
+  --font-size-h2: clamp(1.75rem, 4vw, 2.5rem);
+  --font-size-h3: clamp(1.5rem, 3vw, 2rem);
+  --font-size-h4: clamp(1.25rem, 2.5vw, 1.5rem);
+  --font-size-body: clamp(1rem, 2vw, 1.125rem);
+  --font-size-small: clamp(0.875rem, 1.5vw, 1rem);
+  
+  /* Spacing system */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 1.5rem;
+  --spacing-lg: 2rem;
+  --spacing-xl: 3rem;
+  --spacing-2xl: 4rem;
+  
+  /* Layout */
+  --page-width: 120rem;
+  --page-margin: 2rem;
+  --container-max-width: 1200px;
+  --border-radius: 8px;
+  --border-radius-large: 12px;
+  
+  /* Shadows - Subtle and modern */
+  --shadow-small: 0 2px 4px rgba(44, 24, 16, 0.1);
+  --shadow-medium: 0 4px 20px rgba(44, 24, 16, 0.08);
+  --shadow-large: 0 8px 30px rgba(44, 24, 16, 0.15);
+  
+  /* Transitions */
+  --transition-base: 0.3s ease;
+  --transition-fast: 0.15s ease;
+  
+  /* Z-index scale */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-tooltip: 600;
+
+  /* Wide Awake Gradient System */
+  --gradient-rainbow: linear-gradient(-45deg, 
+    #FF6B6B,        /* Red */
+    #FF8E53,        /* Orange */
+    #FF6B35,        /* Orange-Red */
+    #F7DC6F,        /* Yellow */
+    #82E0AA,        /* Green */
+    #85C1E9,        /* Blue */
+    #BB8FCE,        /* Purple */
+    #FF6B6B         /* Back to Red for seamless loop */
+  );
+  --gradient-size: 400% 400%;
+  --gradient-animation-duration: 20s;
+}
+
+/* Typography system - Headings use Special Gothic */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400; /* Special Gothic Expanded One is bold by design */
+  line-height: 1.2;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-md);
+}
+
+h1 { font-size: var(--font-size-h1); }
+h2 { font-size: var(--font-size-h2); }
+h3 { font-size: var(--font-size-h3); }
+h4 { font-size: var(--font-size-h4); }
+h5 { font-size: var(--font-size-h4); }
+h6 { font-size: var(--font-size-body); }
+
+/* Body text - explicitly use Poppins */
+p,
+div,
+span,
+li,
+dd,
+dt,
+blockquote,
+figcaption,
+caption {
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+}
+
+p {
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Navigation and UI elements - use Poppins */
+nav,
+nav a,
+nav ul,
+nav li,
+.menu,
+.menu-item,
+.nav-link,
+.breadcrumb,
+.pagination {
+  font-family: var(--font-primary--family);
+}
+
+/* Product and commerce elements - use Poppins */
+.product-title:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6),
+.product-description,
+.product-price,
+.product-variant,
+.cart-item,
+.cart-note,
+.collection-description,
+.product-form,
+.variant-picker {
+  font-family: var(--font-primary--family);
+}
+
+/* Form elements - ensure they inherit Poppins */
+input,
+textarea,
+select,
+option,
+optgroup,
+button,
+.form-control,
+.field__input,
+.field__label {
+  font-family: var(--font-primary--family);
+}
+
+/* Links */
+a {
+  font-family: var(--font-primary--family);
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-base);
+}
+
+a:hover,
+a:focus {
+  color: var(--color-secondary);
+  text-decoration: underline;
+}
+
+/* Container system */
+.container {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Text alignment utilities */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+/* Button system - Following Shopify 2.0 patterns */
+.button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border: 2px solid transparent;
+  border-radius: var(--border-radius);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+  font-weight: 600;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  min-height: 44px; /* Accessibility - minimum touch target */
+  line-height: 1;
+}
+
+.button:disabled,
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button--primary,
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  border-color: var(--color-primary);
+}
+
+.button--primary:hover,
+.btn-primary:hover {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.button--secondary,
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.button--secondary:hover,
+.btn-secondary:hover {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+.button--outline,
+.btn-outline {
+  background-color: transparent;
+  color: var(--color-foreground);
+  border-color: var(--color-border);
+}
+
+.button--outline:hover,
+.btn-outline:hover {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+/* Wide Awake Gradient Design System */
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-rainbow {
+  background: var(--gradient-rainbow);
+  background-size: var(--gradient-size);
+  animation: gradientFlow var(--gradient-animation-duration) ease infinite;
+}
+
+.gradient-rainbow-static {
+  background: var(--gradient-rainbow);
+  background-size: var(--gradient-size);
+  background-position: 0% 50%;
+}
+
+.gradient-rainbow-hover:hover {
+  background: var(--gradient-rainbow);
+  background-size: var(--gradient-size);
+  animation: gradientFlow var(--gradient-animation-duration) ease infinite;
+  transition: all var(--transition-base);
+}
+
+/* Gradient Button Variants */
+.button--gradient,
+.btn-gradient {
+  background: var(--gradient-rainbow);
+  background-size: var(--gradient-size);
+  color: white;
+  border: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  animation: gradientFlow var(--gradient-animation-duration) ease infinite;
+}
+
+.button--gradient:hover,
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-large);
+  filter: brightness(1.1);
+}
+
+.button--gradient-hover,
+.btn-gradient-hover {
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  border-color: var(--color-primary);
+  transition: all var(--transition-base);
+}
+
+.button--gradient-hover:hover,
+.btn-gradient-hover:hover {
+  background: var(--gradient-rainbow);
+  background-size: var(--gradient-size);
+  color: white;
+  border: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  animation: gradientFlow var(--gradient-animation-duration) ease infinite;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-large);
+}
+
+/* Form elements */
+.field__input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"],
+input[type="number"],
+textarea,
+select {
+  width: 100%;
+  padding: var(--spacing-sm);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  transition: border-color var(--transition-base);
+}
+
+.field__input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+}
+
+/* Loading states */
+.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Responsive design - Mobile-first approach */
+@media screen and (max-width: 749px) {
+  :root {
+    --page-margin: 1.5rem;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .button,
+  .btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-small);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  :root {
+    --page-margin: 1rem;
+  }
+  
+  .container {
+    padding: 0 var(--spacing-xs);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+  }
+  
+  .button,
+  .btn {
+    border-width: 3px;
+  }
+}
+
+/* Print styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  
+  .button,
+  .btn {
+    border: 1px solid black;
+    background: none;
+  }
+}
+
+/* Focus management for better accessibility */
+.focus-inset {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.focus-outline {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+

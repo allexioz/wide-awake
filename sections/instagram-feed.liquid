@@ -1,0 +1,238 @@
+<section class="instagram-feed">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">{{ section.settings.eyebrow | default: "Follow the Journey" }}</span>
+      <h2 class="section-title">{{ section.settings.title | default: "@wideawakeph" }}</h2>
+      <p class="section-subtitle">{{ section.settings.subtitle | default: "Join our coffee community and see the latest from our roastery, farm visits, and coffee culture." }}</p>
+    </div>
+    
+    <div class="instagram-cta">
+      <a href="https://www.instagram.com/wideawakeph/" target="_blank" rel="noopener" class="instagram-link">
+        <div class="instagram-content">
+          <div class="instagram-icon-wrapper">
+            <i data-lucide="instagram" class="instagram-icon"></i>
+          </div>
+          <div class="instagram-info">
+            <h3>@wideawakeph</h3>
+            <p>{{ section.settings.follow_text | default: "Follow us for daily coffee inspiration" }}</p>
+          </div>
+          <div class="follow-button">
+            <i data-lucide="instagram" class="btn-icon"></i>
+            Follow Us
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .instagram-feed {
+    padding: 80px 0;
+    background: white;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .section-eyebrow {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #5CBFEE;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: #2c1810;
+    margin-bottom: 16px;
+  }
+
+  .section-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .instagram-cta {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .instagram-link {
+    display: block;
+    text-decoration: none;
+    background: linear-gradient(135deg, #E4405F 0%, #F77737 35%, #FCAF45 70%, #C13584 100%);
+    border-radius: 24px;
+    padding: 40px;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(228, 64, 95, 0.3);
+  }
+
+  .instagram-link:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(228, 64, 95, 0.4);
+  }
+
+  .instagram-content {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .instagram-icon-wrapper {
+    flex-shrink: 0;
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+
+  .instagram-icon {
+    width: 40px;
+    height: 40px;
+    color: white;
+  }
+
+  .instagram-info {
+    flex: 1;
+  }
+
+  .instagram-info h3 {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: 2rem;
+    color: white;
+    margin: 0 0 10px 0;
+  }
+
+  .instagram-info p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .follow-button {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .instagram-link:hover .follow-button {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+  }
+
+  .btn-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Mobile Responsive */
+  @media screen and (max-width: 768px) {
+    .instagram-feed {
+      padding: 60px 0;
+    }
+
+    .instagram-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 20px;
+    }
+
+    .instagram-link {
+      padding: 30px 20px;
+    }
+
+    .instagram-info h3 {
+      font-size: 1.6rem;
+    }
+
+    .instagram-info p {
+      font-size: 1rem;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .instagram-content {
+      gap: 15px;
+    }
+
+    .instagram-icon-wrapper {
+      width: 60px;
+      height: 60px;
+    }
+
+    .instagram-icon {
+      width: 30px;
+      height: 30px;
+    }
+
+    .follow-button {
+      padding: 14px 20px;
+      font-size: 0.9rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Instagram Feed",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Follow the Journey"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "@wideawakeph"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Join our coffee community and see the latest from our roastery, farm visits, and coffee culture."
+    },
+    {
+      "type": "text",
+      "id": "follow_text",
+      "label": "Follow Button Text",
+      "default": "Follow us for daily coffee inspiration"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Instagram Feed"
+    }
+  ]
+}
+{% endschema %} 

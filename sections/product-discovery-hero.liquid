@@ -1,0 +1,1924 @@
+{% comment %}
+  Wide Awake Product Discovery Hero
+  Modern ecommerce experience prioritizing immediate product access
+  Now with real Shopify product integration
+{% endcomment %}
+
+{% assign all_products = collections.all.products %}
+{% assign daily_driver_products = collections.daily-driver.products %}
+{% assign premium_brews_products = collections.premium-brews.products %}
+{% assign direct_trade_products = collections.direct-trade.products %}
+{% assign equipment_products = collections.equipment.products %}
+
+{% comment %} Product mapping based on CSV data {% endcomment %}
+{% assign product_segments = 'brazil-sao-silvestre:daily-driver,ethiopia-yirgacheffe:premium-brews,mt-apo-natural:direct-trade,buku-sayisa-natural-ethiopia:premium-brews,cofi-teresa:direct-trade,daybreak-espresso:daily-driver,finca-mierisch:premium-brews,fructifero-anaerobic:direct-trade,jeivert-hernandez:premium-brews,koke-shalaye:premium-brews,mt-apo-72hr:direct-trade,mt-apo-lactic-honey:direct-trade,mt-apo-lactic-washed:direct-trade,nensebo:premium-brews,nyeri-kenya:premium-brews,tanzania-kilimanjaro:daily-driver,vietnam-fine-robusta:daily-driver,veracruz-mexico:daily-driver,mola-cafec-filter:equipment,specialty-water-sachets:equipment,christmas-bundle-mt-apo-collection-lactic-honey-lot-g-01-lot-l-01:premium-brews,bundle-ethiopia-yirgacheffe-and-finca-mierisch-super-natural-100g-or-200g:premium-brews,bundle-kenya-nyeri-mexico-veracruz-tanzania-kilimanjaro-100g-x-3-or-200g-x-3:daily-driver' | split: ',' %}
+
+{% assign product_vibes = 'brazil-sao-silvestre:smooth-sweet,ethiopia-yirgacheffe:light-bright,mt-apo-natural:complex-expressive,buku-sayisa-natural-ethiopia:light-bright,cofi-teresa:light-bright,daybreak-espresso:smooth-sweet,finca-mierisch:complex-expressive,fructifero-anaerobic:complex-expressive,jeivert-hernandez:light-bright,koke-shalaye:light-bright,mt-apo-72hr:complex-expressive,mt-apo-lactic-honey:light-bright,mt-apo-lactic-washed:light-bright,nensebo:light-bright,nyeri-kenya:light-bright,tanzania-kilimanjaro:light-bright,vietnam-fine-robusta:smooth-sweet,veracruz-mexico:smooth-sweet,christmas-bundle-mt-apo-collection-lactic-honey-lot-g-01-lot-l-01:complex-expressive,bundle-ethiopia-yirgacheffe-and-finca-mierisch-super-natural-100g-or-200g:light-bright,bundle-kenya-nyeri-mexico-veracruz-tanzania-kilimanjaro-100g-x-3-or-200g-x-3:light-bright' | split: ',' %}
+
+{% comment %} Count products by vibe {% endcomment %}
+{% assign smooth_sweet_count = 0 %}
+{% assign light_bright_count = 0 %}
+{% assign complex_expressive_count = 0 %}
+
+{% for product in all_products %}
+  {% assign product_handle = product.handle %}
+  {% assign current_vibe = 'smooth-sweet' %}
+  
+  {% for vibe_mapping in product_vibes %}
+    {% assign mapping_parts = vibe_mapping | split: ':' %}
+    {% if mapping_parts[0] == product_handle %}
+      {% assign current_vibe = mapping_parts[1] %}
+      {% break %}
+    {% endif %}
+  {% endfor %}
+  
+  {% case current_vibe %}
+    {% when 'smooth-sweet' %}
+      {% assign smooth_sweet_count = smooth_sweet_count | plus: 1 %}
+    {% when 'light-bright' %}
+      {% assign light_bright_count = light_bright_count | plus: 1 %}
+    {% when 'complex-expressive' %}
+      {% assign complex_expressive_count = complex_expressive_count | plus: 1 %}
+  {% endcase %}
+{% endfor %}
+
+<section class="product-discovery-hero">
+  <div class="discovery-container">
+    <!-- Quick Value Prop -->
+    <div class="discovery-header">
+      <h1 class="discovery-title">{{ section.settings.title | default: "Discover Your Perfect Coffee Journey" }}</h1>
+      <p class="discovery-subtitle">{{ section.settings.subtitle | default: "Wake up to artisan-crafted specialty coffee, ethically sourced and freshly roasted in the Philippines. From your everyday morning ritual to extraordinary single-origin adventures - find the coffee that speaks to your soul." }}</p>
+    </div>
+
+    <!-- Enhanced Smart Filter Navigation with Sticky Behavior -->
+    <div class="smart-filters-wrapper" id="smartFilters">
+      <div class="smart-filters-sticky" data-sticky-filters>
+        <div class="smart-filters">
+          <div class="filter-header">
+            <div class="filter-header-left">
+              <h2 class="filter-main-title">
+                <i data-lucide="filter" class="filter-icon" aria-hidden="true"></i>
+                Filter Coffee
+              </h2>
+              <div class="filter-results-summary" id="filterSummary" aria-live="polite">
+                <span class="results-count">{{ all_products.size }}</span> products
+              </div>
+            </div>
+            <div class="filter-header-right">
+              <button class="filter-toggle-mobile" id="filterToggle" aria-expanded="false" aria-controls="filterContent">
+                <span class="filter-toggle-text">Filters</span>
+                <i data-lucide="chevron-down" class="filter-toggle-icon" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-content" id="filterContent">
+            {% render 'category-filters', 
+              all_count: all_products.size,
+              smooth_count: smooth_sweet_count,
+              bright_count: light_bright_count,
+              complex_count: complex_expressive_count %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Real Product Grid -->
+    <div class="instant-products">
+      {% comment %} Display ALL products but hide excess ones for pagination {% endcomment %}
+      {% assign products_to_show = section.settings.products_per_page | default: 8 %}
+      <div class="product-grid" id="productGrid" data-total-products="{{ all_products.size }}" data-products-per-page="{{ products_to_show }}">
+        
+        {% for product in all_products %}
+          {% assign product_handle = product.handle %}
+          {% assign product_segment = 'daily-driver' %}
+          {% assign product_vibe = 'smooth-sweet' %}
+          
+          {% comment %} Map product to segment and vibe based on CSV data {% endcomment %}
+          {% for segment_mapping in product_segments %}
+            {% assign mapping_parts = segment_mapping | split: ':' %}
+            {% if mapping_parts[0] == product_handle %}
+              {% assign product_segment = mapping_parts[1] %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          
+          {% for vibe_mapping in product_vibes %}
+            {% assign mapping_parts = vibe_mapping | split: ':' %}
+            {% if mapping_parts[0] == product_handle %}
+              {% assign product_vibe = mapping_parts[1] %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          
+          {% comment %} Set segment display name and badge class {% endcomment %}
+          {% case product_segment %}
+            {% when 'daily-driver' %}
+              {% assign segment_display = 'Daily Driver' %}
+              {% assign segment_class = '' %}
+            {% when 'premium-brews' %}
+              {% assign segment_display = 'Premium Brews' %}
+              {% assign segment_class = 'premium' %}
+            {% when 'direct-trade' %}
+              {% assign segment_display = 'Direct Trade' %}
+              {% assign segment_class = 'direct' %}
+            {% when 'equipment' %}
+              {% assign segment_display = 'Equipment' %}
+              {% assign segment_class = 'equipment' %}
+            {% else %}
+              {% assign segment_display = 'Coffee' %}
+              {% assign segment_class = '' %}
+          {% endcase %}
+          
+          {% comment %} Set vibe display {% endcomment %}
+          {% case product_vibe %}
+            {% when 'smooth-sweet' %}
+              {% assign vibe_display = '🍯 Smooth and Sweet' %}
+            {% when 'light-bright' %}
+              {% assign vibe_display = '🍋 Light and Bright' %}
+            {% when 'complex-expressive' %}
+              {% assign vibe_display = '🎭 Complex and Expressive' %}
+            {% else %}
+              {% assign vibe_display = '☕ Great Coffee' %}
+          {% endcase %}
+
+          {% render 'product-card', 
+            product: product,
+            show_quick_view: true,
+            show_flavor_notes: true,
+            lazy_load: true,
+            card_class: 'product-card--secondary-cart' %}
+        {% endfor %}
+
+        <!-- Empty State -->
+        {% if filtered_products.size == 0 %}
+          <div class="empty-state">
+            <div class="empty-state-content">
+              <i data-lucide="coffee" class="empty-state-icon"></i>
+              <h3 class="empty-state-title">No products found</h3>
+              <p class="empty-state-message">
+                We couldn't find any products matching your current selection. 
+                Try adjusting your filters or explore our complete collection.
+              </p>
+              <div class="empty-state-actions">
+                <button class="btn-secondary" onclick="resetAllFilters()">Reset Filters</button>
+                <a href="{{ collections.all.url }}" class="btn-primary">View All Coffee</a>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination Section (Full Width) -->
+  {% assign total_pages = all_products.size | divided_by: products_to_show | ceil %}
+  {% if total_pages > 1 %}
+    <div class="pagination-section-fullwidth">
+      <div class="pagination-content">
+        <div class="pagination-info">
+          <span>Page <span class="current-page">1</span> of <span class="total-pages">{{ total_pages }}</span></span>
+          <span class="products-count">{{ products_to_show }} of {{ all_products.size }} products</span>
+        </div>
+        
+        <div class="pagination-controls">
+          <button class="pagination-btn prev-btn" disabled data-page="prev">
+            <i data-lucide="chevron-left" class="pagination-icon"></i>
+            Previous
+          </button>
+          
+          <div class="pagination-numbers">
+            {% for i in (1..total_pages) %}
+              {% if i <= 5 or total_pages <= 7 %}
+                <button class="pagination-number {% if i == 1 %}active{% endif %}" data-page="{{ i }}">{{ i }}</button>
+              {% elsif i == 6 and total_pages > 7 %}
+                <span class="pagination-ellipsis">...</span>
+                <button class="pagination-number" data-page="{{ total_pages }}">{{ total_pages }}</button>
+                {% break %}
+              {% endif %}
+            {% endfor %}
+          </div>
+          
+          <button class="pagination-btn next-btn" {% if total_pages == 1 %}disabled{% endif %} data-page="next">
+            Next
+            <i data-lucide="chevron-right" class="pagination-icon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Quick Actions Bar -->
+  <div class="discovery-container">
+    <div class="quick-actions-bar">
+      <div class="action-item">
+        <i data-lucide="truck" class="action-icon"></i>
+        <div class="action-text">
+          <strong>Free shipping</strong>
+          <span>On orders over {{ settings.free_shipping_threshold | default: 1000 | money }}</span>
+        </div>
+      </div>
+      <div class="action-item">
+        <i data-lucide="calendar" class="action-icon"></i>
+        <div class="action-text">
+          <strong>Roast days</strong>
+          <span>Monday to Friday</span>
+        </div>
+      </div>
+      <div class="action-item">
+        <i data-lucide="heart-handshake" class="action-icon"></i>
+        <div class="action-text">
+          <strong>Direct trade</strong>
+          <span>Supporting Filipino farmers</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% comment %} Quick View Modal {% endcomment %}
+  <div id="quickViewModal" class="quick-view-overlay" style="display: none;">
+    <div class="quick-view-modal">
+      <div class="quick-view-content">
+        <!-- Close Button -->
+        <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close quick view">
+          <i data-lucide="x" class="close-icon"></i>
+        </button>
+
+        <!-- Product Image Section -->
+        <div class="quick-view-image-section">
+          <div class="quick-view-image-container">
+            <img id="quickViewImage" src="" alt="" class="quick-view-image">
+            <div class="quick-view-badge" id="quickViewBadge" style="display: none;">
+              <span class="badge-text"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Details Section -->
+        <div class="quick-view-details-section">
+          <div class="quick-view-header">
+            <p class="quick-view-vendor quick-view-subtitle" id="quickViewVendor">QUICK VIEW</p>
+            <h2 class="quick-view-title" id="quickViewTitle">Product Name</h2>
+            <div class="quick-view-price" id="quickViewPrice">
+              <span class="price-current">₱0.00</span>
+              <span class="price-compare" style="display: none;"></span>
+            </div>
+          </div>
+
+          <form class="quick-view-form" id="quickViewForm">
+            <!-- Variant Options Container -->
+            <div class="quick-view-options" id="quickViewOptions">
+              <!-- Dynamically populated variant options -->
+            </div>
+
+            <!-- Quantity Selector -->
+            <div class="quantity-section quick-view-quantity">
+              <label class="quantity-label">Quantity</label>
+              <div class="quantity-controls">
+                <button type="button" class="quantity-btn quantity-decrease" onclick="updateQuantity(-1)" aria-label="Decrease quantity">−</button>
+                <input type="number" class="quantity-input" id="quickViewQuantity" value="1" min="1" max="99">
+                <button type="button" class="quantity-btn quantity-increase" onclick="updateQuantity(1)" aria-label="Increase quantity">+</button>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="quick-view-actions quick-view-buttons">
+              <button type="submit" class="btn-add-to-cart quick-view-btn btn-primary" id="quickViewAddToCart">
+                <i data-lucide="shopping-cart" class="btn-icon"></i>
+                ADD TO CART
+              </button>
+              <button type="button" class="btn-buy-now quick-view-btn btn-secondary" id="quickViewBuyNow">
+                BUY IT NOW
+              </button>
+            </div>
+
+            <!-- Subscription Info (if applicable) -->
+            <div class="subscription-info" id="quickViewSubscription" style="display: none;">
+              <div class="subscription-icon-wrapper">
+                <i data-lucide="refresh-cw" class="subscription-icon"></i>
+                <span class="subscription-text">Subscription details</span>
+              </div>
+              <p class="subscription-description" id="subscriptionDescription"></p>
+            </div>
+
+            <!-- Product Features -->
+            <div class="quick-view-features" id="quickViewFeatures">
+              <!-- Dynamically populated features -->
+            </div>
+          </form>
+
+          <!-- View Full Details Link -->
+          <div class="view-details-section">
+            <a href="#" class="view-details-link quick-view-details-link" id="quickViewDetailsLink">
+              VIEW FULL DETAILS
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% comment %} Include standardized product card styles {% endcomment %}
+{% render 'product-card-styles' %}
+
+{% stylesheet %}
+  .product-discovery-hero {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f0f8ff 100%);
+    padding: 60px 0;
+    min-height: 90vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .discovery-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .discovery-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .discovery-title {
+    font-family: var(--font-heading--family), sans-serif;
+    font-size: var(--font-size-h1);
+    color: var(--color-foreground);
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: var(--line-height-heading);
+  }
+
+  .discovery-subtitle {
+    font-family: var(--font-primary--family), sans-serif;
+    font-size: var(--font-size-body);
+    color: var(--color-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: var(--line-height-base);
+  }
+
+  /* Smart Filters - Copy from collection styles */
+  .smart-filters-wrapper {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 2rem;
+  }
+
+  .smart-filters-sticky {
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+    background: rgba(250, 250, 250, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 1.5rem 0;
+  }
+
+  .smart-filters {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .filter-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-main-title {
+    font-family: var(--font-heading--family), sans-serif;
+    font-size: var(--font-size-h4);
+    font-weight: 400;
+    margin: 0;
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: -0.01em;
+    line-height: var(--line-height-heading);
+  }
+
+  .filter-icon {
+    width: 20px;
+    height: 20px;
+    color: #5CBFEE;
+  }
+
+  #filterSummary.filter-results-summary {
+    color: var(--color-muted) !important;
+    font-family: var(--font-primary--family), sans-serif !important;
+    font-weight: 500 !important;
+    font-size: var(--font-size-small) !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  #filterSummary .results-count {
+    color: var(--color-secondary) !important;
+    font-family: var(--font-primary--family), sans-serif !important;
+    font-weight: 600 !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    display: inline !important;
+  }
+
+  .filter-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .filter-toggle-mobile {
+    display: none;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    font-family: var(--font-primary--family), sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-base);
+    color: var(--color-foreground);
+  }
+
+  .filter-toggle-icon {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s ease;
+  }
+
+  .filter-toggle-mobile[aria-expanded="true"] .filter-toggle-icon {
+    transform: rotate(180deg);
+  }
+
+  .filter-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Filter Styles */
+  {% render 'filter-styles-css' %}
+
+
+
+  /* Empty State */
+  .empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    padding: 60px 20px;
+  }
+
+  .empty-state-content {
+    text-align: center;
+    max-width: 500px;
+  }
+
+  .empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 24px;
+    color: #5CBFEE;
+    stroke-width: 1.5;
+  }
+
+  .empty-state-title {
+    font-family: var(--font-heading--family), sans-serif;
+    font-size: var(--font-size-h3);
+    font-weight: 600;
+    color: var(--color-secondary);
+    margin-bottom: 16px;
+    line-height: var(--line-height-heading);
+  }
+
+  .empty-state-message {
+    font-family: var(--font-primary--family), sans-serif;
+    color: var(--color-muted);
+    line-height: var(--line-height-base);
+    margin-bottom: 32px;
+    font-size: var(--font-size-body);
+  }
+
+  .empty-state-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary, .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary--family), sans-serif;
+    font-weight: 500;
+    font-size: var(--font-size-small);
+    text-decoration: none;
+    border: 2px solid;
+    cursor: pointer;
+    transition: var(--transition-base);
+  }
+
+  .btn-primary {
+    background: #5CBFEE;
+    color: white;
+    border-color: #5CBFEE;
+  }
+
+  .btn-primary:hover {
+    background: #4a9fd1;
+    border-color: #4a9fd1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(92, 191, 238, 0.2);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: #2c1810;
+    border-color: #eee;
+  }
+
+  .btn-secondary:hover {
+    border-color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.02);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(92, 191, 238, 0.1);
+  }
+
+  /* Product Grid - Now using standardized product cards */
+  .instant-products {
+    margin-bottom: 60px;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+    justify-content: start;
+  }
+
+  /* Pagination Section - Full Width & Minimal */
+  .pagination-section-fullwidth {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    margin-top: 40px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .pagination-content {
+    padding: 30px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .pagination-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pagination-info span {
+    font-family: var(--font-primary--family), sans-serif;
+    color: var(--color-muted);
+    font-size: var(--font-size-small);
+    font-weight: 500;
+  }
+
+  .current-page, .total-pages {
+    font-weight: 700;
+    color: var(--color-secondary);
+  }
+
+  .products-count {
+    font-size: 0.85rem !important;
+    opacity: 0.8;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--color-white);
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    padding: 10px 16px;
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary--family), sans-serif;
+    font-weight: 500;
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: var(--transition-base);
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    border-color: #5CBFEE;
+    color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.05);
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pagination-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+  }
+
+  .pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 8px;
+  }
+
+  .pagination-number {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-white);
+    color: var(--color-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary--family), sans-serif;
+    font-weight: 500;
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: var(--transition-base);
+  }
+
+  .pagination-number:hover {
+    border-color: #5CBFEE;
+    color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.05);
+  }
+
+  .pagination-number.active {
+    background: #5CBFEE;
+    color: white;
+    border-color: #5CBFEE;
+  }
+
+  .pagination-ellipsis {
+    padding: 0 8px;
+    color: var(--color-muted);
+    font-family: var(--font-primary--family), sans-serif;
+    font-weight: 500;
+  }
+
+  /* Quick Actions Bar */
+  .quick-actions-bar {
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+    border-radius: 20px;
+    padding: 25px 20px;
+    margin-top: 40px;
+    box-shadow: 0 6px 25px rgba(92, 191, 238, 0.3);
+    flex-wrap: wrap;
+    gap: 25px;
+    border: none;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .quick-actions-bar:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(92, 191, 238, 0.4);
+  }
+
+  .quick-actions-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 3s ease;
+    animation: shimmer 4s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  .action-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    z-index: 2;
+    transition: transform 0.3s ease;
+  }
+
+  .action-item:hover {
+    transform: translateY(-2px);
+  }
+
+  .action-icon {
+    width: 24px;
+    height: 24px;
+    color: white;
+  }
+
+  .action-text {
+    font-family: var(--font-primary--family), sans-serif;
+  }
+
+  .action-text strong {
+    display: block;
+    color: var(--color-white);
+    font-weight: 600;
+    font-size: var(--font-size-small);
+  }
+
+  .action-text span {
+    font-size: var(--font-size-small);
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Enhanced Responsive Design */
+  @media screen and (max-width: 1200px) {
+    .filter-tabs {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+    
+    .vibe-buttons {
+      grid-template-columns: 1fr;
+    }
+
+    .product-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .product-discovery-hero {
+      padding: 30px 0;
+    }
+
+    .discovery-container {
+      padding: 0 16px;
+    }
+
+    .smart-filters {
+      padding: 18px 16px;
+      border-radius: 16px;
+    }
+
+    .smart-filters-sticky.is-stuck .smart-filters {
+      padding: 12px 16px;
+      border-radius: 0 0 16px 16px;
+    }
+
+    .filter-header {
+      margin-bottom: 16px;
+    }
+
+    .filter-main-title {
+      font-size: var(--font-size-h4);
+    }
+
+    .filter-toggle-mobile {
+      display: flex;
+    }
+
+    .filter-content {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    .filter-content.expanded {
+      max-height: 1000px;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .filter-section-title {
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .filter-section {
+      margin-bottom: 16px;
+    }
+
+    .filter-tabs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+    }
+
+    .filter-tab {
+      min-width: auto;
+    }
+
+    .tab-content {
+      padding: 12px 16px;
+      gap: 8px;
+    }
+
+    .tab-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .tab-text {
+      font-size: 0.8rem;
+    }
+
+    .tab-count {
+      padding: 2px 6px;
+      font-size: 0.7rem;
+    }
+
+    .vibe-buttons-compact {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .vibe-btn-compact {
+      padding: 12px 14px;
+    }
+
+    .discovery-title {
+      font-size: var(--font-size-h1);
+    }
+
+    .product-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .product-card {
+      border-radius: 16px;
+      max-width: none;
+    }
+
+    .product-info {
+      padding: 20px;
+    }
+
+    .product-name {
+      font-size: 1.15rem;
+      margin-bottom: 14px;
+      min-height: 2.8rem;
+    }
+
+    .product-price {
+      font-size: 1.3rem;
+      margin-bottom: 18px;
+    }
+
+    .price-regular,
+    .price-from-amount,
+    .price-sale {
+      font-size: 1.3rem;
+    }
+
+    .price-from-text {
+      font-size: 0.9rem;
+    }
+
+    .product-actions {
+      gap: 10px;
+    }
+
+    .view-product-btn {
+      font-size: 0.95rem;
+      padding: 12px 16px;
+    }
+
+    .quick-add-btn {
+      width: 44px;
+      height: 44px;
+      padding: 12px;
+    }
+
+    .cart-toast {
+      right: 10px;
+      left: 10px;
+      min-width: auto;
+      max-width: none;
+    }
+
+    .btn-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .quick-actions-bar {
+      flex-direction: column;
+      text-align: left;
+      padding: 20px 16px;
+      gap: 16px;
+      border-radius: 12px;
+      margin-top: 32px;
+    }
+
+    .action-item {
+      justify-content: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .action-item:last-child {
+      border-bottom: none;
+    }
+
+    .action-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    .action-text strong {
+      font-size: 0.9rem;
+      margin-bottom: 2px;
+    }
+
+    .action-text span {
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    .pagination-content {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 20px;
+      padding: 24px 20px;
+    }
+
+    .pagination-info {
+      align-items: center;
+    }
+
+    .pagination-controls {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pagination-numbers {
+      order: -1;
+      margin: 0 0 12px 0;
+    }
+
+    .pagination-btn {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+
+    .pagination-number {
+      width: 36px;
+      height: 36px;
+      font-size: 0.85rem;
+    }
+  }
+
+  /* Cart count animation */
+  .cart-count {
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  /* Improved button interactions */
+  .quick-add-btn:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+
+  .quick-add-btn.loading:active {
+    transform: translateY(-1px) scale(1);
+  }
+
+  /* Better focus states for accessibility */
+  .quick-add-btn:focus-visible {
+    outline: 3px solid #5CBFEE;
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .quick-add-btn,
+    .quick-add-btn .btn-content,
+    .quick-add-btn .btn-loading,
+    .quick-add-btn .btn-success,
+    .quick-add-btn .btn-error,
+    .cart-count,
+    .cart-toast {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .filter-header {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    .filter-header-left {
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .filter-header-right {
+      justify-content: space-between;
+    }
+
+    .filter-tabs {
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .tab-content {
+      padding: 10px 12px;
+      gap: 6px;
+    }
+
+    .tab-text {
+      font-size: 0.75rem;
+    }
+
+    .tab-count {
+      padding: 1px 4px;
+      font-size: 0.65rem;
+    }
+
+    .vibe-btn {
+      padding: 14px;
+    }
+
+    .vibe-name {
+      font-size: 0.85rem;
+    }
+
+    .vibe-desc {
+      font-size: 0.75rem;
+    }
+
+    .product-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .product-actions {
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .btn-outline,
+    .btn-primary {
+      padding: 14px 18px;
+    }
+
+    .discovery-title {
+      font-size: var(--font-size-h2);
+    }
+
+    .discovery-subtitle {
+      font-size: var(--font-size-body);
+    }
+
+    /* Compact vibe buttons mobile adjustments */
+    .vibe-buttons-compact {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .vibe-btn-compact {
+      justify-content: flex-start;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .vibe-label {
+      font-size: 0.8rem;
+    }
+
+    .quick-actions-bar {
+      padding: 16px 12px;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .action-item {
+      padding: 10px 0;
+      gap: 10px;
+    }
+
+    .action-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    .action-text strong {
+      font-size: 0.85rem;
+    }
+
+    .action-text span {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* Focus and keyboard navigation styles */
+  .filter-tab:focus-visible,
+  .vibe-btn-compact:focus-visible {
+    outline: 3px solid #5CBFEE;
+    outline-offset: 2px;
+  }
+
+  .filter-toggle-mobile:focus-visible,
+  .clear-all-filters:focus-visible {
+    outline: 3px solid #5CBFEE;
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    .smart-filters-sticky,
+    .filter-tab,
+    .vibe-btn-compact,
+    .filter-content,
+    .filter-toggle-icon,
+    .clear-all-filters {
+      transition: none !important;
+    }
+
+    .filter-tab::before {
+      display: none;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .filter-tab,
+    .vibe-btn-compact {
+      border-width: 3px;
+    }
+
+    .filter-tab.active,
+    .vibe-btn-compact.active {
+      border-color: ButtonText;
+      background: ButtonFace !important;
+      color: ButtonText !important;
+    }
+
+    /* Override taste profile gradients in high contrast mode */
+    .filter-tab[data-vibe="smooth-sweet"].active,
+    .filter-tab[data-vibe="light-bright"].active,
+    .filter-tab[data-vibe="complex-expressive"].active,
+    .filter-tabs .filter-tab[data-vibe].active {
+      background: ButtonFace !important;
+      color: ButtonText !important;
+      box-shadow: none !important;
+    }
+  }
+
+  /* Animation improvements */
+  .product-card {
+    animation: fadeInUp 0.6s ease-out;
+    animation-fill-mode: both;
+  }
+
+  .product-card:nth-child(1) { animation-delay: 0.1s; }
+  .product-card:nth-child(2) { animation-delay: 0.2s; }
+  .product-card:nth-child(3) { animation-delay: 0.3s; }
+  .product-card:nth-child(4) { animation-delay: 0.4s; }
+  .product-card:nth-child(5) { animation-delay: 0.5s; }
+  .product-card:nth-child(6) { animation-delay: 0.6s; }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Cart Notification Toast */
+  .cart-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    animation: slideInFromRight 0.3s ease;
+    min-width: 300px;
+    max-width: 400px;
+    border-left: 4px solid transparent;
+    border-image: linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B) 1;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+  }
+
+  .cart-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .cart-toast.error {
+    border-left-color: #dc3545;
+  }
+
+  .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    font-family: var(--font-primary--family), sans-serif;
+  }
+
+  .toast-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .toast-text {
+    font-weight: 500;
+    color: var(--color-secondary);
+    flex: 1;
+  }
+
+  .toast-close {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+  }
+
+  .toast-close:hover {
+    background-color: #f0f0f0;
+  }
+
+  @keyframes slideInFromRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* High contrast and accessibility */
+  @media (prefers-contrast: high) {
+    .product-card {
+      border: 2px solid #2c1810;
+    }
+    
+    .badge {
+      border: 2px solid currentColor;
+    }
+    
+    .btn-outline {
+      border-width: 2px;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .product-card,
+    .filter-tab,
+    .vibe-btn-compact,
+    .btn-primary,
+    .btn-outline,
+    .quick-add-btn {
+      transition: none;
+      animation: none;
+    }
+    
+    .product-card:hover {
+      transform: none;
+    }
+    
+    .product-card:hover .product-image img {
+      transform: none;
+    }
+  }
+
+  /* Filter Styles */
+  {% render 'filter-styles-css' %}
+
+  /* Ensure taste profile gradients work on homepage - Higher specificity */
+  .smart-filters .filter-tab[data-vibe="smooth-sweet"].active,
+  .product-discovery-hero .filter-tab[data-vibe="smooth-sweet"].active {
+    background: linear-gradient(135deg, #F1C40F 0%, #E6983B 100%) !important;
+    box-shadow: 0 12px 32px rgba(241, 196, 15, 0.35) !important;
+  }
+
+  .smart-filters .filter-tab[data-vibe="light-bright"].active,
+  .product-discovery-hero .filter-tab[data-vibe="light-bright"].active {
+    background: linear-gradient(135deg, #FF6B7A 0%, #FF8E53 100%) !important;
+    box-shadow: 0 12px 32px rgba(255, 107, 122, 0.35) !important;
+  }
+
+  .smart-filters .filter-tab[data-vibe="complex-expressive"].active,
+  .product-discovery-hero .filter-tab[data-vibe="complex-expressive"].active {
+    background: linear-gradient(135deg, #1ABC9C 0%, #5CBFEE 100%) !important;
+    box-shadow: 0 12px 32px rgba(26, 188, 156, 0.35) !important;
+  }
+
+  .smart-filters .filter-tab[data-filter="all"].active,
+  .product-discovery-hero .filter-tab[data-filter="all"].active {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+    box-shadow: 0 12px 32px rgba(92, 191, 238, 0.4) !important;
+  }
+
+  /* Touch-friendly states - handled by standardized component */
+
+  /* Improved loading states with shimmer */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .product-image:not(:has(img[src])) {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Container queries for better responsive performance */
+  @container (max-width: 400px) {
+    .product-card {
+      transition-duration: 0.15s;
+    }
+    
+    .product-card:hover {
+      transform: translate3d(0, -8px, 0);
+    }
+    
+    .product-card:hover .product-image img {
+      transform: scale3d(1.03, 1.03, 1);
+    }
+  }
+
+  /* Quick View Modal Styles */
+  .quick-view-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0) !important;
+    backdrop-filter: blur(0px) !important;
+    z-index: 9999 !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.15s ease, backdrop-filter 0.2s ease !important;
+  }
+
+  .quick-view-overlay[style*="display: flex"] {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  .quick-view-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  .quick-view-overlay.closing {
+    opacity: 0 !important;
+    transition: opacity 0.25s ease !important;
+  }
+
+  .quick-view-modal {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(92, 191, 238, 0.2) !important;
+    border-radius: 24px !important;
+    max-width: 1000px !important;
+    width: 95% !important;
+    max-height: 85vh !important;
+    overflow: hidden !important;
+    transform: scale(0.97) translate3d(0, 0, 0) !important;
+    transition: transform 0.15s ease !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 
+                0 8px 25px rgba(92, 191, 238, 0.1) !important;
+    position: relative !important;
+  }
+
+  .quick-view-overlay.active .quick-view-modal {
+    transform: scale(1) translate3d(0, 0, 0) !important;
+  }
+
+  .quick-view-content {
+    display: grid !important;
+    grid-template-columns: 1.2fr 1fr !important;
+    height: 100% !important;
+    max-height: 85vh !important;
+    min-height: 500px !important;
+    overflow: hidden !important;
+  }
+
+  .quick-view-close {
+    position: absolute !important;
+    top: 24px !important;
+    right: 24px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(92, 191, 238, 0.1) !important;
+    border-radius: 50% !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 20 !important;
+    backdrop-filter: blur(20px) !important;
+    color: #6c757d !important;
+  }
+
+  .quick-view-close:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(92, 191, 238, 0.2) !important;
+    color: #495057 !important;
+    transform: scale(1.05) !important;
+  }
+
+  .quick-view-image-section {
+    background: linear-gradient(135deg, 
+      rgba(92, 191, 238, 0.02) 0%, 
+      rgba(255, 255, 255, 0.8) 30%,
+      rgba(248, 249, 250, 0.9) 100%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 50px !important;
+    position: relative !important;
+    border-radius: 32px 0 0 32px !important;
+  }
+
+  .quick-view-image-container {
+    width: 100% !important;
+    max-width: 380px !important;
+    aspect-ratio: 1 !important;
+    position: relative !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+    background: white !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .quick-view-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .quick-view-details-section {
+    padding: 50px 45px !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 0 32px 32px 0 !important;
+  }
+
+  .quick-view-title {
+    font-family: var(--font-heading--family), sans-serif !important;
+    font-size: var(--font-size-h3) !important;
+    font-weight: 700 !important;
+    color: var(--color-secondary) !important;
+    margin: 0 0 8px 0 !important;
+    line-height: var(--line-height-heading) !important;
+  }
+
+  .quick-view-subtitle {
+    font-family: var(--font-primary--family), sans-serif !important;
+    font-size: var(--font-size-small) !important;
+    font-weight: 500 !important;
+    color: var(--color-muted) !important;
+    margin: 0 0 24px 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .quick-view-price {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 16px !important;
+    margin-bottom: 32px !important;
+  }
+
+  .quick-view-price .price-current {
+    font-size: var(--font-size-h3) !important;
+    font-weight: 800 !important;
+    color: var(--color-primary) !important;
+    font-family: var(--font-primary--family), sans-serif !important;
+  }
+
+  .quick-view-quantity {
+    margin-bottom: 32px !important;
+  }
+
+  .quantity-label {
+    font-family: var(--font-primary--family), sans-serif !important;
+    font-size: var(--font-size-small) !important;
+    font-weight: 600 !important;
+    color: var(--color-foreground) !important;
+    margin-bottom: 12px !important;
+    display: block !important;
+  }
+
+  .quantity-controls {
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 2px solid rgba(92, 191, 238, 0.1) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    width: fit-content !important;
+  }
+
+  .quantity-btn {
+    background: none !important;
+    border: none !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    color: #6c757d !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+  }
+
+  .quantity-btn:hover {
+    background: rgba(92, 191, 238, 0.1) !important;
+    color: #5CBFEE !important;
+  }
+
+  .quantity-input {
+    border: none !important;
+    background: none !important;
+    width: 60px !important;
+    text-align: center !important;
+    font-family: var(--font-primary--family), sans-serif !important;
+    font-size: var(--font-size-body) !important;
+    font-weight: 600 !important;
+    color: var(--color-secondary) !important;
+    outline: none !important;
+  }
+
+  .quick-view-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-bottom: 32px !important;
+  }
+
+  .quick-view-btn {
+    font-family: var(--font-primary--family), sans-serif !important;
+    font-weight: 600 !important;
+    font-size: var(--font-size-body) !important;
+    padding: 16px 32px !important;
+    border-radius: var(--border-radius-large) !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: var(--transition-base) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(92, 191, 238, 0.3) !important;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 35px rgba(92, 191, 238, 0.4) !important;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #5CBFEE !important;
+    border: 2px solid rgba(92, 191, 238, 0.2) !important;
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px) !important;
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(92, 191, 238, 0.4) !important;
+  }
+
+  .quick-view-details-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: var(--color-primary) !important;
+    text-decoration: none !important;
+    font-family: var(--font-primary--family), sans-serif !important;
+    font-weight: 600 !important;
+    font-size: var(--font-size-small) !important;
+    transition: var(--transition-base) !important;
+    margin-top: auto !important;
+    padding-top: 20px !important;
+  }
+
+  .quick-view-details-link:hover {
+    color: #4A9CDB !important;
+    transform: translateX(4px) !important;
+  }
+
+  @media (max-width: 768px) {
+    .quick-view-content {
+      grid-template-columns: 1fr !important;
+      max-height: 90vh !important;
+    }
+    
+    .quick-view-image-section {
+      padding: 30px !important;
+      border-radius: 24px 24px 0 0 !important;
+    }
+    
+    .quick-view-details-section {
+      padding: 30px !important;
+      border-radius: 0 0 24px 24px !important;
+    }
+    
+    .quick-view-image-container {
+      max-width: 250px !important;
+    }
+  }
+{% endstylesheet %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Ensure icons are properly initialized after page load
+  setTimeout(() => {
+    if (window.ensureIconsWork) {
+      window.ensureIconsWork();
+    }
+    if (window.refreshIcons) {
+      window.refreshIcons();
+    }
+  }, 100);
+  
+  // Re-initialize icons when products are filtered/loaded
+  document.addEventListener('productsFiltered', function() {
+    setTimeout(() => {
+      if (window.refreshIcons) {
+        window.refreshIcons();
+      }
+      if (window.ensureIconsWork) {
+        window.ensureIconsWork();
+      }
+    }, 50);
+  });
+  
+  // Handle success state with proper icon display
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.quick-add-btn')) {
+      const button = e.target.closest('.quick-add-btn');
+      
+      setTimeout(() => {
+        if (button.classList.contains('success')) {
+          const successSpan = button.querySelector('.btn-success');
+          if (successSpan) {
+            // Force icon refresh for this specific element
+            if (window.refreshIcons) {
+              window.refreshIcons();
+            }
+            
+            // Fallback check
+            setTimeout(() => {
+              const hasIcon = successSpan.querySelector('svg');
+              const fallback = successSpan.querySelector('.btn-success-fallback');
+              const lucideIcon = successSpan.querySelector('.btn-success-icon');
+              
+              if (!hasIcon && fallback && lucideIcon) {
+                fallback.style.display = 'inline';
+                lucideIcon.style.display = 'none';
+              } else if (hasIcon && fallback) {
+                fallback.style.display = 'none';
+              }
+            }, 100);
+          }
+        }
+      }, 10);
+    }
+  });
+
+  // Quick View Functionality
+  window.openQuickView = function(productData) {
+    const modal = document.getElementById('quickViewModal');
+    
+    if (!modal) {
+      window.location.href = productData.url;
+      return;
+    }
+    
+    // Update modal content
+    const titleElement = document.getElementById('quickViewTitle');
+    const imageElement = document.getElementById('quickViewImage');
+    const linkElement = document.getElementById('quickViewDetailsLink');
+    const priceElement = document.querySelector('#quickViewPrice .price-current');
+    
+    if (titleElement) titleElement.textContent = productData.title || 'Product Name';
+    if (imageElement) {
+      imageElement.src = productData.image || '';
+      imageElement.alt = productData.title || 'Product';
+    }
+    if (linkElement) linkElement.href = productData.url || '#';
+    if (priceElement) {
+      priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
+    }
+    
+    // Show modal
+    modal.style.display = 'flex';
+    modal.style.visibility = 'visible';
+    modal.classList.remove('closing');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeQuickView = function() {
+    const modal = document.getElementById('quickViewModal');
+    if (modal) {
+      modal.classList.add('closing');
+      modal.classList.remove('active');
+      
+      setTimeout(() => {
+        modal.style.display = 'none';
+        modal.classList.remove('closing');
+        document.body.style.overflow = '';
+      }, 300);
+    }
+  };
+
+  window.updateQuantity = function(change) {
+    const input = document.getElementById('quickViewQuantity');
+    if (input) {
+      const currentValue = parseInt(input.value) || 1;
+      const newValue = Math.max(1, Math.min(99, currentValue + change));
+      input.value = newValue;
+    }
+  };
+
+  // Event listeners for quick view
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('quickViewModal');
+      if (modal?.classList.contains('active')) {
+        closeQuickView();
+      }
+    }
+  });
+
+  document.addEventListener('click', function(e) {
+    const modal = document.getElementById('quickViewModal');
+    const modalContent = modal?.querySelector('.quick-view-modal');
+    
+    if (e.target === modal) {
+      closeQuickView();
+    }
+    
+    // Handle quick view button clicks
+    const button = e.target.closest('.quick-view-btn');
+    if (button && button.dataset.productId) {
+      e.preventDefault();
+      
+      openQuickView({
+        id: button.dataset.productId,
+        handle: button.dataset.productHandle,
+        title: button.dataset.productTitle,
+        vendor: button.dataset.productVendor,
+        image: button.dataset.productImage,
+        price: button.dataset.productPrice,
+        comparePrice: button.dataset.productComparePrice,
+        url: button.dataset.productUrl
+      });
+    }
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Product Discovery Hero",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Discover Your Perfect Coffee Journey"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Wake up to artisan-crafted specialty coffee, ethically sourced and freshly roasted in the Philippines. From your everyday morning ritual to extraordinary single-origin adventures - find the coffee that speaks to your soul."
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 4,
+      "max": 20,
+      "step": 4,
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Discovery Hero",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %} 

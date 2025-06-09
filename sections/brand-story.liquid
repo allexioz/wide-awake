@@ -1,0 +1,296 @@
+<section class="brand-story">
+  <div class="container">
+    <div class="brand-story-content">
+      <div class="story-text">
+        <div class="story-header">
+          <span class="story-eyebrow">{{ section.settings.eyebrow | default: "Our Story" }}</span>
+          <h2 class="story-title">{{ section.settings.title | default: "Rooted in Passion, Brewed with Purpose" }}</h2>
+        </div>
+        
+        <div class="story-body">
+          <p class="story-lead">{{ section.settings.lead_text | default: "Wide Awake began with a simple belief: exceptional coffee should tell a story of the people who grow it and the land it comes from." }}</p>
+          
+          <div class="story-details">
+            {{ section.settings.story_content | default: "<p>Born in the Philippines, we're dedicated to showcasing the incredible potential of Southeast Asian coffee. From the volcanic slopes of Mount Apo to partnerships with passionate farmers, every cup represents a commitment to quality, sustainability, and the art of coffee.</p><p>We're not just roasters—we're storytellers, connecting you to the origins, the farmers, and the craftsmanship that makes each bean extraordinary.</p>" }}
+          </div>
+          
+          {% if section.settings.show_cta %}
+            <div class="story-cta">
+              <a href="{{ section.settings.cta_link | default: '/pages/about' }}" class="btn-primary">
+                {{ section.settings.cta_text | default: "Learn Our Story" }}
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="story-visual">
+        {% if section.settings.story_image %}
+          <div class="story-image">
+            <img src="{{ section.settings.story_image | image_url: width: 600 }}" 
+                 alt="{{ section.settings.story_image.alt | default: 'Wide Awake Coffee Story' }}"
+                 loading="lazy">
+          </div>
+        {% endif %}
+        
+        <div class="story-highlights">
+          <div class="highlight-item">
+            <div class="highlight-number">{{ section.settings.highlight_1_number | default: "2019" }}</div>
+            <div class="highlight-text">{{ section.settings.highlight_1_text | default: "Founded" }}</div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-number">{{ section.settings.highlight_2_number | default: "50+" }}</div>
+            <div class="highlight-text">{{ section.settings.highlight_2_text | default: "Farm Partners" }}</div>
+          </div>
+          <div class="highlight-item">
+            <div class="highlight-number">{{ section.settings.highlight_3_number | default: "100%" }}</div>
+            <div class="highlight-text">{{ section.settings.highlight_3_text | default: "Direct Trade" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .brand-story {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #f8f6f3 0%, #fff 100%);
+  }
+
+  .brand-story-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .story-header {
+    margin-bottom: 30px;
+  }
+
+  .story-eyebrow {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #5CBFEE;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .story-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: #2c1810;
+    line-height: 1.2;
+    margin: 0;
+  }
+
+  .story-lead {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    color: #5a4a3a;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-weight: 500;
+  }
+
+  .story-details {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 35px;
+  }
+
+  .story-details p {
+    margin-bottom: 20px;
+  }
+
+  .story-details p:last-child {
+    margin-bottom: 0;
+  }
+
+  .story-cta {
+    margin-top: 30px;
+  }
+
+  .story-visual {
+    position: relative;
+  }
+
+  .story-image {
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  }
+
+  .story-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+  }
+
+  .story-highlights {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .highlight-item {
+    text-align: center;
+    background: white;
+    padding: 25px 15px;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease;
+  }
+
+  .highlight-item:hover {
+    transform: translateY(-5px);
+  }
+
+  .highlight-number {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: 1.8rem;
+    color: #5CBFEE;
+    margin-bottom: 8px;
+  }
+
+  .highlight-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  /* Mobile Responsive */
+  @media screen and (max-width: 768px) {
+    .brand-story {
+      padding: 60px 0;
+    }
+
+    .brand-story-content {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      text-align: center;
+    }
+
+    .story-image img {
+      height: 300px;
+    }
+
+    .story-highlights {
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .highlight-item {
+      padding: 20px 15px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Brand Story",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Our Story"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Rooted in Passion, Brewed with Purpose"
+    },
+    {
+      "type": "textarea",
+      "id": "lead_text",
+      "label": "Lead Text",
+      "default": "Wide Awake began with a simple belief: exceptional coffee should tell a story of the people who grow it and the land it comes from."
+    },
+    {
+      "type": "richtext",
+      "id": "story_content",
+      "label": "Story Content",
+      "default": "<p>Born in the Philippines, we're dedicated to showcasing the incredible potential of Southeast Asian coffee. From the volcanic slopes of Mount Apo to partnerships with passionate farmers, every cup represents a commitment to quality, sustainability, and the art of coffee.</p><p>We're not just roasters—we're storytellers, connecting you to the origins, the farmers, and the craftsmanship that makes each bean extraordinary.</p>"
+    },
+    {
+      "type": "image_picker",
+      "id": "story_image",
+      "label": "Story Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show Call to Action Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Button Text",
+      "default": "Learn Our Story"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "CTA Button Link"
+    },
+    {
+      "type": "header",
+      "content": "Highlights"
+    },
+    {
+      "type": "text",
+      "id": "highlight_1_number",
+      "label": "Highlight 1 Number",
+      "default": "2019"
+    },
+    {
+      "type": "text",
+      "id": "highlight_1_text",
+      "label": "Highlight 1 Text",
+      "default": "Founded"
+    },
+    {
+      "type": "text",
+      "id": "highlight_2_number",
+      "label": "Highlight 2 Number",
+      "default": "50+"
+    },
+    {
+      "type": "text",
+      "id": "highlight_2_text",
+      "label": "Highlight 2 Text",
+      "default": "Farm Partners"
+    },
+    {
+      "type": "text",
+      "id": "highlight_3_number",
+      "label": "Highlight 3 Number",
+      "default": "100%"
+    },
+    {
+      "type": "text",
+      "id": "highlight_3_text",
+      "label": "Highlight 3 Text",
+      "default": "Direct Trade"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Story"
+    }
+  ]
+}
+{% endschema %} 

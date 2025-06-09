@@ -1,57 +1,1099 @@
-<footer>
-  <div class="footer__copyright">
-    &copy;
-    {{ 'now' | date: '%Y' }}
-    {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
-  </div>
+<footer class="site-footer" role="contentinfo" aria-label="Site footer">
+  <div class="footer-container">
+    <!-- Main Footer Content -->
+    <div class="footer-main">
+      <!-- Brand Section -->
+      <div class="footer-section footer-brand">
+        <div class="footer-logo">
+          <img src="{{ 'WideAwake_Logo_Horizontal_White.png' | asset_url }}" 
+               alt="{{ shop.name }}" 
+               class="footer-logo-img"
+               loading="lazy"
+               width="200"
+               height="auto">
+        </div>
+        <p class="footer-description">
+          {{ section.settings.footer_description | default: "Specialty coffee sourced from quality driven producers. Roasted with passion and precision." }}
+        </p>
+        
+        {% if section.settings.show_shipping_info %}
+          <div class="shipping-info">
+            <h3 class="shipping-title">Shipping Information</h3>
+            <div class="shipping-grid">
+              <div class="shipping-item">
+                <span class="shipping-location">Metro Manila</span>
+                <span class="shipping-price">₱100</span>
+              </div>
+              <div class="shipping-item">
+                <span class="shipping-location">Nationwide</span>
+                <div class="shipping-details">
+                  <span class="shipping-price">₱100</span>
+                  <small class="shipping-note">Min. order ₱1,000</small>
+                </div>
+              </div>
+              <div class="shipping-item">
+                <span class="shipping-location">Regular Rate</span>
+                <span class="shipping-price">₱200</span>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
 
-  <div class="footer__links">
-    {% for link in section.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+      <!-- Navigation Links -->
+      <div class="footer-section footer-links">
+        <h3 class="footer-heading">Shop</h3>
+        {% if section.settings.footer_menu.links.size > 0 %}
+          <nav class="footer-nav" aria-label="Footer navigation">
+            <ul class="footer-nav-list">
+              {% for link in section.settings.footer_menu.links %}
+                <li class="footer-nav-item">
+                  <a href="{{ link.url }}" class="footer-link">{{ link.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </nav>
+        {% else %}
+          <ul class="footer-nav-list">
+            <li class="footer-nav-item"><a href="/collections/all" class="footer-link">All Coffee</a></li>
+            <li class="footer-nav-item"><a href="/collections/single-origin" class="footer-link">Single Origin</a></li>
+            <li class="footer-nav-item"><a href="/collections/blends" class="footer-link">Blends</a></li>
+            <li class="footer-nav-item"><a href="/pages/about" class="footer-link">About Us</a></li>
+            <li class="footer-nav-item"><a href="/pages/brewing-guide" class="footer-link">Brewing Guide</a></li>
+          </ul>
+        {% endif %}
+      </div>
 
-  <div class="footer__payment">
-    {% if section.settings.show_payment_icons %}
-      {% for type in shop.enabled_payment_types %}
-        {{ type | payment_type_svg_tag }}
-      {% endfor %}
-    {% endif %}
+      <!-- Contact Information -->
+      <div class="footer-section footer-contact">
+        <h3 class="footer-heading">Get in Touch</h3>
+        <div class="contact-info">
+          {% if section.settings.contact_email != blank %}
+            <div class="contact-item">
+              <span class="contact-icon">📧</span>
+              <div class="contact-details">
+                <span class="contact-label">Email</span>
+                <a href="mailto:{{ section.settings.contact_email }}" class="contact-link">
+                  {{ section.settings.contact_email }}
+                </a>
+              </div>
+            </div>
+          {% endif %}
+          {% if section.settings.contact_phone != blank %}
+            <div class="contact-item">
+              <span class="contact-icon">📞</span>
+              <div class="contact-details">
+                <span class="contact-label">Phone</span>
+                <a href="tel:{{ section.settings.contact_phone | replace: ' ', '' }}" class="contact-link">
+                  {{ section.settings.contact_phone }}
+                </a>
+              </div>
+            </div>
+          {% endif %}
+          {% if section.settings.contact_address != blank %}
+            <div class="contact-item">
+              <span class="contact-icon">📍</span>
+              <div class="contact-details">
+                <span class="contact-label">Visit Us</span>
+                <span class="contact-text">{{ section.settings.contact_address }}</span>
+              </div>
+            </div>
+          {% endif %}
+          {% if section.settings.roast_schedule != blank %}
+            <div class="contact-item">
+              <span class="contact-icon">☕</span>
+              <div class="contact-details">
+                <span class="contact-label">Roast Days</span>
+                <span class="contact-text">{{ section.settings.roast_schedule }}</span>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Newsletter & Social -->
+      <div class="footer-section footer-newsletter">
+        <h3 class="footer-heading">Stay in the Loop</h3>
+        
+        {% if section.settings.show_newsletter %}
+          <div class="newsletter-wrapper">
+            <p class="newsletter-description">Get the freshest updates on new roasts, brewing tips, and exclusive offers.</p>
+            {% form 'customer', class: 'newsletter-form' %}
+              <div class="newsletter-input-group">
+                <label for="newsletter-email" class="visually-hidden">Email address</label>
+                <input 
+                  type="email" 
+                  id="newsletter-email"
+                  name="contact[email]" 
+                  placeholder="Your email address" 
+                  class="newsletter-input"
+                  required
+                  aria-describedby="newsletter-description"
+                >
+                <button type="submit" class="newsletter-btn" aria-label="Subscribe to newsletter">
+                  <span class="btn-text">Subscribe</span>
+                  <span class="btn-icon">→</span>
+                </button>
+              </div>
+              <input type="hidden" name="contact[tags]" value="newsletter">
+            {% endform %}
+          </div>
+        {% endif %}
+        
+        {% if section.settings.show_social_links %}
+          <div class="social-section">
+            <h4 class="social-heading">Follow Our Journey</h4>
+            <ul class="social-list">
+              {% if section.settings.facebook_url != blank %}
+                <li>
+                  <a href="{{ section.settings.facebook_url }}" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on Facebook">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </a>
+                </li>
+              {% endif %}
+              {% if section.settings.instagram_url != blank %}
+                <li>
+                  <a href="{{ section.settings.instagram_url }}" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                  </a>
+                </li>
+              {% endif %}
+              {% if section.settings.twitter_url != blank %}
+                <li>
+                  <a href="{{ section.settings.twitter_url }}" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on Twitter">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                    </svg>
+                  </a>
+                </li>
+              {% endif %}
+              {% if section.settings.youtube_url != blank %}
+                <li>
+                  <a href="{{ section.settings.youtube_url }}" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on YouTube">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                  </a>
+                </li>
+              {% endif %}
+              {% if section.settings.tiktok_url != blank %}
+                <li>
+                  <a href="{{ section.settings.tiktok_url }}" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Follow us on TikTok">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                    </svg>
+                  </a>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+      <div class="footer-legal">
+        <p class="copyright">&copy; {{ 'now' | date: "%Y" }} {{ shop.name }}. All rights reserved.</p>
+        <div class="footer-links-secondary">
+          <a href="/pages/privacy-policy" class="legal-link">Privacy Policy</a>
+          <a href="/pages/terms-of-service" class="legal-link">Terms of Service</a>
+          <a href="/pages/shipping-policy" class="legal-link">Shipping Policy</a>
+        </div>
+      </div>
+      
+      {% if section.settings.show_payment_icons %}
+        <div class="payment-section">
+          <span class="payment-text">Secure payments</span>
+          <div class="payment-icons">
+            {% for type in shop.enabled_payment_types %}
+              {{ type | payment_type_svg_tag: class: 'payment-icon' }}
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+    </div>
   </div>
 </footer>
 
 {% stylesheet %}
-  footer {
+  /* =====================================================
+     WIDE AWAKE FOOTER - ON-BRAND DESIGN
+     ===================================================== */
+
+  /* Reset and Base Styles */
+  .site-footer * {
+    box-sizing: border-box;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+  }
+
+  /* Main Footer Container */
+  .site-footer {
+    background: linear-gradient(180deg, 
+      #2c1810 0%, 
+      #1f0f08 40%, 
+      #1a0c06 100%
+    );
+    color: #f8f5f1;
+    padding: 5rem 0 2rem;
+    font-family: var(--font-primary--family, 'Poppins', sans-serif);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle coffee bean pattern overlay */
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><circle cx="30" cy="30" r="2" fill="%23d4a574" opacity="0.03"/></g></svg>');
+    pointer-events: none;
+  }
+
+  /* Brand accent border */
+  .site-footer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+      var(--color-primary, #5CBFEE) 0%, 
+      #d4a574 50%, 
+      var(--color-primary, #5CBFEE) 100%
+    );
+    opacity: 0.8;
+  }
+
+  .footer-container {
+    max-width: var(--container-max-width, 1200px);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md, 1.5rem);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Main Footer Grid */
+  .footer-main {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr 1.3fr;
+    gap: var(--spacing-2xl, 4rem);
+    margin-bottom: var(--spacing-2xl, 4rem);
+    padding: var(--spacing-lg, 2rem) 0;
+  }
+
+  /* Footer Sections */
+  .footer-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md, 1.5rem);
+  }
+
+  .footer-heading {
+    color: var(--color-primary, #5CBFEE);
+    font-family: var(--font-heading--family, 'Special Gothic Expanded One', sans-serif);
+    font-size: 1.1rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 var(--spacing-sm, 1rem) 0;
+    position: relative;
+    padding-bottom: 0.5rem;
+  }
+
+  .footer-heading::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 2rem;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-primary, #5CBFEE), #d4a574);
+    border-radius: 1px;
+  }
+
+  /* Brand Section */
+  .footer-brand {
+    max-width: 100%;
+  }
+
+  .footer-logo {
+    margin-bottom: var(--spacing-md, 1.5rem);
+  }
+
+  .footer-logo-img {
+    max-width: 240px;
+    height: auto;
+    filter: brightness(1.1) contrast(1.05);
+    transition: all 0.3s ease;
+  }
+
+  .footer-logo-img:hover {
+    filter: brightness(1.2) contrast(1.1);
+    transform: scale(1.02);
+  }
+
+  .footer-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #e0d6c7;
+    margin: 0 0 var(--spacing-lg, 2rem) 0;
+    max-width: 90%;
+  }
+
+  /* Shipping Information */
+  .shipping-info {
+    background: rgba(212, 165, 116, 0.08);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    border-radius: var(--border-radius, 8px);
+    padding: var(--spacing-md, 1.5rem);
+    backdrop-filter: blur(10px);
+  }
+
+  .shipping-title {
+    font-family: var(--font-heading--family, 'Special Gothic Expanded One', sans-serif);
+    font-size: 0.9rem;
+    color: #d4a574;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 var(--spacing-sm, 1rem) 0;
+  }
+
+  .shipping-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .shipping-item {
     display: flex;
     justify-content: space-between;
-    margin-top: 2rem;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(212, 165, 116, 0.1);
   }
-  footer a {
-    text-decoration: none;
-    color: var(--color-foreground);
+
+  .shipping-item:last-child {
+    border-bottom: none;
   }
-  footer .footer__links,
-  footer .footer__payment {
+
+  .shipping-location {
+    font-size: 0.9rem;
+    color: #e0d6c7;
+    font-weight: 500;
+  }
+
+  .shipping-price {
+    color: var(--color-primary, #5CBFEE);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .shipping-details {
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+
+  .shipping-note {
+    color: #c0b399;
+    font-size: 0.8rem;
+    font-style: italic;
+  }
+
+  /* Navigation Links */
+  .footer-nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .footer-nav-item {
+    transition: transform 0.2s ease;
+  }
+
+  .footer-nav-item:hover {
+    transform: translateX(0.25rem);
+  }
+
+  .footer-link {
+    color: #e0d6c7;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    position: relative;
+    display: inline-block;
+    line-height: 1.4;
+  }
+
+  .footer-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--color-primary, #5CBFEE), #d4a574);
+    transition: width 0.3s ease;
+  }
+
+  .footer-link:hover {
+    color: var(--color-primary, #5CBFEE);
+  }
+
+  .footer-link:hover::after {
+    width: 100%;
+  }
+
+  /* Contact Information */
+  .contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md, 1.5rem);
+  }
+
+  .contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 0.75rem 0;
+  }
+
+  .contact-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+    filter: grayscale(0.3);
+  }
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+  }
+
+  .contact-label {
+    font-size: 0.8rem;
+    color: #d4a574;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .contact-link,
+  .contact-text {
+    color: #e0d6c7;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 400;
+    transition: color 0.3s ease;
+    line-height: 1.4;
+  }
+
+  .contact-link:hover {
+    color: var(--color-primary, #5CBFEE);
+  }
+
+  /* Newsletter Section */
+  .newsletter-wrapper {
+    margin-bottom: var(--spacing-lg, 2rem);
+  }
+
+  .newsletter-description {
+    font-size: 0.9rem;
+    color: #e0d6c7;
+    margin: 0 0 var(--spacing-md, 1.5rem) 0;
+    line-height: 1.5;
+  }
+
+  .newsletter-form {
+    margin: 0;
+  }
+
+  .newsletter-input-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: var(--spacing-sm, 1rem);
+    background: rgba(248, 245, 241, 0.08);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    border-radius: var(--border-radius, 8px);
+    padding: 0.25rem;
+    transition: all 0.3s ease;
+  }
+
+  .newsletter-input-group:focus-within {
+    border-color: var(--color-primary, #5CBFEE);
+    box-shadow: 0 0 0 3px rgba(92, 191, 238, 0.1);
+    background: rgba(248, 245, 241, 0.12);
+  }
+
+  .newsletter-input {
+    flex: 1;
+    padding: 1rem 1.25rem;
+    border: none;
+    border-radius: calc(var(--border-radius, 8px) - 2px);
+    background: transparent;
+    color: #f8f5f1;
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: all 0.3s ease;
+  }
+
+  .newsletter-input::placeholder {
+    color: #c0b399;
+  }
+
+  .newsletter-input:focus {
+    outline: none;
+    background: rgba(248, 245, 241, 0.05);
+  }
+
+  .newsletter-btn {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, 
+      var(--color-primary, #5CBFEE) 0%, 
+      #4A9CDB 100%
+    );
+    color: white;
+    border: none;
+    border-radius: calc(var(--border-radius, 8px) - 2px);
+    font-weight: 600;
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .newsletter-btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  .newsletter-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(92, 191, 238, 0.3);
+  }
+
+  .newsletter-btn:hover:before {
+    left: 100%;
+  }
+
+  .newsletter-btn:active {
+    transform: translateY(-1px);
+  }
+
+  .btn-icon {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+  }
+
+  .newsletter-btn:hover .btn-icon {
+    transform: translateX(0.25rem);
+  }
+
+  /* Social Links */
+  .social-section {
+    margin-top: var(--spacing-md, 1.5rem);
+  }
+
+  .social-heading {
+    font-size: 0.85rem;
+    color: #d4a574;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 var(--spacing-sm, 1rem) 0;
+  }
+
+  .social-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: rgba(248, 245, 241, 0.08);
+    border: 1px solid rgba(212, 165, 116, 0.2);
+    border-radius: 50%;
+    color: #e0d6c7;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .social-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--color-primary, #5CBFEE), #d4a574);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .social-link:hover {
+    transform: translateY(-3px);
+    border-color: var(--color-primary, #5CBFEE);
+    box-shadow: 0 8px 25px rgba(92, 191, 238, 0.2);
+  }
+
+  .social-link:hover::before {
+    opacity: 1;
+  }
+
+  .social-link svg {
+    width: 1rem;
+    height: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+
+  .social-link:hover svg {
+    color: white;
+    transform: scale(1.1);
+  }
+
+  /* Footer Bottom */
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg, 2rem) 0 0;
+    border-top: 1px solid rgba(212, 165, 116, 0.15);
+    gap: var(--spacing-lg, 2rem);
+  }
+
+  .footer-legal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .copyright {
+    color: #c0b399;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  .footer-links-secondary {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .legal-link {
+    color: #c0b399;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: color 0.3s ease;
+  }
+
+  .legal-link:hover {
+    color: var(--color-primary, #5CBFEE);
+  }
+
+  .payment-section {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm, 1rem);
+  }
+
+  .payment-text {
+    color: #c0b399;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .payment-icons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .payment-icon {
+    height: 1.75rem;
+    width: auto;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    filter: brightness(1.1);
+  }
+
+  .payment-icon:hover {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  /* =====================================================
+     RESPONSIVE DESIGN
+     ===================================================== */
+
+  @media (max-width: 1024px) {
+    .footer-main {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacing-xl, 3rem);
+    }
+
+    .footer-container {
+      padding: 0 var(--spacing-md, 1.5rem);
+    }
+
+    .footer-brand {
+      grid-column: 1 / -1;
+      max-width: 100%;
+      margin-bottom: var(--spacing-lg, 2rem);
+    }
+
+    .shipping-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .site-footer {
+      padding: var(--spacing-2xl, 4rem) 0 var(--spacing-lg, 2rem);
+    }
+
+    .footer-main {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-xl, 3rem);
+      text-align: center;
+    }
+
+    .footer-brand {
+      text-align: center;
+      margin-bottom: var(--spacing-lg, 2rem);
+    }
+
+    .footer-description {
+      max-width: 100%;
+    }
+
+    .footer-heading::after {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      gap: var(--spacing-md, 1.5rem);
+      text-align: center;
+    }
+
+    .footer-links-secondary {
+      justify-content: center;
+    }
+
+    .newsletter-input-group {
+      flex-direction: column;
+    }
+
+    .social-list {
+      justify-content: center;
+    }
+
+    .contact-item {
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .contact-icon {
+      margin-top: 0;
+    }
+
+    .shipping-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .shipping-item {
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .footer-nav-item:hover {
+      transform: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .site-footer {
+      padding: var(--spacing-xl, 3rem) 0 var(--spacing-lg, 2rem);
+    }
+
+    .footer-container {
+      padding: 0 var(--spacing-sm, 1rem);
+    }
+
+    .footer-logo-img {
+      max-width: 200px;
+    }
+
+    .footer-heading {
+      font-size: 1rem;
+    }
+
+    .newsletter-input,
+    .newsletter-btn {
+      padding: 0.875rem 1rem;
+      font-size: 0.9rem;
+    }
+
+    .social-link {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    .social-link svg {
+      width: 0.9rem;
+      height: 0.9rem;
+    }
+
+    .footer-main {
+      gap: var(--spacing-lg, 2rem);
+    }
+
+    .footer-links-secondary {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
+
+  /* =====================================================
+     ACCESSIBILITY & MOTION
+     ===================================================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    .footer-link::after,
+    .footer-nav-item,
+    .newsletter-btn,
+    .social-link,
+    .payment-icon,
+    .footer-logo-img,
+    .newsletter-btn::before {
+      transition: none;
+    }
+
+    .newsletter-btn:hover,
+    .social-link:hover,
+    .footer-logo-img:hover {
+      transform: none;
+    }
+  }
+
+  /* Focus styles for keyboard navigation */
+  .footer-link:focus,
+  .newsletter-input:focus,
+  .newsletter-btn:focus,
+  .social-link:focus,
+  .contact-link:focus,
+  .legal-link:focus {
+    outline: 2px solid var(--color-primary, #5CBFEE);
+    outline-offset: 2px;
+  }
+
+  /* High contrast support */
+  @media (prefers-contrast: high) {
+    .site-footer {
+      background: #000;
+      color: #fff;
+    }
+
+    .footer-link,
+    .contact-link,
+    .legal-link {
+      color: #fff;
+    }
+
+    .footer-link:hover,
+    .contact-link:hover,
+    .legal-link:hover {
+      color: var(--color-primary, #5CBFEE);
+    }
+
+    .shipping-info,
+    .newsletter-input-group,
+    .social-link {
+      border-color: #666;
+    }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.footer",
+  "name": "Footer",
   "settings": [
     {
+      "type": "header",
+      "content": "Brand Information"
+    },
+    {
+      "type": "textarea",
+      "id": "footer_description",
+      "label": "Footer Description",
+      "default": "Specialty coffee sourced from quality driven producers. Roasted with passion and precision.",
+      "info": "Brief description about your business"
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
       "type": "link_list",
-      "id": "menu",
-      "label": "t:labels.menu"
+      "id": "footer_menu",
+      "label": "Footer Menu",
+      "info": "Add links to important pages (leave empty to use default coffee links)"
+    },
+    {
+      "type": "header",
+      "content": "Shipping Information"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_info",
+      "label": "Show Shipping Information",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "text",
+      "id": "contact_email",
+      "label": "Contact Email",
+      "info": "Enter your business email address"
+    },
+    {
+      "type": "text",
+      "id": "contact_phone",
+      "label": "Contact Phone",
+      "info": "Enter your business phone number"
+    },
+    {
+      "type": "textarea",
+      "id": "contact_address",
+      "label": "Contact Address",
+      "info": "Physical address or location"
+    },
+    {
+      "type": "text",
+      "id": "roast_schedule",
+      "label": "Roast Schedule",
+      "default": "Mondays to Fridays",
+      "info": "When do you roast coffee?"
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show Newsletter Signup",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Social Media"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_social_links",
+      "label": "Show Social Links",
+      "default": true
+    },
+    {
+      "type": "url",
+      "id": "facebook_url",
+      "label": "Facebook URL"
+    },
+    {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL"
+    },
+    {
+      "type": "url",
+      "id": "twitter_url",
+      "label": "Twitter URL"
+    },
+    {
+      "type": "url",
+      "id": "youtube_url",
+      "label": "YouTube URL"
+    },
+    {
+      "type": "url",
+      "id": "tiktok_url",
+      "label": "TikTok URL"
+    },
+    {
+      "type": "header",
+      "content": "Payment"
     },
     {
       "type": "checkbox",
       "id": "show_payment_icons",
-      "label": "t:labels.show_payment_icons",
-      "default": true
+      "label": "Show Payment Icons",
+      "default": true,
+      "info": "Display accepted payment methods"
     }
   ]
 }
 {% endschema %}
+

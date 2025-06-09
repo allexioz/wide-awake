@@ -1,105 +1,130 @@
+{% comment %}
+  Wide Awake Meta Tags - SEO and Social Media
+{% endcomment %}
+
 <meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#5CBFEE">
 
-{%- liquid
-  assign og_title = page_title | default: shop.name
-  assign og_url = canonical_url | default: request.origin
-  assign og_type = 'website'
-  assign og_description = page_description | default: shop.description | default: shop.name
+{% capture seo_title %}
+  {%- if page_title -%}
+    {{ page_title }}
+    {%- unless page_title contains shop.name -%}
+      {{ " - " }}{{ shop.name }}
+    {%- endunless -%}
+  {%- else -%}
+    {{ shop.name }}
+  {%- endif -%}
+{% endcapture %}
 
-  if request.page_type == 'product'
-    assign og_type = 'product'
-  elsif request.page_type == 'article'
-    assign og_type = 'article'
-  elsif request.page_type == 'password'
-    assign og_url = request.origin
-  endif
-%}
-
-<meta
-  property="og:site_name"
-  content="{{ shop.name }}"
->
-<meta
-  property="og:url"
-  content="{{ og_url }}"
->
-<meta
-  property="og:title"
-  content="{{ og_title | escape }}"
->
-<meta
-  property="og:type"
-  content="{{ og_type }}"
->
-<meta
-  property="og:description"
-  content="{{ og_description | escape }}"
->
-
-{%- if page_image -%}
-  <meta
-    property="og:image"
-    content="http:{{ page_image | image_url }}"
-  >
-  <meta
-    property="og:image:secure_url"
-    content="https:{{ page_image | image_url }}"
-  >
-  <meta
-    property="og:image:width"
-    content="{{ page_image.width }}"
-  >
-  <meta
-    property="og:image:height"
-    content="{{ page_image.height }}"
-  >
-{%- endif -%}
-
-{%- if request.page_type == 'product' -%}
-  <script type="application/ld+json">
-    {{ product | structured_data }}
-  </script>
-
-  <meta
-    property="og:price:amount"
-    content="{{ product.price | money_without_currency | strip_html }}"
-  >
-  <meta
-    property="og:price:currency"
-    content="{{ cart.currency.iso_code }}"
-  >
-{%- endif -%}
-
-<meta
-  name="twitter:card"
-  content="summary_large_image"
->
-<meta
-  name="twitter:title"
-  content="{{ og_title | escape }}"
->
-<meta
-  name="twitter:description"
-  content="{{ og_description | escape }}"
->
-
-<title>
-  {{ page_title }}
-  {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
-  {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-  {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
-</title>
-
-<link
-  rel="canonical"
-  href="{{ canonical_url }}"
->
+<title>{{ seo_title }}</title>
 
 {% if page_description %}
-  <meta
-    name="description"
-    content="{{ page_description | escape }}"
-  >
+  <meta name="description" content="{{ page_description | escape }}">
+{% elsif shop.description != blank %}
+  <meta name="description" content="{{ shop.description | escape }}">
+{% else %}
+  <meta name="description" content="Wide Awake - Specialty coffee sourced from quality driven producers. Roasted with passion and precision.">
 {% endif %}
+
+{% unless settings.favicon == blank %}
+  <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png">
+{% endunless %}
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ canonical_url }}">
+
+<!-- Open Graph Tags -->
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ seo_title }}">
+<meta property="og:type" content="website">
+<meta property="og:description" content="{{ page_description | default: shop.description | default: 'Wide Awake - Specialty coffee sourced from quality driven producers. Roasted with passion and precision.' | escape }}">
+
+{% if page_image %}
+  <meta property="og:image" content="http:{{ page_image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="https:{{ page_image | image_url: width: 1200 }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+{% elsif collection.image %}
+  <meta property="og:image" content="http:{{ collection.image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="https:{{ collection.image | image_url: width: 1200 }}">
+{% elsif product.featured_image %}
+  <meta property="og:image" content="http:{{ product.featured_image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="https:{{ product.featured_image | image_url: width: 1200 }}">
+{% endif %}
+
+<!-- Twitter Card Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ seo_title }}">
+<meta name="twitter:description" content="{{ page_description | default: shop.description | default: 'Wide Awake - Specialty coffee sourced from quality driven producers. Roasted with passion and precision.' | escape }}">
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{ shop.name }}",
+  "url": "{{ shop.url }}{{ page.url }}",
+  {% if shop.description %}
+    "description": "{{ shop.description | escape }}",
+  {% endif %}
+  "logo": {
+    "@type": "ImageObject",
+    "url": "{{ 'logo.png' | asset_url }}"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer service",
+    "areaServed": "PH",
+    "availableLanguage": "English"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "PH"
+  }
+}
+</script>
+
+{% if template contains 'product' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": "{{ product.title | escape }}",
+  "description": "{{ product.description | strip_html | escape }}",
+  "image": [
+    {% for image in product.images limit: 3 %}
+      "{{ image | image_url: width: 800 }}"{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ shop.name }}"
+  },
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ shop.url }}{{ product.url }}",
+    "priceCurrency": "{{ cart.currency.iso_code }}",
+    "price": "{{ product.price | divided_by: 100.0 }}",
+    "priceValidUntil": "{{ 'now' | date: '%Y' | plus: 1 }}-12-31",
+    "availability": "{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "seller": {
+      "@type": "Organization",
+      "name": "{{ shop.name }}"
+    }
+  }
+}
+</script>
+{% endif %}
+
+<!-- Preconnect to important third-party domains -->
+<link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://monorail-edge.shopifysvc.com">
+
+<!-- DNS Prefetch -->
+<link rel="dns-prefetch" href="//productreviews.shopifycdn.com">
+<link rel="dns-prefetch" href="//ajax.googleapis.com">
+<link rel="dns-prefetch" href="//maps.googleapis.com">
+<link rel="dns-prefetch" href="//maps.gstatic.com">

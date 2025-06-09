@@ -5,13 +5,600 @@
   https://shopify.dev/docs/storefronts/themes/architecture/templates/page
 {% endcomment %}
 
-<h1>{{ page.title }}</h1>
+<section class="page-section">
+  <div class="page-container">
+    <!-- Page Hero -->
+    <div class="page-hero">
+      <div class="page-hero-content">
+        <h1 class="page-title">{{ page.title }}</h1>
+        {% if page.summary != blank %}
+          <p class="page-summary">{{ page.summary }}</p>
+        {% endif %}
+      </div>
+      <div class="page-hero-accent"></div>
+    </div>
 
-{{ page.content }}
+    <!-- Page Content -->
+    <div class="page-content">
+      <div class="page-content-inner">
+        {{ page.content }}
+      </div>
+    </div>
+
+    <!-- Page Footer Actions -->
+    {% if section.settings.show_back_button %}
+      <div class="page-actions">
+        <a href="javascript:history.back()" class="page-back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15,18 9,12 15,6"></polyline>
+          </svg>
+          Go Back
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  /* =====================================================
+     WIDE AWAKE PAGE STYLES - ON-BRAND TYPOGRAPHY
+     ===================================================== */
+
+  /* Page Section Container */
+  .page-section {
+    background: linear-gradient(180deg, #faf9f7 0%, #f8f5f1 100%);
+    min-height: 60vh;
+    padding: var(--spacing-2xl, 4rem) 0;
+    font-family: var(--font-primary--family, 'Poppins', sans-serif);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle coffee bean pattern overlay */
+  .page-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><circle cx="30" cy="30" r="2" fill="%23d4a574" opacity="0.02"/></g></svg>');
+    pointer-events: none;
+  }
+
+  .page-container {
+    max-width: var(--container-max-width, 1200px);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md, 1.5rem);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Page Hero Section */
+  .page-hero {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl, 4rem);
+    position: relative;
+    padding: var(--spacing-xl, 3rem) 0;
+  }
+
+  .page-hero-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .page-title {
+    font-family: var(--font-heading--family, 'Special Gothic Expanded One', sans-serif);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 400;
+    color: var(--color-secondary, #2c1810);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    line-height: 1.1;
+    margin: 0 0 var(--spacing-md, 1.5rem) 0;
+    position: relative;
+    display: inline-block;
+  }
+
+     .page-title::after {
+     content: '';
+     position: absolute;
+     bottom: -0.5rem;
+     left: 50%;
+     transform: translateX(-50%);
+     width: 4rem;
+     height: 3px;
+     background: #5CBFEE;
+     border-radius: 2px;
+   }
+
+  .page-summary {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--color-muted, #666666);
+    max-width: 600px;
+    margin: 0 auto;
+    font-weight: 400;
+  }
+
+     .page-hero-accent {
+     position: absolute;
+     top: 0;
+     right: 0;
+     width: 200px;
+     height: 200px;
+     background: radial-gradient(circle, rgba(212, 165, 116, 0.06) 0%, transparent 70%);
+     border-radius: 50%;
+     z-index: 1;
+   }
+
+  /* Page Content */
+  .page-content {
+    background: white;
+    border-radius: var(--border-radius-large, 12px);
+    box-shadow: var(--shadow-medium, 0 4px 20px rgba(44, 24, 16, 0.08));
+    border: 1px solid rgba(212, 165, 116, 0.1);
+    overflow: hidden;
+    position: relative;
+  }
+
+     .page-content::before {
+     content: '';
+     position: absolute;
+     top: 0;
+     left: 0;
+     right: 0;
+     height: 4px;
+     background: #5CBFEE;
+   }
+
+  .page-content-inner {
+    padding: var(--spacing-2xl, 4rem);
+  }
+
+  /* Typography Styles for Page Content */
+  .page-content-inner h1,
+  .page-content-inner h2,
+  .page-content-inner h3,
+  .page-content-inner h4,
+  .page-content-inner h5,
+  .page-content-inner h6 {
+    font-family: var(--font-heading--family, 'Special Gothic Expanded One', sans-serif);
+    color: var(--color-secondary, #2c1810);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
+    margin: 2rem 0 1rem 0;
+    position: relative;
+  }
+
+  .page-content-inner h1 {
+    font-size: clamp(2rem, 4vw, 2.75rem);
+    margin-top: 0;
+  }
+
+     .page-content-inner h2 {
+     font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+     color: #5CBFEE;
+   }
+
+   .page-content-inner h3 {
+     font-size: clamp(1.5rem, 3vw, 2rem);
+     color: var(--color-secondary, #2c1810);
+   }
+
+  .page-content-inner h4 {
+    font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+
+  .page-content-inner h5 {
+    font-size: clamp(1.1rem, 2vw, 1.5rem);
+  }
+
+  .page-content-inner h6 {
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+  }
+
+  /* Add accent lines under major headings */
+  .page-content-inner h2::after,
+  .page-content-inner h3::after {
+    content: '';
+    position: absolute;
+    bottom: -0.5rem;
+    left: 0;
+    width: 2.5rem;
+    height: 2px;
+    background: currentColor;
+    opacity: 0.6;
+  }
+
+  .page-content-inner p {
+    font-size: clamp(1rem, 2vw, 1.125rem);
+    line-height: 1.7;
+    color: var(--color-foreground, #2c1810);
+    margin: 0 0 var(--spacing-md, 1.5rem) 0;
+    font-weight: 400;
+  }
+
+  .page-content-inner p:last-child {
+    margin-bottom: 0;
+  }
+
+     /* Enhanced paragraph styling for coffee content */
+   .page-content-inner p:first-of-type {
+     font-size: clamp(1.1rem, 2.2vw, 1.25rem);
+     font-weight: 500;
+     color: var(--color-secondary, #2c1810);
+     position: relative;
+     padding-left: 1rem;
+     border-left: 3px solid #5CBFEE;
+     background: rgba(92, 191, 238, 0.05);
+     padding: var(--spacing-md, 1.5rem);
+     border-radius: 0 var(--border-radius, 8px) var(--border-radius, 8px) 0;
+     margin-bottom: var(--spacing-lg, 2rem);
+   }
+
+     /* Links */
+   .page-content-inner a {
+     color: #5CBFEE;
+     text-decoration: none;
+     font-weight: 500;
+     transition: all 0.3s ease;
+     position: relative;
+     border-bottom: 1px solid transparent;
+   }
+
+   .page-content-inner a:hover {
+     color: var(--color-secondary, #2c1810);
+     border-bottom-color: #5CBFEE;
+   }
+
+  /* Lists */
+  .page-content-inner ul,
+  .page-content-inner ol {
+    margin: var(--spacing-md, 1.5rem) 0;
+    padding-left: var(--spacing-lg, 2rem);
+  }
+
+  .page-content-inner li {
+    margin-bottom: 0.75rem;
+    line-height: 1.6;
+    color: var(--color-foreground, #2c1810);
+  }
+
+  .page-content-inner ul li {
+    list-style: none;
+    position: relative;
+  }
+
+     .page-content-inner ul li::before {
+     content: '☕';
+     position: absolute;
+     left: -1.5rem;
+     color: #5CBFEE;
+     font-size: 0.9rem;
+   }
+
+  /* Blockquotes */
+  .page-content-inner blockquote {
+    background: rgba(92, 191, 238, 0.05);
+    border-left: 4px solid #5CBFEE;
+    margin: var(--spacing-lg, 2rem) 0;
+    padding: var(--spacing-lg, 2rem);
+    border-radius: 0 var(--border-radius, 8px) var(--border-radius, 8px) 0;
+    position: relative;
+  }
+
+  .page-content-inner blockquote::before {
+    content: '"';
+    position: absolute;
+    top: -0.5rem;
+    left: var(--spacing-md, 1.5rem);
+    font-size: 4rem;
+    color: #5CBFEE;
+    opacity: 0.3;
+    line-height: 1;
+    font-family: serif;
+  }
+
+  .page-content-inner blockquote p {
+    margin: 0;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--color-secondary, #2c1810);
+  }
+
+  /* Images */
+  .page-content-inner img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius, 8px);
+    box-shadow: var(--shadow-small, 0 2px 4px rgba(44, 24, 16, 0.1));
+    margin: var(--spacing-lg, 2rem) 0;
+  }
+
+  /* Tables */
+  .page-content-inner table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--spacing-lg, 2rem) 0;
+    background: white;
+    border-radius: var(--border-radius, 8px);
+    overflow: hidden;
+    box-shadow: var(--shadow-small, 0 2px 4px rgba(44, 24, 16, 0.1));
+  }
+
+  .page-content-inner th,
+  .page-content-inner td {
+    padding: var(--spacing-sm, 1rem);
+    text-align: left;
+    border-bottom: 1px solid rgba(92, 191, 238, 0.2);
+  }
+
+     .page-content-inner th {
+     background: var(--color-secondary, #2c1810);
+     color: #f8f5f1;
+     font-family: var(--font-heading--family, 'Special Gothic Expanded One', sans-serif);
+     text-transform: uppercase;
+     letter-spacing: 0.05em;
+     font-size: 0.9rem;
+   }
+
+  .page-content-inner tr:nth-child(even) {
+    background: rgba(248, 245, 241, 0.5);
+  }
+
+     .page-content-inner tr:hover {
+     background: rgba(212, 165, 116, 0.08);
+   }
+
+  /* Code */
+  .page-content-inner code {
+    background: rgba(212, 165, 116, 0.1);
+    color: var(--color-secondary, #2c1810);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.9em;
+  }
+
+  .page-content-inner pre {
+    background: var(--color-secondary, #2c1810);
+    color: #f8f5f1;
+    padding: var(--spacing-md, 1.5rem);
+    border-radius: var(--border-radius, 8px);
+    overflow-x: auto;
+    margin: var(--spacing-lg, 2rem) 0;
+  }
+
+  .page-content-inner pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+
+  /* Page Actions */
+  .page-actions {
+    margin-top: var(--spacing-2xl, 4rem);
+    text-align: center;
+  }
+
+     .page-back-btn {
+     display: inline-flex;
+     align-items: center;
+     gap: 0.5rem;
+     padding: var(--spacing-sm, 1rem) var(--spacing-lg, 2rem);
+     background: var(--color-secondary, #2c1810);
+     color: #f8f5f1;
+     text-decoration: none;
+     border-radius: var(--border-radius, 8px);
+     font-weight: 600;
+     font-size: 0.95rem;
+     text-transform: uppercase;
+     letter-spacing: 0.05em;
+     transition: all 0.3s ease;
+     border: 2px solid transparent;
+     cursor: pointer;
+     box-shadow: var(--shadow-small, 0 2px 4px rgba(44, 24, 16, 0.1));
+   }
+
+     .page-back-btn:hover {
+     transform: translateY(-2px);
+     box-shadow: var(--shadow-medium, 0 4px 20px rgba(44, 24, 16, 0.08));
+     background: #d4a574;
+     color: var(--color-secondary, #2c1810);
+     border-color: #d4a574;
+   }
+
+  .page-back-btn svg {
+    transition: transform 0.3s ease;
+  }
+
+  .page-back-btn:hover svg {
+    transform: translateX(-0.25rem);
+  }
+
+  /* =====================================================
+     RESPONSIVE DESIGN
+     ===================================================== */
+
+  @media (max-width: 1024px) {
+    .page-section {
+      padding: var(--spacing-xl, 3rem) 0;
+    }
+
+    .page-content-inner {
+      padding: var(--spacing-xl, 3rem);
+    }
+
+    .page-hero {
+      padding: var(--spacing-lg, 2rem) 0;
+      margin-bottom: var(--spacing-xl, 3rem);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .page-section {
+      padding: var(--spacing-lg, 2rem) 0;
+    }
+
+    .page-container {
+      padding: 0 var(--spacing-sm, 1rem);
+    }
+
+    .page-content-inner {
+      padding: var(--spacing-lg, 2rem);
+    }
+
+    .page-hero {
+      padding: var(--spacing-md, 1.5rem) 0;
+      margin-bottom: var(--spacing-lg, 2rem);
+    }
+
+    .page-title {
+      font-size: clamp(2rem, 8vw, 2.5rem);
+    }
+
+    .page-content-inner h1 {
+      font-size: clamp(1.75rem, 6vw, 2.25rem);
+    }
+
+    .page-content-inner h2 {
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+
+    .page-hero-accent {
+      width: 150px;
+      height: 150px;
+    }
+
+    /* Stack tables on mobile */
+    .page-content-inner table,
+    .page-content-inner thead,
+    .page-content-inner tbody,
+    .page-content-inner th,
+    .page-content-inner td,
+    .page-content-inner tr {
+      display: block;
+    }
+
+    .page-content-inner thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    .page-content-inner tr {
+      margin-bottom: var(--spacing-sm, 1rem);
+      background: white;
+      border-radius: var(--border-radius, 8px);
+      padding: var(--spacing-sm, 1rem);
+      box-shadow: var(--shadow-small, 0 2px 4px rgba(44, 24, 16, 0.1));
+    }
+
+    .page-content-inner td {
+      border: none;
+      position: relative;
+      padding-left: 30%;
+      padding-bottom: 0.5rem;
+    }
+
+    .page-content-inner td:before {
+      content: attr(data-label) ":";
+      position: absolute;
+      left: 6px;
+      width: 25%;
+      padding-right: var(--spacing-sm, 1rem);
+      white-space: nowrap;
+      font-weight: 600;
+      color: var(--color-primary, #5CBFEE);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .page-content-inner {
+      padding: var(--spacing-md, 1.5rem);
+    }
+
+    .page-content-inner p:first-of-type {
+      padding: var(--spacing-sm, 1rem);
+    }
+
+    .page-actions {
+      margin-top: var(--spacing-xl, 3rem);
+    }
+
+    .page-back-btn {
+      padding: 0.875rem var(--spacing-md, 1.5rem);
+      font-size: 0.9rem;
+    }
+  }
+
+  /* =====================================================
+     ACCESSIBILITY & MOTION
+     ===================================================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    .page-back-btn,
+    .page-content-inner a {
+      transition: none;
+    }
+
+    .page-back-btn:hover,
+    .page-back-btn:hover svg {
+      transform: none;
+    }
+  }
+
+  /* Focus styles for keyboard navigation */
+  .page-back-btn:focus,
+  .page-content-inner a:focus {
+    outline: 2px solid var(--color-primary, #5CBFEE);
+    outline-offset: 2px;
+  }
+
+  /* High contrast support */
+  @media (prefers-contrast: high) {
+    .page-section {
+      background: #fff;
+    }
+
+    .page-content {
+      border: 2px solid #000;
+    }
+
+    .page-title,
+    .page-content-inner h1,
+    .page-content-inner h2,
+    .page-content-inner h3,
+    .page-content-inner h4,
+    .page-content-inner h5,
+    .page-content-inner h6 {
+      color: #000;
+    }
+
+    .page-content-inner p,
+    .page-content-inner li {
+      color: #000;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.page",
-  "settings": []
+  "name": "Page",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Page Display Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_back_button",
+      "label": "Show Back Button",
+      "default": true,
+      "info": "Display a back button at the bottom of the page"
+    }
+  ]
 }
 {% endschema %}

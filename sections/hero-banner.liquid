@@ -1,0 +1,645 @@
+{% comment %}
+  Wide Awake Hero Banner Section
+  Following Shopify 2024 best practices
+{% endcomment %}
+
+<section class="hero-banner hero-banner--{{ section.settings.height }}" id="Banner-{{ section.id }}" aria-labelledby="Banner-heading-{{ section.id }}">
+  <div class="hero-banner__media">
+    {%- if section.settings.hero_image != blank -%}
+      <div class="hero-banner__media-wrapper">
+        {%- liquid
+          assign image_height = section.settings.hero_image.width | divided_by: section.settings.hero_image.aspect_ratio
+          if section.settings.height == 'adapt'
+            assign desktop_height = image_height
+          else
+            assign desktop_height = section.settings.desktop_height
+          endif
+        -%}
+        
+        <img
+          srcset="{%- if section.settings.hero_image.width >= 375 -%}{{ section.settings.hero_image | image_url: width: 375 }} 375w,{%- endif -%}
+                  {%- if section.settings.hero_image.width >= 550 -%}{{ section.settings.hero_image | image_url: width: 550 }} 550w,{%- endif -%}
+                  {%- if section.settings.hero_image.width >= 750 -%}{{ section.settings.hero_image | image_url: width: 750 }} 750w,{%- endif -%}
+                  {%- if section.settings.hero_image.width >= 1100 -%}{{ section.settings.hero_image | image_url: width: 1100 }} 1100w,{%- endif -%}
+                  {%- if section.settings.hero_image.width >= 1500 -%}{{ section.settings.hero_image | image_url: width: 1500 }} 1500w,{%- endif -%}
+                  {%- if section.settings.hero_image.width >= 1780 -%}{{ section.settings.hero_image | image_url: width: 1780 }} 1780w,{%- endif -%}
+                  {%- if section.settings.hero_image.width >= 2000 -%}{{ section.settings.hero_image | image_url: width: 2000 }} 2000w,{%- endif -%}
+                  {%- if section.settings.hero_image.width >= 3000 -%}{{ section.settings.hero_image | image_url: width: 3000 }} 3000w,{%- endif -%}
+                  {{ section.settings.hero_image | image_url }} {{ section.settings.hero_image.width }}w"
+          src="{{ section.settings.hero_image | image_url: width: 1500 }}"
+          sizes="100vw"
+          alt="{{ section.settings.hero_image.alt | escape }}"
+          class="hero-banner__image"
+          loading="lazy"
+          width="{{ section.settings.hero_image.width }}"
+          height="{{ section.settings.hero_image.height }}"
+          style="--desktop-height: {{ desktop_height }}px"
+        >
+      </div>
+    {%- endif -%}
+  </div>
+
+  <div class="hero-banner__text banner__content banner__content--{{ section.settings.desktop_content_position }} banner__content--mobile-{{ section.settings.mobile_content_alignment }}">
+    <div class="hero-banner__container">
+      <div class="hero-banner__box color-{{ section.settings.color_scheme }} gradient">
+        {%- if section.settings.hero_title != blank -%}
+          <h1 id="Banner-heading-{{ section.id }}" class="banner__heading inline-richtext {{ section.settings.heading_size }}">
+            {{ section.settings.hero_title }}
+          </h1>
+        {%- endif -%}
+        
+        {%- if section.settings.hero_subtitle != blank -%}
+          <div class="banner__text rte {{ section.settings.text_style }}" {{ block.shopify_attributes }}>
+            <p>{{ section.settings.hero_subtitle }}</p>
+          </div>
+        {%- endif -%}
+        
+        {%- if section.settings.primary_button_text != blank or section.settings.secondary_button_text != blank -%}
+          <div class="banner__buttons">
+            {%- if section.settings.primary_button_text != blank -%}
+              <a{% if section.settings.primary_button_link == blank %} role="link" aria-disabled="true"{% else %} href="{{ section.settings.primary_button_link }}"{% endif %} class="button button--primary">
+                {{ section.settings.primary_button_text | escape }}
+              </a>
+            {%- endif -%}
+            
+            {%- if section.settings.secondary_button_text != blank -%}
+              <a{% if section.settings.secondary_button_link == blank %} role="link" aria-disabled="true"{% else %} href="{{ section.settings.secondary_button_link }}"{% endif %} class="button button--secondary">
+                {{ section.settings.secondary_button_text | escape }}
+              </a>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .hero-banner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: var(--viewport-height, 100vh);
+    overflow: hidden;
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+  }
+
+  .hero-banner--small {
+    min-height: 40rem;
+  }
+
+  .hero-banner--medium {
+    min-height: 50rem;
+  }
+
+  .hero-banner--large {
+    min-height: 75rem;
+  }
+
+  .hero-banner--adapt,
+  .hero-banner--adapt_image {
+    min-height: auto;
+  }
+
+  @media screen and (max-width: 749px) {
+    .hero-banner--small {
+      min-height: 28rem;
+    }
+
+    .hero-banner--medium {
+      min-height: 34rem;
+    }
+
+    .hero-banner--large {
+      min-height: 40rem;
+    }
+  }
+
+  .hero-banner__media {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+
+  .hero-banner__media-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .hero-banner__image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .hero-banner:hover .hero-banner__image {
+    transform: scale3d(1.03, 1.03, 1);
+  }
+
+  .hero-banner__text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: var(--spacing-lg) 0;
+    width: 100%;
+  }
+
+  .hero-banner__container {
+    max-width: var(--container-max-width, 1200px);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    width: 100%;
+  }
+
+  .hero-banner__box {
+    max-width: 68rem;
+    padding: var(--spacing-xl) var(--spacing-lg);
+    text-align: center;
+    border-radius: var(--border-radius-large);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-large);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0 auto;
+  }
+
+  .hero-banner__box.color-background-1 {
+    background: rgba(var(--color-background), 0.95);
+    color: rgb(var(--color-foreground));
+  }
+
+  .hero-banner__box.color-inverse {
+    background: rgba(var(--color-foreground), 0.9);
+    color: rgb(var(--color-background));
+  }
+
+  .banner__heading {
+    margin-bottom: var(--spacing-md);
+    font-family: var(--font-heading--family);
+    color: var(--color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .banner__heading.h0 {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 0.9;
+  }
+
+  .banner__heading.h1 {
+    font-size: var(--font-size-h1);
+  }
+
+  .banner__heading.h2 {
+    font-size: var(--font-size-h2);
+  }
+
+  .banner__text {
+    margin-bottom: var(--spacing-lg);
+    font-size: var(--font-size-body);
+    line-height: 1.6;
+    color: var(--color-muted);
+    font-family: 'Poppins' !important;
+  }
+
+  .banner__text.subtitle {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    font-weight: 500;
+    font-family: 'Poppins' !important;
+  }
+
+  .banner__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    justify-content: center;
+    align-items: center;
+  }
+
+  .banner__buttons .button,
+  .banner__buttons .btn {
+    font-family: 'Poppins' !important;
+  }
+
+  /* Content positioning */
+  .banner__content--top-left .hero-banner__container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .banner__content--top-left .hero-banner__box {
+    margin: 0;
+    text-align: left;
+  }
+
+  .banner__content--top-center .hero-banner__container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .banner__content--top-center .hero-banner__box {
+    margin: 0;
+    text-align: center;
+  }
+
+  .banner__content--top-right .hero-banner__container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+  }
+
+  .banner__content--top-right .hero-banner__box {
+    margin: 0;
+    text-align: right;
+  }
+
+  .banner__content--middle-left {
+    align-items: center;
+  }
+
+  .banner__content--middle-left .hero-banner__container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .banner__content--middle-left .hero-banner__box {
+    margin: 0;
+    text-align: left;
+  }
+
+  .banner__content--middle-center {
+    align-items: center;
+  }
+
+  .banner__content--middle-center .hero-banner__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .banner__content--middle-center .hero-banner__box {
+    margin: 0;
+    text-align: center;
+  }
+
+  .banner__content--middle-right {
+    align-items: center;
+  }
+
+  .banner__content--middle-right .hero-banner__container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .banner__content--middle-right .hero-banner__box {
+    margin: 0;
+    text-align: right;
+  }
+
+  .banner__content--bottom-left {
+    align-items: flex-end;
+  }
+
+  .banner__content--bottom-left .hero-banner__container {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+  }
+
+  .banner__content--bottom-left .hero-banner__box {
+    margin: 0;
+    text-align: left;
+  }
+
+  .banner__content--bottom-center {
+    align-items: flex-end;
+  }
+
+  .banner__content--bottom-center .hero-banner__container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+  }
+
+  .banner__content--bottom-center .hero-banner__box {
+    margin: 0;
+    text-align: center;
+  }
+
+  .banner__content--bottom-right {
+    align-items: flex-end;
+  }
+
+  .banner__content--bottom-right .hero-banner__container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  .banner__content--bottom-right .hero-banner__box {
+    margin: 0;
+    text-align: right;
+  }
+
+  /* Mobile content alignment */
+  @media screen and (max-width: 749px) {
+    .hero-banner__box {
+      padding: var(--spacing-lg) var(--spacing-md);
+    }
+
+    .banner__content--mobile-left .hero-banner__box {
+      text-align: left;
+    }
+
+    .banner__content--mobile-center .hero-banner__box {
+      text-align: center;
+    }
+
+    .banner__content--mobile-right .hero-banner__box {
+      text-align: right;
+    }
+
+    .banner__buttons {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .banner__buttons .button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Accessibility improvements */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-banner__image {
+      transition: none;
+    }
+    
+    .hero-banner:hover .hero-banner__image {
+      transform: none;
+    }
+  }
+
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .hero-banner__box {
+      background: rgb(var(--color-background));
+      border: 2px solid rgb(var(--color-foreground));
+      backdrop-filter: none;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    .hero-banner {
+      min-height: auto;
+      background: white;
+      color: black;
+    }
+    
+    .hero-banner__box {
+      background: white;
+      color: black;
+      box-shadow: none;
+      border: 1px solid black;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.image_banner.name",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "t:sections.image_banner.settings.image.label"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "hero_title",
+      "default": "We Care About Your Coffee.",
+      "label": "t:sections.image_banner.settings.heading.label"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "t:sections.all.heading_size.options__1.label"
+        },
+        {
+          "value": "h1",
+          "label": "t:sections.all.heading_size.options__2.label"
+        },
+        {
+          "value": "h0",
+          "label": "t:sections.all.heading_size.options__3.label"
+        }
+      ],
+      "default": "h1",
+      "label": "t:sections.all.heading_size.label"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "hero_subtitle",
+      "default": "Our coffee beans are meticulously sourced and roasted with attention to detail to bring you a flavorful experience.",
+      "label": "t:sections.image_banner.settings.text.label"
+    },
+    {
+      "type": "select",
+      "id": "text_style",
+      "options": [
+        {
+          "value": "body",
+          "label": "t:sections.image_banner.settings.text_style.options__1.label"
+        },
+        {
+          "value": "subtitle",
+          "label": "t:sections.image_banner.settings.text_style.options__2.label"
+        },
+        {
+          "value": "caption-with-letter-spacing",
+          "label": "t:sections.image_banner.settings.text_style.options__3.label"
+        }
+      ],
+      "default": "body",
+      "label": "t:sections.image_banner.settings.text_style.label"
+    },
+    {
+      "type": "text",
+      "id": "primary_button_text",
+      "default": "Shop Now",
+      "label": "t:sections.image_banner.settings.button_label_1.label",
+      "info": "t:sections.image_banner.settings.button_label_1.info"
+    },
+    {
+      "type": "url",
+      "id": "primary_button_link",
+      "label": "t:sections.image_banner.settings.button_link_1.label"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_text",
+      "default": "About Us",
+      "label": "t:sections.image_banner.settings.button_label_2.label",
+      "info": "t:sections.image_banner.settings.button_label_2.info"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "label": "t:sections.image_banner.settings.button_link_2.label"
+    },
+    {
+      "type": "select",
+      "id": "desktop_content_position",
+      "options": [
+        {
+          "value": "top-left",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__1.label"
+        },
+        {
+          "value": "top-center",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__2.label"
+        },
+        {
+          "value": "top-right",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__3.label"
+        },
+        {
+          "value": "middle-left",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__4.label"
+        },
+        {
+          "value": "middle-center",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__5.label"
+        },
+        {
+          "value": "middle-right",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__6.label"
+        },
+        {
+          "value": "bottom-left",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__7.label"
+        },
+        {
+          "value": "bottom-center",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__8.label"
+        },
+        {
+          "value": "bottom-right",
+          "label": "t:sections.image_banner.settings.desktop_content_position.options__9.label"
+        }
+      ],
+      "default": "middle-center",
+      "label": "t:sections.image_banner.settings.desktop_content_position.label"
+    },
+    {
+      "type": "select",
+      "id": "mobile_content_alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "t:sections.image_banner.settings.mobile_content_alignment.options__1.label"
+        },
+        {
+          "value": "center",
+          "label": "t:sections.image_banner.settings.mobile_content_alignment.options__2.label"
+        },
+        {
+          "value": "right",
+          "label": "t:sections.image_banner.settings.mobile_content_alignment.options__3.label"
+        }
+      ],
+      "default": "center",
+      "label": "t:sections.image_banner.settings.mobile_content_alignment.label"
+    },
+    {
+      "type": "select",
+      "id": "color_scheme",
+      "options": [
+        {
+          "value": "background-1",
+          "label": "t:sections.all.colors.background_1.label"
+        },
+        {
+          "value": "background-2",
+          "label": "t:sections.all.colors.background_2.label"
+        },
+        {
+          "value": "inverse",
+          "label": "t:sections.all.colors.inverse.label"
+        },
+        {
+          "value": "accent-1",
+          "label": "t:sections.all.colors.accent_1.label"
+        },
+        {
+          "value": "accent-2",
+          "label": "t:sections.all.colors.accent_2.label"
+        }
+      ],
+      "default": "background-1",
+      "label": "t:sections.all.colors.label"
+    },
+    {
+      "type": "select",
+      "id": "height",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "t:sections.image_banner.settings.height.options__1.label"
+        },
+        {
+          "value": "small",
+          "label": "t:sections.image_banner.settings.height.options__2.label"
+        },
+        {
+          "value": "medium",
+          "label": "t:sections.image_banner.settings.height.options__3.label"
+        },
+        {
+          "value": "large",
+          "label": "t:sections.image_banner.settings.height.options__4.label"
+        }
+      ],
+      "default": "medium",
+      "label": "t:sections.image_banner.settings.height.label"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.image_banner.presets.name"
+    }
+  ]
+}
+{% endschema %} 

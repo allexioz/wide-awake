@@ -1,0 +1,407 @@
+<section class="youtube-media">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-eyebrow">{{ section.settings.eyebrow | default: "Behind the Beans" }}</span>
+      <h2 class="section-title">{{ section.settings.title | default: "From Farm to Cup" }}</h2>
+      <p class="section-subtitle">{{ section.settings.subtitle | default: "Go behind the scenes with our coffee journey through the Philippines and beyond." }}</p>
+    </div>
+    
+    <div class="media-grid">
+      {% if section.settings.featured_video_url %}
+        <div class="featured-video">
+          <div class="video-wrapper">
+            <iframe 
+              src="{{ section.settings.featured_video_url }}" 
+              title="{{ section.settings.featured_video_title | default: 'Wide Awake Coffee Video' }}"
+              frameborder="0" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+              allowfullscreen>
+            </iframe>
+          </div>
+          {% if section.settings.featured_video_title %}
+            <h3 class="video-title">{{ section.settings.featured_video_title }}</h3>
+          {% endif %}
+          {% if section.settings.featured_video_description %}
+            <p class="video-description">{{ section.settings.featured_video_description }}</p>
+          {% endif %}
+        </div>
+      {% endif %}
+      
+      <div class="video-sidebar">
+        {% for block in section.blocks %}
+          {% case block.type %}
+            {% when 'video' %}
+              <div class="video-item" {{ block.shopify_attributes }}>
+                <div class="video-thumbnail">
+                  <a href="{{ block.settings.video_url }}" target="_blank" rel="noopener">
+                    {% if block.settings.thumbnail_image %}
+                      <img src="{{ block.settings.thumbnail_image | image_url: width: 300 }}" 
+                           alt="{{ block.settings.video_title }}"
+                           loading="lazy">
+                    {% endif %}
+                    <div class="play-overlay">
+                      <i data-lucide="play" class="play-icon"></i>
+                    </div>
+                  </a>
+                </div>
+                <div class="video-info">
+                  <h4 class="video-item-title">{{ block.settings.video_title }}</h4>
+                  {% if block.settings.video_duration %}
+                    <span class="video-duration">{{ block.settings.video_duration }}</span>
+                  {% endif %}
+                </div>
+              </div>
+          {% endcase %}
+        {% endfor %}
+        
+        <div class="channel-cta">
+          <div class="channel-info">
+            <div class="channel-icon">
+              <i data-lucide="youtube" class="youtube-icon"></i>
+            </div>
+            <div class="channel-text">
+              <h4>Wide Awake Coffee</h4>
+              <p>Subscribe for coffee stories</p>
+            </div>
+          </div>
+          <a href="https://www.youtube.com/@wideawakeph3662" target="_blank" rel="noopener" class="btn-primary">
+            Subscribe
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .youtube-media {
+    padding: 80px 0;
+    background: #fafafa;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .section-eyebrow {
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #5CBFEE;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    color: #2c1810;
+    margin-bottom: 16px;
+  }
+
+  .section-subtitle {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .media-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .featured-video {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .video-wrapper {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+
+  .video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2c1810;
+    margin: 20px 25px 12px;
+  }
+
+  .video-description {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 0 25px 25px;
+  }
+
+  .video-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .video-item {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .video-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  }
+
+  .video-thumbnail {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .video-thumbnail img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .video-item:hover .video-thumbnail img {
+    transform: scale(1.05);
+  }
+
+  .play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .video-item:hover .play-overlay {
+    background: #5CBFEE;
+    color: white;
+    transform: translate(-50%, -50%) scale(1.1);
+  }
+
+  .play-icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 2px; /* Visual centering for play icon */
+  }
+
+  .video-info {
+    padding: 15px;
+  }
+
+  .video-item-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #2c1810;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-duration {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    color: #999;
+    background: #f5f5f5;
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .channel-cta {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+    color: white;
+    padding: 25px;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .channel-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .channel-icon {
+    background: rgba(255, 255, 255, 0.2);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .youtube-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .channel-text h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+
+  .channel-text p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    margin: 0;
+    opacity: 0.9;
+  }
+
+  .channel-cta .btn-primary {
+    background: white;
+    color: #5CBFEE;
+    border: none;
+    font-weight: 600;
+  }
+
+  .channel-cta .btn-primary:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+  }
+
+  /* Mobile Responsive */
+  @media screen and (max-width: 768px) {
+    .youtube-media {
+      padding: 60px 0;
+    }
+
+    .media-grid {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .video-sidebar {
+      grid-row: 2;
+    }
+
+    .channel-info {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .channel-text {
+      text-align: center;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "YouTube Media",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow Text",
+      "default": "Behind the Beans"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "From Farm to Cup"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Go behind the scenes with our coffee journey through the Philippines and beyond."
+    },
+    {
+      "type": "url",
+      "id": "featured_video_url",
+      "label": "Featured Video Embed URL",
+      "info": "Use YouTube embed URL format: https://www.youtube.com/embed/VIDEO_ID"
+    },
+    {
+      "type": "text",
+      "id": "featured_video_title",
+      "label": "Featured Video Title"
+    },
+    {
+      "type": "textarea",
+      "id": "featured_video_description",
+      "label": "Featured Video Description"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "video",
+      "name": "Video",
+      "settings": [
+        {
+          "type": "text",
+          "id": "video_title",
+          "label": "Video Title"
+        },
+        {
+          "type": "url",
+          "id": "video_url",
+          "label": "Video URL",
+          "info": "Link to the YouTube video"
+        },
+        {
+          "type": "image_picker",
+          "id": "thumbnail_image",
+          "label": "Thumbnail Image"
+        },
+        {
+          "type": "text",
+          "id": "video_duration",
+          "label": "Video Duration",
+          "placeholder": "5:30"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "YouTube Media"
+    }
+  ]
+}
+{% endschema %} 

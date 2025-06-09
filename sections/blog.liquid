@@ -5,31 +5,458 @@
   https://shopify.dev/docs/storefronts/themes/architecture/templates/blog
 {% endcomment %}
 
-<h1>{{ blog.title }}</h1>
-
-{% paginate blog.articles by 5 %}
-  {% for article in blog.articles %}
-    <div>
-      {% if article.image %}
-        {{ article.image | image_url: width: 1000 | image_tag }}
-      {% endif %}
-      <h2>
-        {{ article.title | link_to: article.url }}
-      </h2>
-      {% assign date = article.published_at | time_tag: format: 'date' %}
-      <p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-      <p>{{ article.excerpt }}</p>
+<section class="blog-section">
+  <div class="container">
+    <div class="blog-header">
+      <h1 class="blog-title">{{ blog.title }}</h1>
+      <p class="blog-description">
+        Stay updated with our latest coffee insights, brewing guides, and industry news.
+      </p>
     </div>
-  {% endfor %}
 
-  {%- if paginate.pages > 1 -%}
-    {{- paginate | default_pagination -}}
-  {%- endif -%}
-{% endpaginate %}
+    <div class="blog-content">
+      {% paginate blog.articles by 6 %}
+        <div class="articles-grid">
+          {% for article in blog.articles %}
+            <article class="article-card">
+              {% if article.image %}
+                <div class="article-image">
+                  <a href="{{ article.url }}" aria-label="Read {{ article.title }}">
+                    {{ article.image | image_url: width: 600, height: 400 | image_tag: loading: 'lazy', alt: article.title }}
+                  </a>
+                </div>
+              {% endif %}
+              
+              <div class="article-content">
+                <div class="article-meta">
+                  {% assign date = article.published_at | time_tag: format: 'date' %}
+                  <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}" class="article-date">
+                    <i data-lucide="calendar" class="meta-icon"></i>
+                    {{ article.published_at | date: '%B %d, %Y' }}
+                  </time>
+                  {% if article.author %}
+                    <span class="article-author">
+                      <i data-lucide="user" class="meta-icon"></i>
+                      {{ article.author }}
+                    </span>
+                  {% endif %}
+                </div>
+
+                <h2 class="article-title">
+                  <a href="{{ article.url }}">{{ article.title }}</a>
+                </h2>
+
+                {% if article.excerpt %}
+                  <p class="article-excerpt">{{ article.excerpt | strip_html | truncate: 150 }}</p>
+                {% endif %}
+
+                <a href="{{ article.url }}" class="read-more-btn">
+                  <span>Read More</span>
+                  <i data-lucide="arrow-right" class="btn-icon"></i>
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          <div class="pagination-wrapper">
+            <nav class="pagination" aria-label="Blog pagination">
+              {%- if paginate.previous -%}
+                <a href="{{ paginate.previous.url }}" class="pagination-btn prev-btn" aria-label="Previous page">
+                  <i data-lucide="chevron-left" class="pagination-icon"></i>
+                  Previous
+                </a>
+              {%- endif -%}
+
+              <div class="pagination-pages">
+                {%- for part in paginate.parts -%}
+                  {%- if part.is_link -%}
+                    <a href="{{ part.url }}" class="pagination-number">{{ part.title }}</a>
+                  {%- else -%}
+                    {%- if part.title == paginate.current_page -%}
+                      <span class="pagination-number current" aria-current="page">{{ part.title }}</span>
+                    {%- else -%}
+                      <span class="pagination-ellipsis">{{ part.title }}</span>
+                    {%- endif -%}
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="pagination-btn next-btn" aria-label="Next page">
+                  Next
+                  <i data-lucide="chevron-right" class="pagination-icon"></i>
+                </a>
+              {%- endif -%}
+            </nav>
+          </div>
+        {%- endif -%}
+      {% endpaginate %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
+
+  .blog-section {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    color: #1a1a1a;
+    padding: 80px 0;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .blog-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .blog-title {
+    font-family: 'Special Gothic Expanded One', monospace;
+    font-size: 3rem;
+    font-weight: 400;
+    margin: 0 0 20px 0;
+    background: linear-gradient(135deg, #5CBFEE 0%, #E6983B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+  }
+
+  .blog-description {
+    font-size: 1.2rem;
+    color: #666666;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* Articles Grid */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 32px;
+    margin-bottom: 60px;
+  }
+
+  .article-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(229, 229, 229, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative;
+  }
+
+  .article-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-color: rgba(92, 191, 238, 0.3);
+  }
+
+  .article-image {
+    position: relative;
+    overflow: hidden;
+    height: 240px;
+  }
+
+  .article-image a {
+    display: block;
+    height: 100%;
+  }
+
+  .article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .article-card:hover .article-image img {
+    transform: scale(1.05);
+  }
+
+  .article-content {
+    padding: 24px;
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .article-date,
+  .article-author {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #666666;
+    font-weight: 500;
+  }
+
+  .meta-icon {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+  }
+
+  .article-title {
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+  }
+
+  .article-title a {
+    font-family: 'Special Gothic Expanded One', monospace;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #1a1a1a;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .article-title a:hover {
+    background: linear-gradient(135deg, #5CBFEE 0%, #E6983B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .article-excerpt {
+    color: #666666;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+
+  .read-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #5CBFEE 0%, #E6983B 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .read-more-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(92, 191, 238, 0.3);
+  }
+
+  .btn-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    transition: transform 0.3s ease;
+  }
+
+  .read-more-btn:hover .btn-icon {
+    transform: translateX(4px);
+  }
+
+  /* Pagination */
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+  }
+
+  .pagination {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    padding: 16px 24px;
+    border: 1px solid rgba(229, 229, 229, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(248, 248, 248, 0.8);
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(229, 229, 229, 0.5);
+  }
+
+  .pagination-btn:hover {
+    background: linear-gradient(135deg, #5CBFEE 0%, #E6983B 100%);
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(92, 191, 238, 0.3);
+  }
+
+  .pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .pagination-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .pagination-number:hover {
+    background: rgba(92, 191, 238, 0.1);
+    color: #5CBFEE;
+  }
+
+  .pagination-number.current {
+    background: linear-gradient(135deg, #5CBFEE 0%, #E6983B 100%);
+    color: white;
+    font-weight: 600;
+  }
+
+  .pagination-ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: #666666;
+    font-size: 0.9rem;
+  }
+
+  .pagination-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+  }
+
+  /* Empty State */
+  .articles-grid:empty::after {
+    content: 'No articles found.';
+    grid-column: 1 / -1;
+    text-align: center;
+    color: #666666;
+    font-size: 1.1rem;
+    padding: 60px 20px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .blog-section {
+      padding: 60px 0;
+    }
+
+    .container {
+      padding: 0 16px;
+    }
+
+    .blog-title {
+      font-size: 2.2rem;
+    }
+
+    .blog-description {
+      font-size: 1rem;
+    }
+
+    .articles-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .article-content {
+      padding: 20px;
+    }
+
+    .article-meta {
+      gap: 12px;
+    }
+
+    .pagination {
+      flex-wrap: wrap;
+      padding: 12px 16px;
+    }
+
+    .pagination-pages {
+      order: -1;
+      width: 100%;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .blog-title {
+      font-size: 1.8rem;
+    }
+
+    .article-image {
+      height: 200px;
+    }
+
+    .article-title a {
+      font-size: 1.1rem;
+    }
+
+    .pagination-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .pagination-number {
+      width: 36px;
+      height: 36px;
+      font-size: 0.8rem;
+    }
+  }
+{% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:general.blog",
-  "settings": []
+  "name": "Blog",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Blog Settings"
+    },
+    {
+      "type": "text",
+      "id": "custom_description",
+      "label": "Custom Description",
+      "info": "Override the default blog description"
+    }
+  ]
 }
 {% endschema %}

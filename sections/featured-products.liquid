@@ -1,0 +1,1052 @@
+{% comment %}
+  Wide Awake Featured Products Section
+{% endcomment %}
+
+<section class="featured-products">
+  <div class="container">
+    {% if section.settings.section_title != blank %}
+      <div class="section-header">
+        <h2 class="section-title">{{ section.settings.section_title }}</h2>
+        {% if section.settings.section_subtitle != blank %}
+          <p class="section-subtitle">{{ section.settings.section_subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    {% if section.settings.featured_collection != blank %}
+      <div class="products-grid">
+        {% assign featured_collection = collections[section.settings.featured_collection] %}
+        {% for product in featured_collection.products limit: section.settings.products_to_show %}
+          <div class="product-card">
+            <div class="product-image">
+              {% if product.featured_image %}
+                <a href="{{ product.url }}">
+                  <img src="{{ product.featured_image | image_url: width: 400 }}" 
+                       alt="{{ product.featured_image.alt | default: product.title }}"
+                       loading="lazy">
+                </a>
+                
+                <!-- Quick View Button -->
+                <button class="quick-view-btn product-quick-view-btn"
+                        data-product-id="{{ product.id }}"
+                        data-product-handle="{{ product.handle }}"
+                        data-product-title="{{ product.title }}"
+                        data-product-vendor="{{ product.vendor }}"
+                        data-product-image="{{ product.featured_image | image_url: width: 600 }}"
+                        data-product-price="{{ product.price }}"
+                        data-product-compare-price="{{ product.compare_at_price }}"
+                        data-product-url="{{ product.url }}"
+                        aria-label="Quick view {{ product.title }}">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  Quick View
+                </button>
+              {% endif %}
+            </div>
+            <div class="product-info">
+              <h3 class="product-title">
+                <a href="{{ product.url }}">{{ product.title }}</a>
+              </h3>
+              <div class="product-price">
+                {% if product.compare_at_price > product.price %}
+                  <span class="price-sale">{{ product.price | money }}</span>
+                  <span class="price-regular">{{ product.compare_at_price | money }}</span>
+                {% else %}
+                  <span class="price">{{ product.price | money }}</span>
+                {% endif %}
+              </div>
+              {% if product.description != blank %}
+                <p class="product-description">{{ product.description | strip_html | truncate: 100 }}</p>
+              {% endif %}
+              <div class="product-actions">
+                <a href="{{ product.url }}" class="btn btn-outline">View Details</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if section.settings.show_view_all %}
+        <div class="section-footer">
+          <a href="{{ featured_collection.url }}" class="btn btn-primary btn-large">
+            {{ section.settings.view_all_text | default: "View All Coffee" }}
+          </a>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</section>
+
+{% comment %} Quick View Modal for Featured Products {% endcomment %}
+<div id="quickViewModal" class="quick-view-overlay" style="display: none;">
+  <div class="quick-view-modal">
+    <div class="quick-view-content">
+      <!-- Close Button -->
+      <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close quick view">×</button>
+
+      <!-- Product Image Section -->
+      <div class="quick-view-image-section">
+        <div class="quick-view-image-container">
+          <img id="quickViewImage" src="" alt="" class="quick-view-image">
+        </div>
+      </div>
+
+      <!-- Product Details Section -->
+      <div class="quick-view-details-section">
+        <div class="quick-view-header">
+          <p class="quick-view-vendor quick-view-subtitle" id="quickViewVendor">QUICK VIEW</p>
+          <h2 class="quick-view-title" id="quickViewTitle">Product Name</h2>
+          <div class="quick-view-price" id="quickViewPrice">
+            <span class="price-current">₱0.00</span>
+          </div>
+        </div>
+
+        <form class="quick-view-form" id="quickViewForm">
+          <!-- Quantity Selector -->
+          <div class="quantity-section quick-view-quantity">
+            <label class="quantity-label">Quantity</label>
+            <div class="quantity-controls">
+              <button type="button" class="quantity-btn quantity-decrease" onclick="updateQuantity(-1)">−</button>
+              <input type="number" class="quantity-input" id="quickViewQuantity" value="1" min="1" max="99">
+              <button type="button" class="quantity-btn quantity-increase" onclick="updateQuantity(1)">+</button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="quick-view-actions quick-view-buttons">
+            <button type="submit" class="btn-add-to-cart quick-view-btn btn-primary">
+              ADD TO CART
+            </button>
+            <button type="button" class="btn-buy-now quick-view-btn btn-secondary">
+              BUY IT NOW
+            </button>
+          </div>
+        </form>
+
+        <!-- View Full Details Link -->
+        <div class="view-details-section">
+          <a href="#" class="view-details-link quick-view-details-link" id="quickViewDetailsLink">
+            VIEW FULL DETAILS
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .featured-products {
+    padding: 80px 0;
+    background-color: #f8f5f1;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c1810;
+    margin-bottom: 1rem;
+    font-family: 'Special Gothic Expanded One' !important;
+  }
+
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-family: 'Poppins' !important;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change: transform;
+  }
+
+  .product-card:hover {
+    transform: translate3d(0, -5px, 0);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-image {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+    will-change: transform;
+  }
+
+  /* Quick View Button */
+  .product-quick-view-btn {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(92, 191, 238, 0.2);
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #5CBFEE;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+  }
+
+  .product-card:hover .product-quick-view-btn {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .product-quick-view-btn:hover {
+    background: rgba(92, 191, 238, 0.1);
+    border-color: rgba(92, 191, 238, 0.4);
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 25px rgba(92, 191, 238, 0.2);
+  }
+
+  .product-quick-view-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+  }
+
+  .product-card:hover .product-image img {
+    transform: scale3d(1.04, 1.04, 1);
+  }
+
+  .product-info {
+    padding: 24px;
+  }
+
+  .product-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-family: 'Poppins' !important;
+  }
+
+  .product-title a {
+    color: #2c1810;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-family: 'Poppins' !important;
+  }
+
+  .product-title a:hover {
+    color: #5CBFEE;
+  }
+
+  .product-price {
+    margin-bottom: 12px;
+  }
+
+  .price {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c1810;
+    font-family: 'Poppins' !important;
+  }
+
+  .price-sale {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #d4574c;
+    margin-right: 8px;
+    font-family: 'Poppins' !important;
+  }
+
+  .price-regular {
+    font-size: 0.9rem;
+    color: #999;
+    text-decoration: line-through;
+    font-family: 'Poppins' !important;
+  }
+
+  .product-description {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 16px;
+    font-family: 'Poppins' !important;
+  }
+
+  .product-actions {
+    margin-top: auto;
+  }
+
+  .btn-outline {
+    background-color: transparent;
+    color: #2c1810;
+    border: 2px solid #2c1810;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-family: 'Poppins' !important;
+  }
+
+  .btn-outline:hover {
+    background-color: #2c1810;
+    color: white;
+  }
+
+  .section-footer {
+    text-align: center;
+  }
+
+  .btn-large {
+    padding: 16px 40px;
+    font-size: 1.1rem;
+    font-family: 'Poppins' !important;
+  }
+
+  /* Touch-friendly states for mobile */
+  .product-card.touch-active {
+    transform: translate3d(0, -3px, 0) scale(0.98);
+  }
+
+  .product-card.hover-effect .product-image img {
+    transform: scale3d(1.04, 1.04, 1);
+  }
+
+  /* Loading state shimmer */
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .product-image:not(:has(img[src])) {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* Responsive performance optimizations */
+  @media (max-width: 768px) {
+    .product-card {
+      transition-duration: 0.15s;
+    }
+    
+    .product-card:hover {
+      transform: translate3d(0, -3px, 0);
+    }
+    
+    .product-card:hover .product-image img {
+      transform: scale3d(1.02, 1.02, 1);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .products-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Quick View Modal Styles */
+  .quick-view-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0) !important;
+    backdrop-filter: blur(0px) !important;
+    z-index: 9999 !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.15s ease, backdrop-filter 0.2s ease !important;
+    contain: layout style paint !important;
+    transform: translate3d(0, 0, 0) !important;
+    will-change: opacity, backdrop-filter !important;
+  }
+
+  .quick-view-overlay[style*="display: flex"] {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  .quick-view-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+
+  /* Choreographed exit animations */
+  .quick-view-overlay.closing {
+    opacity: 0 !important;
+    transition: opacity 0.25s ease !important;
+  }
+
+  .quick-view-overlay.closing .quick-view-modal {
+    transform: scale(0.95) translate3d(0, 20px, 0) !important;
+    transition: transform 0.25s cubic-bezier(0.55, 0.085, 0.68, 0.53) !important;
+  }
+
+  /* Staggered exit choreography */
+  .quick-view-overlay.closing .quick-view-details-link {
+    animation: fadeOutDown 0.2s ease forwards;
+  }
+
+  .quick-view-overlay.closing .quick-view-buttons {
+    animation: slideOutDown 0.2s ease 0.05s forwards;
+  }
+
+  .quick-view-overlay.closing .quick-view-quantity {
+    animation: slideOutRight 0.2s ease 0.1s forwards;
+  }
+
+  .quick-view-overlay.closing .quick-view-price {
+    animation: slideOutRight 0.2s ease 0.12s forwards;
+  }
+
+  .quick-view-overlay.closing .quick-view-title {
+    animation: slideOutRight 0.2s ease 0.15s forwards;
+  }
+
+  .quick-view-overlay.closing .quick-view-image-container {
+    animation: slideOutLeft 0.25s ease 0.1s forwards;
+  }
+
+  .quick-view-overlay.closing .quick-view-close {
+    animation: scaleOut 0.15s ease forwards;
+  }
+
+  /* Exit keyframes */
+  @keyframes fadeOutDown {
+    to {
+      opacity: 0;
+      transform: translate3d(0, 15px, 0);
+    }
+  }
+
+  @keyframes slideOutDown {
+    to {
+      opacity: 0;
+      transform: translate3d(0, 25px, 0) scale3d(0.95, 0.95, 1);
+    }
+  }
+
+  @keyframes slideOutRight {
+    to {
+      opacity: 0;
+      transform: translate3d(30px, 0, 0);
+    }
+  }
+
+  @keyframes slideOutLeft {
+    to {
+      opacity: 0;
+      transform: translate3d(-40px, 0, 0) scale3d(0.95, 0.95, 1);
+    }
+  }
+
+  @keyframes scaleOut {
+    to {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 1);
+    }
+  }
+
+  .quick-view-modal {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(92, 191, 238, 0.2) !important;
+    border-radius: 24px !important;
+    max-width: 1000px !important;
+    width: 95% !important;
+    max-height: 85vh !important;
+    overflow: hidden !important;
+    transform: scale(0.97) translate3d(0, 0, 0) !important;
+    transition: transform 0.15s ease !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 
+                0 8px 25px rgba(92, 191, 238, 0.1) !important;
+    position: relative !important;
+    opacity: 1 !important;
+    contain: layout style !important;
+    will-change: transform !important;
+  }
+
+  .quick-view-overlay.active .quick-view-modal {
+    transform: scale(1) translate3d(0, 0, 0) !important;
+  }
+
+  .quick-view-content {
+    display: grid !important;
+    grid-template-columns: 1.2fr 1fr !important;
+    height: 100% !important;
+    max-height: 85vh !important;
+    position: relative !important;
+    z-index: 1 !important;
+    min-height: 500px !important;
+    overflow: hidden !important;
+  }
+
+  .quick-view-close {
+    position: absolute !important;
+    top: 24px !important;
+    right: 24px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(92, 191, 238, 0.1) !important;
+    border-radius: 50% !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 20 !important;
+    backdrop-filter: blur(20px) !important;
+    color: #6c757d !important;
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .quick-view-close:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(92, 191, 238, 0.2) !important;
+    color: #495057 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .quick-view-image-section {
+    background: linear-gradient(135deg, 
+      rgba(92, 191, 238, 0.02) 0%, 
+      rgba(255, 255, 255, 0.8) 30%,
+      rgba(248, 249, 250, 0.9) 100%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 50px !important;
+    position: relative !important;
+    border-radius: 24px 0 0 24px !important;
+  }
+
+  .quick-view-image-container {
+    width: 100% !important;
+    max-width: 380px !important;
+    aspect-ratio: 1 !important;
+    position: relative !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+    background: white !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), 
+                0 8px 25px rgba(92, 191, 238, 0.06) !important;
+    z-index: 2 !important;
+  }
+
+  .quick-view-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .quick-view-details-section {
+    padding: 50px 45px !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 0 24px 24px 0 !important;
+    position: relative !important;
+  }
+
+  .quick-view-title {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: #2c1810 !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.2 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .quick-view-subtitle {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    color: #6c757d !important;
+    margin: 0 0 24px 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .quick-view-price {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 16px !important;
+    margin-bottom: 32px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .price-current {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: #5CBFEE !important;
+    font-family: 'Poppins', sans-serif !important;
+    letter-spacing: -0.03em !important;
+  }
+
+  .quick-view-quantity {
+    margin-bottom: 32px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .quantity-label {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #495057 !important;
+    margin-bottom: 12px !important;
+    display: block !important;
+  }
+
+  .quantity-controls {
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 2px solid rgba(92, 191, 238, 0.1) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    width: fit-content !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .quantity-btn {
+    background: none !important;
+    border: none !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    color: #6c757d !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+  }
+
+  .quantity-btn:hover {
+    background: rgba(92, 191, 238, 0.1) !important;
+    color: #5CBFEE !important;
+  }
+
+  .quantity-input {
+    border: none !important;
+    background: none !important;
+    width: 60px !important;
+    text-align: center !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #2c1810 !important;
+    outline: none !important;
+  }
+
+  .quick-view-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-bottom: 32px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .quick-view-btn {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    padding: 16px 32px !important;
+    border-radius: 16px !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
+    position: relative !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(92, 191, 238, 0.3) !important;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 35px rgba(92, 191, 238, 0.4) !important;
+    background: linear-gradient(135deg, #4A9CDB 0%, #3A87C7 100%) !important;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #5CBFEE !important;
+    border: 2px solid rgba(92, 191, 238, 0.2) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px) !important;
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(92, 191, 238, 0.4) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12) !important;
+    color: #4A9CDB !important;
+  }
+
+  .quick-view-details-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #5CBFEE !important;
+    text-decoration: none !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: auto !important;
+    padding-top: 20px !important;
+  }
+
+  .quick-view-details-link:hover {
+    color: #4A9CDB !important;
+    transform: translateX(4px) !important;
+  }
+
+  .quick-view-details-link::after {
+    content: '→';
+    transition: transform 0.2s ease;
+  }
+
+  .quick-view-details-link:hover::after {
+    transform: translateX(4px);
+  }
+
+  /* Performance-optimized animation choreography */
+  .quick-view-overlay.active .quick-view-image-container {
+    animation: slideInLeft 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+  }
+
+  .quick-view-overlay.active .quick-view-title {
+    animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+  }
+
+  .quick-view-overlay.active .quick-view-subtitle {
+    animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+  }
+
+  .quick-view-overlay.active .quick-view-price {
+    animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s both;
+  }
+
+  .quick-view-overlay.active .quick-view-quantity {
+    animation: slideInRight 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+  }
+
+  .quick-view-overlay.active .quick-view-buttons {
+    animation: slideInUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.35s both;
+  }
+
+  .quick-view-overlay.active .quick-view-details-link {
+    animation: fadeInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.45s both;
+  }
+
+  .quick-view-overlay.active .quick-view-close {
+    animation: scaleIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+  }
+
+  /* GPU-optimized keyframes */
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translate3d(-60px, 0, 0) scale3d(0.9, 0.9, 1);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translate3d(40px, 20px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 30px, 0) scale3d(0.95, 0.95, 1);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale3d(0.3, 0.3, 1);
+    }
+    to {
+      opacity: 1;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+
+  /* Initial hidden states for choreography */
+  .quick-view-image-container,
+  .quick-view-title,
+  .quick-view-subtitle,
+  .quick-view-price,
+  .quick-view-quantity,
+  .quick-view-buttons,
+  .quick-view-details-link,
+  .quick-view-close {
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+
+  /* Remove initial opacity when modal is active */
+  .quick-view-overlay.active .quick-view-image-container,
+  .quick-view-overlay.active .quick-view-title,
+  .quick-view-overlay.active .quick-view-subtitle,
+  .quick-view-overlay.active .quick-view-price,
+  .quick-view-overlay.active .quick-view-quantity,
+  .quick-view-overlay.active .quick-view-buttons,
+  .quick-view-overlay.active .quick-view-details-link,
+  .quick-view-overlay.active .quick-view-close {
+    opacity: 1;
+  }
+{% endstylesheet %}
+
+<!-- Ultra-performance Quick View JavaScript -->
+<script>
+function openQuickView(productData) {
+  const modal = document.getElementById('quickViewModal');
+  
+  if (!modal) {
+    window.location.href = productData.url;
+    return;
+  }
+  
+  // Batch DOM updates for better performance
+  const titleElement = document.getElementById('quickViewTitle');
+  const imageElement = document.getElementById('quickViewImage');
+  const linkElement = document.getElementById('quickViewDetailsLink');
+  const priceElement = document.querySelector('#quickViewPrice .price-current');
+  
+  // Update all content in one go
+  if (titleElement) titleElement.textContent = productData.title || 'Product Name';
+  if (imageElement) {
+    imageElement.src = productData.image || '';
+    imageElement.alt = productData.title || 'Product';
+  }
+  if (linkElement) linkElement.href = productData.url || '#';
+  if (priceElement) {
+    priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
+  }
+  
+  // Instant modal display
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.classList.remove('closing');
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQuickView() {
+  const modal = document.getElementById('quickViewModal');
+  if (modal) {
+    modal.classList.add('closing');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.remove('closing');
+      document.body.style.overflow = '';
+    }, 300); // Increased for choreography
+  }
+}
+
+function updateQuantity(change) {
+  const input = document.getElementById('quickViewQuantity');
+  if (input) {
+    const currentValue = parseInt(input.value) || 1;
+    const newValue = Math.max(1, Math.min(99, currentValue + change));
+    input.value = newValue;
+  }
+}
+
+// Ultra-fast event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('quickViewModal');
+  const modalContent = modal?.querySelector('.quick-view-modal');
+  
+  // Optimized escape key handler
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+      closeQuickView();
+    }
+  });
+  
+  // Optimized click outside handler
+  if (modal && modalContent) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeQuickView();
+    });
+    
+    modalContent.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
+  
+  // Single optimized click handler for all quick view buttons
+  document.addEventListener('click', function(e) {
+    const button = e.target.closest('.quick-view-btn');
+    if (button && button.classList.contains('product-quick-view-btn')) {
+      e.preventDefault();
+      
+      openQuickView({
+        id: button.dataset.productId,
+        handle: button.dataset.productHandle,
+        title: button.dataset.productTitle,
+        vendor: button.dataset.productVendor,
+        image: button.dataset.productImage,
+        price: button.dataset.productPrice,
+        comparePrice: button.dataset.productComparePrice,
+        url: button.dataset.productUrl
+      });
+    }
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Featured Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Featured Coffee"
+    },
+    {
+      "type": "textarea",
+      "id": "section_subtitle",
+      "label": "Section Subtitle"
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Featured Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to Show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show View All Button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View All Button Text",
+      "default": "View All Coffee"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Products",
+      "category": "Product"
+    }
+  ]
+}
+{% endschema %} 

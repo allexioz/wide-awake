@@ -1,37 +1,1608 @@
 {% comment %}
-  This section is used in the cart template to render /cart page with an
-  overview of the items in customer's cart.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/cart
+  Enhanced cart section with 2025 UX best practices
+  - Clear visual hierarchy and product information  
+  - Transparent pricing with shipping calculator
+  - Save for later functionality
+  - Trust indicators and social proof
+  - Mobile-optimized design
+  - One-click actions and shortcuts
 {% endcomment %}
 
-<h1>{{ 'cart.title' | t }}</h1>
+<section class="cart-page" data-cart-total="{{ cart.total_price }}">
+  <div class="container">
+    {% if cart.item_count == 0 %}
+      <!-- Empty Cart State -->
+      <div class="empty-cart">
+        <div class="empty-cart-content">
+          <div class="empty-cart-icon">
+            <i data-lucide="shopping-cart" class="cart-icon"></i>
+          </div>
+          <h1 class="empty-cart-title">Your cart is empty</h1>
+          <p class="empty-cart-message">Looks like you haven't added any coffee to your cart yet. Let's find some amazing beans for you!</p>
+          <div class="empty-cart-actions">
+            <a href="{{ collections.all.url }}" class="btn-primary">
+              <i data-lucide="coffee" class="btn-icon"></i>
+              Explore Coffee
+            </a>
+            <a href="{{ collections.bundles.url | default: collections.all.url }}" class="btn-secondary">
+              <i data-lucide="gift" class="btn-icon"></i>
+              View Bundles
+            </a>
+          </div>
+        </div>
+        
+                 <!-- Recommended Products for Empty Cart -->
+         {% assign popular_products = collections.all.products | sort: 'best-selling' %}
+         {% if popular_products.size > 0 %}
+           <div class="empty-cart-recommendations">
+             <h2>Popular Picks</h2>
+             <div class="recommendations-grid">
+               {% for product in popular_products limit: 3 %}
+                 <div class="recommendation-card">
+                   <a href="{{ product.url }}" class="recommendation-link">
+                     <div class="recommendation-image">
+                       <img src="{{ product.featured_image | img_url: '300x300' }}" 
+                            alt="{{ product.title }}"
+                            loading="lazy">
+                     </div>
+                     <h3 class="recommendation-title">{{ product.title }}</h3>
+                     <div class="recommendation-price">{{ product.price | money }}</div>
+                   </a>
+                 </div>
+               {% endfor %}
+             </div>
+           </div>
+         {% endif %}
+      </div>
+    {% else %}
+      <!-- Cart with Items -->
+      <div class="cart-with-items">
+        <!-- Cart Header -->
+        <div class="cart-header">
+          <h1 class="cart-title">
+            Shopping Cart
+            <span class="cart-count">({{ cart.item_count }} {{ cart.item_count | pluralize: 'item', 'items' }})</span>
+          </h1>
+          <div class="cart-actions">
+            <button class="btn-link save-cart-btn" data-action="save-cart">
+              <i data-lucide="bookmark" class="btn-icon"></i>
+              Save Cart
+            </button>
+            <button class="btn-link clear-cart-btn" data-action="clear-cart">
+              <i data-lucide="trash-2" class="btn-icon"></i>
+              Clear Cart
+            </button>
+          </div>
+        </div>
 
-<form action="{{ routes.cart_url }}" method="post">
-  <table>
-    {% for item in cart.items %}
-      <tr>
-        <td>
-          {% render 'image', image: item.image, url: item.url %}
-        </td>
-        <td>
-          <p>{{ item.product.title }}</p>
-          {{ 'cart.remove' | t | link_to: item.url_to_remove }}
-        </td>
-        <td>
-          <input type="text" name="updates[]" value="{{ item.quantity }}">
-          <input type="submit" value="{{ 'cart.update' | t }}">
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
+        <div class="cart-layout">
+          <!-- Cart Items Section -->
+          <div class="cart-items-section">
+            <form action="{{ routes.cart_url }}" method="post" class="cart-form" id="cart-form">
+              <div class="cart-items">
+                {% for item in cart.items %}
+                  <div class="cart-item" data-variant-id="{{ item.variant.id }}" data-line="{{ forloop.index }}">
+                    <!-- Product Image -->
+                    <div class="cart-item-image">
+                      <a href="{{ item.product.url }}">
+                        <img src="{{ item.image | img_url: '200x200' }}" 
+                             alt="{{ item.product.title }}"
+                             loading="lazy">
+                      </a>
+                    </div>
 
-  <input type="submit" name="checkout" value="{{ 'cart.checkout' | t }}">
-</form>
+                    <!-- Product Details -->
+                    <div class="cart-item-details">
+                      <div class="cart-item-header">
+                        <h3 class="cart-item-title">
+                          <a href="{{ item.product.url }}">{{ item.product.title }}</a>
+                        </h3>
+                        <button type="button" 
+                                class="cart-item-remove" 
+                                data-action="remove-item"
+                                data-line="{{ forloop.index }}"
+                                aria-label="Remove {{ item.product.title }}">
+                          <i data-lucide="x" class="remove-icon"></i>
+                        </button>
+                      </div>
+
+                      {% if item.variant.title != 'Default Title' %}
+                        <div class="cart-item-variant">{{ item.variant.title }}</div>
+                      {% endif %}
+
+                      {% if item.properties.size > 0 %}
+                        <div class="cart-item-properties">
+                          {% for property in item.properties %}
+                            {% unless property.last == blank %}
+                              <div class="cart-item-property">
+                                <strong>{{ property.first }}:</strong> {{ property.last }}
+                              </div>
+                            {% endunless %}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+
+                      <!-- Quantity and Pricing -->
+                      <div class="cart-item-controls">
+                        <div class="quantity-controls">
+                          <button type="button" 
+                                  class="quantity-btn quantity-decrease"
+                                  data-action="decrease-quantity"
+                                  data-line="{{ forloop.index }}"
+                                  aria-label="Decrease quantity">
+                            <i data-lucide="minus" class="quantity-icon"></i>
+                          </button>
+                          <input type="number" 
+                                 name="updates[]" 
+                                 class="quantity-input"
+                                 value="{{ item.quantity }}"
+                                 min="0"
+                                 data-line="{{ forloop.index }}"
+                                 aria-label="Quantity for {{ item.product.title }}">
+                          <button type="button" 
+                                  class="quantity-btn quantity-increase"
+                                  data-action="increase-quantity"
+                                  data-line="{{ forloop.index }}"
+                                  aria-label="Increase quantity">
+                            <i data-lucide="plus" class="quantity-icon"></i>
+                          </button>
+                        </div>
+
+                        <div class="cart-item-pricing">
+                          <div class="cart-item-price">
+                            {% if item.original_line_price > item.final_line_price %}
+                              <span class="price-sale">{{ item.final_line_price | money }}</span>
+                              <span class="price-compare">{{ item.original_line_price | money }}</span>
+                            {% else %}
+                              <span class="price-regular">{{ item.final_line_price | money }}</span>
+                            {% endif %}
+                          </div>
+                          {% if item.quantity > 1 %}
+                            <div class="cart-item-unit-price">{{ item.final_price | money }} each</div>
+                          {% endif %}
+                        </div>
+                      </div>
+
+                      <!-- Save for Later -->
+                      <div class="cart-item-actions">
+                        <button type="button" 
+                                class="btn-link save-later-btn"
+                                data-action="save-for-later"
+                                data-variant-id="{{ item.variant.id }}">
+                          <i data-lucide="heart" class="btn-icon"></i>
+                          Save for Later
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </form>
+
+            <!-- Continue Shopping -->
+            <div class="continue-shopping">
+              <a href="{{ collections.all.url }}" class="btn-secondary">
+                <i data-lucide="arrow-left" class="btn-icon"></i>
+                Continue Shopping
+              </a>
+            </div>
+          </div>
+
+          <!-- Cart Summary Section -->
+          <div class="cart-summary-section">
+            <div class="cart-summary sticky-summary">
+              <h2 class="summary-title">Order Summary</h2>
+              
+              <!-- Pricing Breakdown -->
+              <div class="summary-pricing">
+                <div class="summary-line">
+                  <span>Subtotal ({{ cart.item_count }} items)</span>
+                  <span>{{ cart.total_price | money }}</span>
+                </div>
+
+                {% if cart.total_discounts > 0 %}
+                  <div class="summary-line discount-line">
+                    <span>Discounts</span>
+                    <span>-{{ cart.total_discounts | money }}</span>
+                  </div>
+                {% endif %}
+
+                <!-- Shipping Calculator -->
+                <div class="summary-line shipping-line">
+                  <span>Shipping</span>
+                  <span class="shipping-calculator">
+                    <button type="button" class="btn-link" data-action="calculate-shipping">
+                      Calculate
+                      <i data-lucide="calculator" class="btn-icon"></i>
+                    </button>
+                  </span>
+                </div>
+
+                                 <!-- Free Shipping Progress -->
+                 {% assign free_shipping_threshold = 150000 %} 
+                 {% assign remaining_for_free_shipping = free_shipping_threshold | minus: cart.total_price %}
+                 {% if remaining_for_free_shipping > 0 %}
+                   <div class="free-shipping-progress">
+                     <div class="progress-bar">
+                       <div class="progress-fill" style="width: {{ cart.total_price | times: 100 | divided_by: free_shipping_threshold }}%"></div>
+                     </div>
+                     <p class="progress-text">
+                       Add {{ remaining_for_free_shipping | money }} more for <strong>free shipping!</strong>
+                     </p>
+                   </div>
+                 {% else %}
+                   <div class="free-shipping-achieved">
+                     <i data-lucide="check-circle" class="success-icon"></i>
+                     <span>You qualify for free shipping!</span>
+                   </div>
+                 {% endif %}
+
+                <!-- Tax Notice -->
+                <div class="summary-note">
+                  <i data-lucide="info" class="note-icon"></i>
+                  <span>Tax calculated at checkout</span>
+                </div>
+
+                <!-- Total -->
+                <div class="summary-total">
+                  <span>Total</span>
+                  <span class="total-price">{{ cart.total_price | money }}</span>
+                </div>
+              </div>
+
+              <!-- Trust Indicators -->
+              <div class="trust-indicators">
+                <div class="trust-item">
+                  <i data-lucide="shield-check" class="trust-icon"></i>
+                  <span>Secure checkout</span>
+                </div>
+                                 <div class="trust-item">
+                   <i data-lucide="truck" class="trust-icon"></i>
+                   <span>Free shipping over ₱1,500</span>
+                 </div>
+                <div class="trust-item">
+                  <i data-lucide="refresh-cw" class="trust-icon"></i>
+                  <span>Easy returns</span>
+                </div>
+              </div>
+
+                             <!-- Checkout Button -->
+               <div class="checkout-actions">
+                 <form action="/cart" method="post" class="checkout-form">
+                   <button type="submit" 
+                           name="checkout"
+                           class="btn-checkout">
+                     <i data-lucide="lock" class="btn-icon"></i>
+                     Secure Checkout
+                     <span class="checkout-price">{{ cart.total_price | money }}</span>
+                   </button>
+                 </form>
+
+                                 <!-- Express Checkout Options -->
+                 <div class="express-checkout">
+                   <div class="express-divider">
+                     <span>or pay with</span>
+                   </div>
+                   <div class="express-buttons">
+                     {% comment %} Add payment buttons here {% endcomment %}
+                     <button class="express-payment-btn gcash-btn">
+                       <span>GCash</span>
+                     </button>
+                     <button class="express-payment-btn paymaya-btn">
+                       <span>PayMaya</span>
+                     </button>
+                     <button class="express-payment-btn card-btn">
+                       <span>💳 Card</span>
+                     </button>
+                   </div>
+                 </div>
+              </div>
+
+              <!-- Security Badges -->
+              <div class="security-badges">
+                <p class="security-text">
+                  <i data-lucide="lock" class="security-icon"></i>
+                  Your information is protected by 256-bit SSL encryption
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Floating Cart Summary (Mobile) -->
+    <div class="floating-cart-summary" id="floating-summary">
+      <div class="floating-summary-content">
+        <div class="floating-summary-info">
+          <span class="floating-total">{{ cart.total_price | money }}</span>
+          <span class="floating-count">{{ cart.item_count }} items</span>
+        </div>
+                 <form action="/cart" method="post" style="display: contents;">
+           <button type="submit" 
+                   name="checkout"
+                   class="floating-checkout-btn">
+             Checkout
+           </button>
+         </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Cart Page Styles - 2025 UX Best Practices */
+  .cart-page {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #fef9e7 100%);
+    min-height: 90vh;
+    padding: 40px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cart-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 10% 20%, rgba(92, 191, 238, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(230, 152, 59, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* Empty Cart State */
+  .empty-cart {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 60px 20px;
+  }
+
+  .empty-cart-content {
+    background: white;
+    border-radius: 24px;
+    padding: 60px 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 60px;
+  }
+
+  .empty-cart-icon {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 32px;
+    background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .empty-cart-icon .cart-icon {
+    width: 60px;
+    height: 60px;
+    color: white;
+  }
+
+  .empty-cart-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+  }
+
+  .empty-cart-message {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 40px;
+  }
+
+  .empty-cart-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Cart with Items */
+  .cart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e5e5e5;
+  }
+
+  .cart-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: 2.5rem;
+    color: #1a1a1a;
+    margin: 0;
+  }
+
+  .cart-count {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 1.2rem;
+    color: #666;
+  }
+
+  .cart-actions {
+    display: flex;
+    gap: 24px;
+  }
+
+  .cart-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 60px;
+    align-items: start;
+  }
+
+  /* Cart Items */
+  .cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .cart-item {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .cart-item:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+  }
+
+  .cart-item-image {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+
+  .cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .cart-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .cart-item-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .cart-item-title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .cart-item-title a:hover {
+    color: #5CBFEE;
+  }
+
+  .cart-item-remove {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+  }
+
+  .cart-item-remove:hover {
+    background: #ff4757;
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .cart-item-variant {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+  }
+
+  .cart-item-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+  }
+
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+    border: 2px solid #e5e5e5;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .quantity-btn {
+    background: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #2c1810;
+  }
+
+  .quantity-btn:hover {
+    background: #E6983B;
+    color: white;
+  }
+
+  .quantity-input {
+    width: 60px;
+    height: 40px;
+    border: none;
+    text-align: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    background: white;
+    border-left: 1px solid #e5e5e5;
+    border-right: 1px solid #e5e5e5;
+  }
+
+  .cart-item-pricing {
+    text-align: right;
+  }
+
+  .cart-item-price {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2C3E50;
+    margin-bottom: 4px;
+  }
+
+  .price-regular {
+    color: #2C3E50;
+    font-weight: 700;
+  }
+
+  .price-sale {
+    color: #dc3545;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+
+  .price-compare {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .cart-item-unit-price {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .cart-item-actions {
+    margin-top: 12px;
+  }
+
+  /* Cart Summary */
+  .cart-summary-section {
+    position: relative;
+  }
+
+  .sticky-summary {
+    position: sticky;
+    top: 20px;
+  }
+
+  .cart-summary {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  }
+
+  .summary-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: 1.8rem;
+    color: #2c1810;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .summary-pricing {
+    margin-bottom: 32px;
+  }
+
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    font-family: 'Poppins', sans-serif;
+    color: #2c1810;
+  }
+
+  .summary-line:not(:last-child) {
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .discount-line {
+    background: linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 600;
+  }
+
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-top: 2px solid #e5e5e5;
+    margin-top: 16px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2C3E50;
+  }
+
+  .free-shipping-progress {
+    margin: 16px 0;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B);
+    background-size: 400% 400%;
+    animation: gradientFlow 6s ease infinite;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+
+  @keyframes gradientFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .progress-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+  }
+
+  .free-shipping-achieved {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #d4edda;
+    border-radius: 8px;
+    color: #155724;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    margin: 16px 0;
+  }
+
+  .trust-indicators {
+    margin: 24px 0;
+    padding: 20px 0;
+    border-top: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+  .trust-icon {
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .btn-checkout {
+    width: 100%;
+    background: linear-gradient(135deg, #E6983B 0%, #d18a35 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 18px 24px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .btn-checkout:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(230, 152, 59, 0.3);
+  }
+
+  .checkout-price {
+    font-weight: 700;
+    margin-left: auto;
+  }
+
+  /* Button Styles */
+  .btn-primary {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(92, 191, 238, 0.3);
+    text-decoration: none;
+    color: white;
+  }
+
+  .btn-secondary {
+    background: white;
+    color: #1a1a1a;
+    border: 2px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary:hover {
+    background: #1a1a1a;
+    color: white;
+    text-decoration: none;
+  }
+
+  .btn-link {
+    background: none;
+    border: none;
+    color: #5CBFEE;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+  }
+
+  .btn-link:hover {
+    color: #4a9fd1;
+    text-decoration: underline;
+  }
+
+     .btn-icon {
+     width: 16px;
+     height: 16px;
+   }
+
+   /* Express Checkout Styles */
+   .express-checkout {
+     margin: 20px 0;
+   }
+
+   .express-divider {
+     text-align: center;
+     margin: 16px 0;
+     position: relative;
+   }
+
+   .express-divider::before {
+     content: '';
+     position: absolute;
+     top: 50%;
+     left: 0;
+     right: 0;
+     height: 1px;
+     background: #e5e5e5;
+     z-index: 1;
+   }
+
+   .express-divider span {
+     background: white;
+     padding: 0 16px;
+     color: #666;
+     font-family: 'Poppins', sans-serif;
+     font-size: 0.9rem;
+     position: relative;
+     z-index: 2;
+   }
+
+   .express-buttons {
+     display: grid;
+     grid-template-columns: 1fr 1fr;
+     gap: 8px;
+     margin-top: 16px;
+   }
+
+   .express-payment-btn {
+     background: white;
+     border: 2px solid #e5e5e5;
+     border-radius: 8px;
+     padding: 12px 16px;
+     font-family: 'Poppins', sans-serif;
+     font-weight: 600;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     gap: 8px;
+   }
+
+   .express-payment-btn:hover {
+     border-color: #5CBFEE;
+     background: #f8f9ff;
+     transform: translateY(-1px);
+   }
+
+   .gcash-btn {
+     color: #007bff;
+   }
+
+   .paymaya-btn {
+     color: #00d4ff;
+   }
+
+   .card-btn {
+     color: #2c1810;
+     grid-column: 1 / -1;
+   }
+
+  /* Continue Shopping */
+  .continue-shopping {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  /* Floating Cart Summary (Mobile) */
+  .floating-cart-summary {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #e5e5e5;
+    padding: 16px 20px;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+  }
+
+  .floating-summary-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .floating-summary-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .floating-total {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #2c1810;
+  }
+
+  .floating-count {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    color: #666;
+  }
+
+       .floating-checkout-btn {
+       background: #E6983B;
+       color: white;
+       border: none;
+       border-radius: 8px;
+       padding: 12px 24px;
+       font-family: 'Poppins', sans-serif;
+       font-weight: 600;
+       cursor: pointer;
+       transition: all 0.3s ease;
+     }
+
+     .floating-checkout-btn:hover {
+       background: #d18a35;
+       transform: translateY(-1px);
+     }
+
+     /* Enhanced Toast Notifications */
+     .cart-toast {
+       position: fixed;
+       top: 20px;
+       right: 20px;
+       background: rgba(255, 255, 255, 0.95);
+       backdrop-filter: blur(20px);
+       -webkit-backdrop-filter: blur(20px);
+       color: #1a1a1a;
+       border-radius: 16px;
+       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+       border: 1px solid rgba(0, 0, 0, 0.08);
+       transform: translateX(calc(100% + 40px));
+       transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+       z-index: 10000;
+       max-width: 320px;
+       min-width: 280px;
+       font-family: 'Poppins', sans-serif;
+     }
+
+     .cart-toast.visible {
+       transform: translateX(0);
+     }
+
+     .toast-content {
+       display: flex;
+       align-items: center;
+       gap: 12px;
+       padding: 16px 20px;
+     }
+
+     .toast-icon {
+       flex-shrink: 0;
+       width: 24px;
+       height: 24px;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       position: relative;
+     }
+
+     .toast-lucide-icon {
+       width: 20px;
+       height: 20px;
+       stroke-width: 2;
+     }
+
+     .toast-fallback-icon {
+       font-size: 18px;
+       font-weight: 700;
+       line-height: 1;
+       display: none;
+     }
+
+     .toast-message {
+       flex: 1;
+       font-size: 0.95rem;
+       font-weight: 500;
+       line-height: 1.4;
+     }
+
+     /* Toast Type Styling */
+     .cart-toast-success {
+       border-left: 4px solid transparent;
+       border-image: linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B) 1;
+     }
+
+     .cart-toast-success .toast-icon {
+       background: linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B);
+       -webkit-background-clip: text;
+       -webkit-text-fill-color: transparent;
+       background-clip: text;
+     }
+
+     .cart-toast-error {
+       border-left: 4px solid #dc3545;
+     }
+
+     .cart-toast-error .toast-icon {
+       color: #dc3545;
+     }
+
+     .cart-toast-info {
+       border-left: 4px solid #5CBFEE;
+     }
+
+     .cart-toast-info .toast-icon {
+       color: #5CBFEE;
+     }
+
+     /* Animation for icon */
+     .cart-toast.visible .toast-icon {
+       animation: toastIconPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+     }
+
+     @keyframes toastIconPop {
+       0% {
+         transform: scale(0) rotate(-180deg);
+         opacity: 0;
+       }
+       50% {
+         transform: scale(1.2) rotate(-90deg);
+       }
+       100% {
+         transform: scale(1) rotate(0deg);
+         opacity: 1;
+       }
+     }
+
+     /* Loading State */
+     .cart-loading {
+       pointer-events: none;
+       opacity: 0.7;
+     }
+
+     .cart-loading::after {
+       content: '';
+       position: fixed;
+       top: 0;
+       left: 0;
+       right: 0;
+       bottom: 0;
+       background: rgba(255, 255, 255, 0.8);
+       z-index: 9999;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+     }
+
+  /* Responsive Design */
+  @media screen and (max-width: 1024px) {
+    .cart-layout {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .cart-summary-section {
+      order: -1;
+    }
+
+    .sticky-summary {
+      position: static;
+    }
+
+    .floating-cart-summary {
+      display: block;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .cart-page {
+      padding: 20px 0;
+    }
+
+    .cart-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .cart-actions {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .cart-item {
+      grid-template-columns: 100px 1fr;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .cart-item-image {
+      aspect-ratio: 1 / 1;
+    }
+    
+    .cart-item-image img {
+      height: 100%;
+    }
+
+    .cart-item-controls {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .cart-item-pricing {
+      text-align: left;
+    }
+
+    .cart-summary {
+      padding: 24px;
+    }
+
+    .empty-cart-content {
+      padding: 40px 24px;
+    }
+
+    .empty-cart-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .empty-cart-actions .btn-primary,
+       .empty-cart-actions .btn-secondary {
+     width: 100%;
+     justify-content: center;
+   }
+
+   /* Empty Cart Recommendations */
+   .empty-cart-recommendations {
+     margin-top: 40px;
+   }
+
+   .empty-cart-recommendations h2 {
+     font-family: 'Special Gothic Expanded One', sans-serif;
+     font-size: 1.8rem;
+     color: #2c1810;
+     text-align: center;
+     margin-bottom: 32px;
+   }
+
+   .recommendations-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+     gap: 24px;
+     max-width: 800px;
+     margin: 0 auto;
+   }
+
+   .recommendation-card {
+     background: white;
+     border-radius: 16px;
+     padding: 20px;
+     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+     transition: all 0.3s ease;
+   }
+
+   .recommendation-card:hover {
+     transform: translateY(-4px);
+     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+   }
+
+   .recommendation-link {
+     text-decoration: none;
+     color: inherit;
+   }
+
+   .recommendation-image {
+     margin-bottom: 16px;
+   }
+
+   .recommendation-image {
+     aspect-ratio: 1 / 1;
+     overflow: hidden;
+     border-radius: 8px;
+   }
+
+   .recommendation-image img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     border-radius: 8px;
+   }
+
+   .recommendation-title {
+     font-family: 'Poppins', sans-serif;
+     font-size: 1rem;
+     font-weight: 600;
+     color: #2c1810;
+     margin-bottom: 8px;
+     line-height: 1.3;
+   }
+
+   .recommendation-price {
+     font-family: 'Poppins', sans-serif;
+     font-size: 1.1rem;
+     font-weight: 700;
+     color: #5CBFEE;
+   }
+  }
+
+  @media screen and (max-width: 480px) {
+    .cart-title {
+      font-size: 2rem;
+    }
+
+    .cart-count {
+      font-size: 1rem;
+    }
+
+    .cart-item {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .cart-item-header {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cart-item-controls {
+      align-items: center;
+    }
+
+    .cart-item-pricing {
+      text-align: center;
+    }
+  }
+</style>
+
+<script>
+ // Enhanced Cart Functionality - 2025 UX Features
+ document.addEventListener('DOMContentLoaded', function() {
+   const cartForm = document.getElementById('cart-form');
+   const floatingSummary = document.getElementById('floating-summary');
+   
+   // Initialize Lucide icons
+   if (typeof lucide !== 'undefined') {
+     lucide.createIcons();
+   }
+  
+  // Cart functionality handlers
+  document.addEventListener('click', function(e) {
+    const action = e.target.closest('[data-action]')?.dataset.action;
+    if (!action) return;
+    
+    e.preventDefault();
+    
+    switch(action) {
+      case 'increase-quantity':
+        adjustQuantity(e.target, 1);
+        break;
+      case 'decrease-quantity':
+        adjustQuantity(e.target, -1);
+        break;
+      case 'remove-item':
+        removeItem(e.target);
+        break;
+      case 'save-for-later':
+        saveForLater(e.target);
+        break;
+      case 'clear-cart':
+        clearCart();
+        break;
+      case 'save-cart':
+        saveCart();
+        break;
+      case 'calculate-shipping':
+        calculateShipping();
+        break;
+    }
+  });
+
+  // Quantity adjustment
+  function adjustQuantity(button, change) {
+    const line = button.dataset.line;
+    const input = document.querySelector(`input[data-line="${line}"]`);
+    const newQuantity = Math.max(0, parseInt(input.value) + change);
+    
+    input.value = newQuantity;
+    updateCartItem(line, newQuantity);
+  }
+
+  // Remove item with confirmation
+  function removeItem(button) {
+    const line = button.dataset.line;
+    const productName = button.closest('.cart-item').querySelector('.cart-item-title a').textContent;
+    
+    if (confirm(`Remove ${productName} from your cart?`)) {
+      updateCartItem(line, 0);
+    }
+  }
+
+  // Update cart via AJAX
+  function updateCartItem(line, quantity) {
+    const formData = new FormData();
+    formData.append(`updates[${line}]`, quantity);
+    
+    showLoadingState();
+    
+    fetch('/cart/update.js', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(cart => {
+      refreshCartDisplay(cart);
+      showToast(quantity === 0 ? 'Item removed from cart' : 'Cart updated', 'success');
+    })
+    .catch(error => {
+      showToast('Error updating cart', 'error');
+      console.error('Cart update error:', error);
+    })
+    .finally(() => {
+      hideLoadingState();
+    });
+  }
+
+  // Save for later functionality
+  function saveForLater(button) {
+    const variantId = button.dataset.variantId;
+    // Add to wishlist/saved items logic here
+    showToast('Item saved for later', 'success');
+  }
+
+  // Clear entire cart
+  function clearCart() {
+    if (confirm('Are you sure you want to clear your entire cart?')) {
+      fetch('/cart/clear.js', { method: 'POST' })
+        .then(() => {
+          window.location.reload();
+        });
+    }
+  }
+
+  // Save cart functionality
+  function saveCart() {
+    // Save cart state to localStorage or user account
+    localStorage.setItem('saved_cart', JSON.stringify(window.cart));
+    showToast('Cart saved successfully', 'success');
+  }
+
+  // Shipping calculator
+  function calculateShipping() {
+    // Open shipping calculator modal
+    showToast('Shipping calculator coming soon', 'info');
+  }
+
+  // Floating summary scroll behavior
+  function handleFloatingSummary() {
+    if (window.innerWidth <= 1024) {
+      const cartSummary = document.querySelector('.cart-summary');
+      if (cartSummary) {
+        const rect = cartSummary.getBoundingClientRect();
+        const shouldShow = rect.bottom < window.innerHeight;
+        
+        if (shouldShow && !floatingSummary.classList.contains('visible')) {
+          floatingSummary.style.display = 'block';
+          setTimeout(() => floatingSummary.classList.add('visible'), 10);
+        } else if (!shouldShow && floatingSummary.classList.contains('visible')) {
+          floatingSummary.classList.remove('visible');
+          setTimeout(() => floatingSummary.style.display = 'none', 300);
+        }
+      }
+    }
+  }
+
+  // Loading and toast states
+  function showLoadingState() {
+    document.body.classList.add('cart-loading');
+  }
+
+  function hideLoadingState() {
+    document.body.classList.remove('cart-loading');
+  }
+
+  function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `cart-toast cart-toast-${type}`;
+    
+    // Create toast content with icon
+    const toastContent = document.createElement('div');
+    toastContent.className = 'toast-content';
+    
+    // Create icon element
+    const iconElement = document.createElement('div');
+    iconElement.className = 'toast-icon';
+    
+    let iconHTML = '';
+    switch(type) {
+      case 'success':
+        iconHTML = `
+          <i data-lucide="check-circle" class="toast-lucide-icon"></i>
+          <span class="toast-fallback-icon">✓</span>
+        `;
+        break;
+      case 'error':
+        iconHTML = `
+          <i data-lucide="x-circle" class="toast-lucide-icon"></i>
+          <span class="toast-fallback-icon">✗</span>
+        `;
+        break;
+      case 'info':
+        iconHTML = `
+          <i data-lucide="info" class="toast-lucide-icon"></i>
+          <span class="toast-fallback-icon">ℹ</span>
+        `;
+        break;
+      default:
+        iconHTML = `
+          <i data-lucide="bell" class="toast-lucide-icon"></i>
+          <span class="toast-fallback-icon">●</span>
+        `;
+    }
+    
+    iconElement.innerHTML = iconHTML;
+    
+    // Create message element
+    const messageElement = document.createElement('div');
+    messageElement.className = 'toast-message';
+    messageElement.textContent = message;
+    
+    // Assemble toast
+    toastContent.appendChild(iconElement);
+    toastContent.appendChild(messageElement);
+    toast.appendChild(toastContent);
+    
+    document.body.appendChild(toast);
+    
+    // Initialize Lucide icons for this toast
+    setTimeout(() => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons({
+          nameAttr: 'data-lucide',
+          attrs: {
+            class: 'toast-lucide-icon'
+          }
+        });
+        // Hide fallback if Lucide loaded
+        const fallbacks = toast.querySelectorAll('.toast-fallback-icon');
+        fallbacks.forEach(fallback => fallback.style.display = 'none');
+      } else {
+        // Hide Lucide icons if not loaded
+        const lucideIcons = toast.querySelectorAll('.toast-lucide-icon');
+        lucideIcons.forEach(icon => icon.style.display = 'none');
+      }
+      
+      toast.classList.add('visible');
+    }, 10);
+    
+    setTimeout(() => {
+      toast.classList.remove('visible');
+      setTimeout(() => {
+        if (document.body.contains(toast)) {
+          document.body.removeChild(toast);
+        }
+      }, 300);
+    }, 3000);
+  }
+
+  // Refresh cart display after updates
+  function refreshCartDisplay(cart) {
+    // Update cart count in header
+    document.querySelectorAll('[data-cart-count]').forEach(el => {
+      el.textContent = cart.item_count;
+    });
+    
+    // Update totals
+    document.querySelectorAll('[data-cart-total]').forEach(el => {
+      el.textContent = formatMoney(cart.total_price);
+    });
+  }
+
+     // Money formatting helper
+   function formatMoney(cents) {
+     return new Intl.NumberFormat('en-PH', {
+       style: 'currency',
+       currency: 'PHP',
+       minimumFractionDigits: 2
+     }).format(cents / 100);
+   }
+
+  // Initialize floating summary behavior
+  window.addEventListener('scroll', handleFloatingSummary);
+  window.addEventListener('resize', handleFloatingSummary);
+  
+  // Initial check
+  handleFloatingSummary();
+});
+</script>
 
 {% schema %}
 {
-  "name": "t:general.cart",
-  "settings": []
+  "name": "Cart Page",
+  "settings": [
+    {
+             "type": "number",
+       "id": "free_shipping_threshold",
+       "label": "Free Shipping Threshold (in cents)",
+       "default": 150000,
+       "info": "Amount required for free shipping in cents (150000 = ₱1,500)"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shipping_calculator",
+      "label": "Show Shipping Calculator",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_save_for_later",
+      "label": "Enable Save for Later",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "empty_cart_heading",
+      "label": "Empty Cart Heading",
+      "default": "Your cart is empty"
+    },
+    {
+      "type": "textarea",
+      "id": "empty_cart_message",
+      "label": "Empty Cart Message",
+      "default": "Looks like you haven't added any coffee to your cart yet. Let's find some amazing beans for you!"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Enhanced Cart Page"
+    }
+  ]
 }
 {% endschema %}

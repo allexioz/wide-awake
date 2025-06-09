@@ -1,47 +1,2875 @@
-{% comment %}
-  This section is used in the collection template to render collection page
-  listing all products within a collection.
-
-  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
-{% endcomment %}
-
-<h1>{{ collection.title }}</h1>
-
-<div class="collection-products">
-  {% paginate collection.products by 20 %}
-    {% for product in collection.products %}
-      <div class="collection-product">
-        {% if product.featured_image %}
-          {% render 'image',
-            class: 'collection-product__image',
-            image: product.featured_image,
-            url: product.url,
-            width: 400,
-            height: 400,
-            crop: 'center'
-          %}
+<div class="collection-page-optimized">
+  <!-- Modern Collection Header -->
+  <div class="collection-header-new">
+    <div class="collection-hero-new">
+      <div class="hero-background">
+        <div class="hero-pattern"></div>
+      </div>
+      <div class="hero-content">
+        <div class="collection-breadcrumb">
+          <a href="/" class="breadcrumb-link">Home</a>
+          <span class="breadcrumb-separator">/</span>
+          <span class="breadcrumb-current">{{ collection.title }}</span>
+        </div>
+        <h1 class="collection-title-new">{{ collection.title }}</h1>
+        {% if collection.description != blank %}
+          <p class="collection-description-new">{{ collection.description }}</p>
         {% endif %}
-        <div class="collection-product__content">
-          <p>{{ product.title | escape | link_to: product.url }}</p>
-          <p>{{ product.price | money }}</p>
+        <div class="collection-stats">
+          <div class="stat-item">
+            <span class="stat-number">{{ collection.products_count }}</span>
+            <span class="stat-label">{% if collection.products_count == 1 %}Product{% else %}Products{% endif %}</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ collection.all_tags.size }}</span>
+            <span class="stat-label">Categories</span>
+          </div>
         </div>
       </div>
-    {% endfor %}
+    </div>
+  </div>
 
-    {{ paginate | default_pagination }}
-  {% endpaginate %}
+  <!-- Main Content Container - Simplified -->
+  <main class="collection-main-optimized">
+    <!-- Enhanced Collection Controls -->
+    <!-- Enhanced Smart Filter Navigation -->
+    <div class="smart-filters-wrapper" id="smartFilters">
+      <div class="smart-filters-sticky" data-sticky-filters>
+        <div class="smart-filters">
+            <div class="filter-header">
+              <div class="filter-header-left">
+                <h2 class="filter-main-title">
+                  <i data-lucide="filter" class="filter-icon" aria-hidden="true"></i>
+                  Filter {{ collection.title }}
+                </h2>
+                <div class="filter-results-summary" id="filterSummary" aria-live="polite">
+                  <span class="results-count">{{ collection.products_count }}</span> products
+                </div>
+              </div>
+              <div class="filter-header-right">
+                <!-- Sort Controls -->
+                <div class="sort-controls-new">
+                  <div class="sort-dropdown">
+                    <button class="sort-trigger" id="sortTrigger">
+                      <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                      <span class="sort-label">Sort: Featured</span>
+                      <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                    </button>
+                    <div class="sort-menu" id="sortMenu">
+                      <div class="sort-option active" data-sort="featured">
+                        <i data-lucide="star" class="option-icon"></i>
+                        Featured
+                      </div>
+                      <div class="sort-option" data-sort="price-low">
+                        <i data-lucide="trending-up" class="option-icon"></i>
+                        Price: Low to High
+                      </div>
+                      <div class="sort-option" data-sort="price-high">
+                        <i data-lucide="trending-down" class="option-icon"></i>
+                        Price: High to Low
+                      </div>
+                      <div class="sort-option" data-sort="title-a">
+                        <i data-lucide="a-arrow-down" class="option-icon"></i>
+                        Name: A to Z
+                      </div>
+                      <div class="sort-option" data-sort="title-z">
+                        <i data-lucide="z-arrow-down" class="option-icon"></i>
+                        Name: Z to A
+                      </div>
+                      <div class="sort-option" data-sort="created-new">
+                        <i data-lucide="calendar-plus" class="option-icon"></i>
+                        Newest First
+                      </div>
+                      <div class="sort-option" data-sort="best-selling">
+                        <i data-lucide="shopping-bag" class="option-icon"></i>
+                        Best Selling
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View Controls -->
+                <div class="view-controls-new">
+                  <div class="view-buttons">
+                    <button class="view-btn active" data-view="grid-3" title="3 Column Grid">
+                      <i data-lucide="grid-3x3" class="view-icon"></i>
+                    </button>
+                    <button class="view-btn" data-view="grid-4" title="4 Column Grid">
+                      <i data-lucide="layout-grid" class="view-icon"></i>
+                    </button>
+                    <button class="view-btn" data-view="list" title="List View">
+                      <i data-lucide="list" class="view-icon"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <button class="filter-toggle-mobile" id="filterToggle" aria-expanded="false" aria-controls="filterContent">
+                  <span class="filter-toggle-text">Filters</span>
+                  <i data-lucide="chevron-down" class="filter-toggle-icon" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-content" id="filterContent">
+              {% comment %} Calculate filter counts {% endcomment %}
+              {% assign smooth_sweet_count = 0 %}
+              {% assign light_bright_count = 0 %}
+              {% assign complex_expressive_count = 0 %}
+              
+              {% assign product_vibes = 'brazil-sao-silvestre:smooth-sweet,ethiopia-yirgacheffe:light-bright,mt-apo-natural:complex-expressive,buku-sayisa-natural-ethiopia:light-bright,cofi-teresa:light-bright,daybreak-espresso:smooth-sweet,finca-mierisch:complex-expressive,fructifero-anaerobic:complex-expressive,jeivert-hernandez:light-bright,koke-shalaye:light-bright,mt-apo-72hr:complex-expressive,mt-apo-lactic-honey:light-bright,mt-apo-lactic-washed:light-bright,nensebo:light-bright,nyeri-kenya:light-bright,tanzania-kilimanjaro:light-bright,vietnam-fine-robusta:smooth-sweet,veracruz-mexico:smooth-sweet' | split: ',' %}
+              
+              {% for product in collection.products %}
+                {% assign product_vibe = 'smooth-sweet' %}
+                {% for vibe_mapping in product_vibes %}
+                  {% assign mapping_parts = vibe_mapping | split: ':' %}
+                  {% if mapping_parts[0] == product.handle %}
+                    {% assign product_vibe = mapping_parts[1] %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+                
+                {% case product_vibe %}
+                  {% when 'smooth-sweet' %}
+                    {% assign smooth_sweet_count = smooth_sweet_count | plus: 1 %}
+                  {% when 'light-bright' %}
+                    {% assign light_bright_count = light_bright_count | plus: 1 %}
+                  {% when 'complex-expressive' %}
+                    {% assign complex_expressive_count = complex_expressive_count | plus: 1 %}
+                {% endcase %}
+              {% endfor %}
+              
+              {% render 'category-filters', 
+                all_count: collection.products_count,
+                smooth_count: smooth_sweet_count,
+                bright_count: light_bright_count,
+                complex_count: complex_expressive_count %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Products Grid with Client-side Filtering -->
+    <section class="products-section-optimized">
+      {% assign products_per_page = section.settings.products_per_page | default: 12 %}
+      
+      <div class="product-grid product-grid-optimized" 
+           id="productGrid" 
+           data-view="grid-3"
+           data-total-products="{{ collection.products.size }}"
+           data-products-per-page="{{ products_per_page }}">
+        
+        {% for product in collection.products %}
+          {% assign product_handle = product.handle %}
+          {% assign product_segment = 'daily-driver' %}
+          {% assign product_vibe = 'smooth-sweet' %}
+          
+          {% comment %} Map product to segment and vibe based on CSV data {% endcomment %}
+          {% assign product_segments = 'brazil-sao-silvestre:daily-driver,ethiopia-yirgacheffe:premium-brews,mt-apo-natural:direct-trade,buku-sayisa-natural-ethiopia:premium-brews,cofi-teresa:direct-trade,daybreak-espresso:daily-driver,finca-mierisch:premium-brews,fructifero-anaerobic:direct-trade,jeivert-hernandez:premium-brews,koke-shalaye:premium-brews,mt-apo-72hr:direct-trade,mt-apo-lactic-honey:direct-trade,mt-apo-lactic-washed:direct-trade,nensebo:premium-brews,nyeri-kenya:premium-brews,tanzania-kilimanjaro:daily-driver,vietnam-fine-robusta:daily-driver,veracruz-mexico:daily-driver,mola-cafec-filter:equipment,specialty-water-sachets:equipment' | split: ',' %}
+
+          {% assign product_vibes = 'brazil-sao-silvestre:smooth-sweet,ethiopia-yirgacheffe:light-bright,mt-apo-natural:complex-expressive,buku-sayisa-natural-ethiopia:light-bright,cofi-teresa:light-bright,daybreak-espresso:smooth-sweet,finca-mierisch:complex-expressive,fructifero-anaerobic:complex-expressive,jeivert-hernandez:light-bright,koke-shalaye:light-bright,mt-apo-72hr:complex-expressive,mt-apo-lactic-honey:light-bright,mt-apo-lactic-washed:light-bright,nensebo:light-bright,nyeri-kenya:light-bright,tanzania-kilimanjaro:light-bright,vietnam-fine-robusta:smooth-sweet,veracruz-mexico:smooth-sweet' | split: ',' %}
+          
+          {% for segment_mapping in product_segments %}
+            {% assign mapping_parts = segment_mapping | split: ':' %}
+            {% if mapping_parts[0] == product_handle %}
+              {% assign product_segment = mapping_parts[1] %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          
+          {% for vibe_mapping in product_vibes %}
+            {% assign mapping_parts = vibe_mapping | split: ':' %}
+            {% if mapping_parts[0] == product_handle %}
+              {% assign product_vibe = mapping_parts[1] %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          
+          {% comment %} Set vibe display {% endcomment %}
+          {% case product_vibe %}
+            {% when 'smooth-sweet' %}
+              {% assign vibe_display = '🍯 Smooth and Sweet' %}
+            {% when 'light-bright' %}
+              {% assign vibe_display = '🍋 Light and Bright' %}
+            {% when 'complex-expressive' %}
+              {% assign vibe_display = '🎭 Complex and Expressive' %}
+            {% else %}
+              {% assign vibe_display = '☕ Great Coffee' %}
+          {% endcase %}
+
+          {% render 'product-card', 
+            product: product,
+            show_quick_view: true,
+            show_flavor_notes: true,
+            lazy_load: false %}
+        {% endfor %}
+
+        <!-- Empty State (controlled by JavaScript) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <div class="empty-state-content">
+            <i data-lucide="coffee" class="empty-state-icon"></i>
+            <h3 class="empty-state-title">No products found</h3>
+            <p class="empty-state-message">
+              Try adjusting your filters or explore our complete collection.
+            </p>
+            <div class="empty-state-actions">
+              <button onclick="resetAllFilters()" class="btn-primary">Clear Filters</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Client-side Pagination (managed by ProductDiscovery) -->
+      <div class="pagination-section-fullwidth" id="paginationSection" style="display: none;">
+        <div class="pagination-content">
+          <div class="pagination-info">
+            <span>Page <span class="current-page">1</span> of <span class="total-pages">1</span></span>
+            <span class="products-count">{{ collection.products.size }} of {{ collection.products.size }} products</span>
+          </div>
+          
+          <div class="pagination-controls">
+            <button class="pagination-btn prev-btn" disabled data-page="prev">
+              <i data-lucide="chevron-left" class="pagination-icon"></i>
+              Previous
+            </button>
+            
+            <div class="pagination-numbers" id="paginationNumbers">
+              <!-- Pagination numbers will be dynamically generated by JavaScript -->
+            </div>
+            
+            <button class="pagination-btn next-btn" disabled data-page="next">
+              Next
+              <i data-lucide="chevron-right" class="pagination-icon"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
 
+{% comment %} Include Quick View Modal - Inline for debugging {% endcomment %}
+<div id="quickViewModal" class="quick-view-overlay" style="display: none;">
+  <div class="quick-view-modal">
+    <div class="quick-view-content">
+      <!-- Close Button -->
+      <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close quick view">
+        <i data-lucide="x" class="close-icon"></i>
+      </button>
+
+      <!-- Product Image Section -->
+      <div class="quick-view-image-section">
+        <div class="quick-view-image-container">
+          <img id="quickViewImage" src="" alt="" class="quick-view-image">
+          <div class="quick-view-badge" id="quickViewBadge" style="display: none;">
+            <span class="badge-text"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Details Section -->
+      <div class="quick-view-details-section">
+        <div class="quick-view-header">
+          <p class="quick-view-vendor quick-view-subtitle" id="quickViewVendor">QUICK VIEW</p>
+          <h2 class="quick-view-title" id="quickViewTitle">Product Name</h2>
+          <div class="quick-view-price" id="quickViewPrice">
+            <span class="price-current">₱0.00</span>
+            <span class="price-compare" style="display: none;"></span>
+          </div>
+        </div>
+
+        <form class="quick-view-form" id="quickViewForm">
+          <!-- Variant Options Container -->
+          <div class="quick-view-options" id="quickViewOptions">
+            <!-- Dynamically populated variant options -->
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="quantity-section quick-view-quantity">
+            <label class="quantity-label">Quantity</label>
+            <div class="quantity-controls">
+              <button type="button" class="quantity-btn quantity-decrease" onclick="updateQuantity(-1)" aria-label="Decrease quantity">−</button>
+              <input type="number" class="quantity-input" id="quickViewQuantity" value="1" min="1" max="99">
+              <button type="button" class="quantity-btn quantity-increase" onclick="updateQuantity(1)" aria-label="Increase quantity">+</button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="quick-view-actions quick-view-buttons">
+            <button type="submit" class="btn-add-to-cart quick-view-btn btn-primary" id="quickViewAddToCart">
+              <i data-lucide="shopping-cart" class="btn-icon"></i>
+              ADD TO CART
+            </button>
+            <button type="button" class="btn-buy-now quick-view-btn btn-secondary" id="quickViewBuyNow">
+              BUY IT NOW
+            </button>
+          </div>
+
+          <!-- Subscription Info (if applicable) -->
+          <div class="subscription-info" id="quickViewSubscription" style="display: none;">
+            <div class="subscription-icon-wrapper">
+              <i data-lucide="refresh-cw" class="subscription-icon"></i>
+              <span class="subscription-text">Subscription details</span>
+            </div>
+            <p class="subscription-description" id="subscriptionDescription"></p>
+          </div>
+
+          <!-- Product Features -->
+          <div class="quick-view-features" id="quickViewFeatures">
+            <!-- Dynamically populated features -->
+          </div>
+        </form>
+
+        <!-- View Full Details Link -->
+        <div class="view-details-section">
+          <a href="#" class="view-details-link quick-view-details-link" id="quickViewDetailsLink">
+            VIEW FULL DETAILS
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% comment %} Modern Collection Layout Styles - Using Wide Awake Design System {% endcomment %}
+<style>
+/* ===========================================
+   WIDE AWAKE COLLECTION PAGE - DESIGN SYSTEM
+   =========================================== */
+
+/* Collection Header */
+.collection-page-optimized {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--color-light) 0%, var(--color-white) 100%);
+}
+
+.collection-header-new {
+  position: relative;
+  background: linear-gradient(135deg, var(--color-primary) 0%, #4A9FD1 100%);
+  color: var(--color-white);
+  overflow: hidden;
+}
+
+.collection-hero-new {
+  position: relative;
+  padding: var(--spacing-2xl) var(--spacing-lg) var(--spacing-xl);
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+}
+
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.1;
+}
+
+.hero-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.2) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.1) 0%, transparent 50%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.collection-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-small);
+  opacity: 0.9;
+}
+
+.breadcrumb-link {
+  color: rgba(255,255,255,0.8);
+  text-decoration: none;
+  transition: var(--transition-fast);
+  font-family: var(--font-primary--family);
+}
+
+.breadcrumb-link:hover {
+  color: var(--color-white);
+}
+
+.breadcrumb-separator {
+  opacity: 0.6;
+}
+
+.breadcrumb-current {
+  color: var(--color-white);
+  font-weight: 500;
+  font-family: var(--font-primary--family);
+}
+
+.collection-title-new {
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h1);
+  font-weight: 400;
+  margin: 0 0 var(--spacing-sm) 0;
+  letter-spacing: 0.05em;
+  line-height: var(--line-height-heading);
+  text-transform: uppercase;
+  color: var(--color-white);
+}
+
+.collection-description-new {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+  opacity: 0.9;
+  margin: 0 0 var(--spacing-lg) 0;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+.collection-stats {
+  display: flex;
+  gap: var(--spacing-lg);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.stat-number {
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h3);
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: var(--spacing-xs);
+  color: var(--color-white);
+}
+
+.stat-label {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-small);
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.controls-top {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.controls-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+.results-summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-small);
+  color: var(--color-muted);
+}
+
+.results-count {
+  font-weight: 600;
+  color: var(--color-foreground);
+  font-size: var(--font-size-body);
+  font-family: var(--font-primary--family);
+}
+
+/* ===============================================
+   SMART FILTER SYSTEM - PERFORMANCE OPTIMIZED
+   =============================================== */
+
+.smart-filters-wrapper {
+  position: relative;
+  z-index: 10;
+  margin-bottom: 32px;
+  overflow: visible;
+}
+
+.smart-filters-sticky {
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 0 0 24px 24px;
+  transition: box-shadow 0.2s ease;
+}
+
+.smart-filters-sticky.is-stuck {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.smart-filters {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: padding 0.2s ease;
+}
+
+.smart-filters-sticky.is-stuck .smart-filters {
+  padding: 12px 16px;
+  border-radius: 0 0 16px 16px;
+  box-shadow: none;
+  border: none;
+}
+
+/* Filter Header */
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.filter-header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-main-title {
+  font-family: var(--font-primary--family);
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.filter-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  color: #6c757d;
+}
+
+.filter-results-summary {
+  background: #f8f9fa;
+  color: #6c757d;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 400;
+  font-family: var(--font-primary--family);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+}
+
+.results-count {
+  font-weight: 500;
+}
+
+.filter-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Sort Controls - Simplified */
+.sort-controls-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-controls-new .sort-dropdown {
+  position: relative;
+}
+
+.sort-controls-new .sort-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid #e9ecef;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  font-family: var(--font-primary--family);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #495057;
+  min-width: 140px;
+  white-space: nowrap;
+}
+
+.sort-controls-new .sort-trigger:hover {
+  border-color: #5CBFEE;
+}
+
+.sort-controls-new .sort-icon {
+  width: 14px;
+  height: 14px;
+  color: #6c757d;
+}
+
+.sort-controls-new .dropdown-icon {
+  width: 14px;
+  height: 14px;
+  color: #6c757d;
+  transition: transform 0.2s ease;
+  margin-left: auto;
+}
+
+.sort-controls-new .sort-trigger.active .dropdown-icon {
+  transform: rotate(180deg);
+}
+
+.sort-controls-new .sort-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: all 0.2s ease;
+  margin-top: 2px;
+}
+
+.sort-controls-new .sort-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.sort-controls-new .sort-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  color: #495057;
+  font-family: var(--font-primary--family);
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.sort-controls-new .sort-option:last-child {
+  border-bottom: none;
+}
+
+.sort-controls-new .sort-option:hover {
+  background: #f8f9fa;
+  color: #5CBFEE;
+}
+
+.sort-controls-new .sort-option.active {
+  background: rgba(92, 191, 238, 0.1);
+  color: #5CBFEE;
+}
+
+.sort-controls-new .option-icon {
+  width: 14px;
+  height: 14px;
+  color: currentColor;
+}
+
+/* View Controls - Simplified */
+.view-controls-new {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.view-controls-new .view-buttons {
+  display: flex;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.view-controls-new .view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border: none;
+  background: white;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-right: 1px solid #e9ecef;
+  color: #6c757d;
+}
+
+.view-controls-new .view-btn:last-child {
+  border-right: none;
+}
+
+.view-controls-new .view-btn:hover {
+  background: #f8f9fa;
+  color: #5CBFEE;
+}
+
+.view-controls-new .view-btn.active {
+  background: #5CBFEE;
+  color: white;
+}
+
+.view-controls-new .view-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.filter-toggle-mobile {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-family: var(--font-primary--family);
+  font-weight: 500;
+  color: #495057;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.filter-toggle-mobile:hover {
+  background: #e9ecef;
+  border-color: #5CBFEE;
+  color: #2c1810;
+}
+
+.filter-toggle-icon {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s ease;
+}
+
+.filter-toggle-mobile[aria-expanded="true"] .filter-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.filter-content {
+  transition: opacity 0.2s ease;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 749px) {
+  .filter-toggle-mobile {
+    display: flex;
+  }
+  
+  .filter-content {
+    display: none;
+  }
+  
+  .filter-content.active {
+    display: block;
+    margin-top: 16px;
+  }
+  
+  .smart-filters {
+    padding: 16px;
+  }
+  
+  .filter-header {
+    margin-bottom: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .filter-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .filter-header-right {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .sort-controls-new .sort-trigger {
+    min-width: 120px;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+
+  .view-controls-new .view-btn {
+    padding: 6px 8px;
+  }
+
+      .view-controls-new .view-icon {
+      width: 14px;
+      height: 14px;
+    }
+
+    .pagination-container {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      padding: 1rem;
+    }
+
+    .pagination-info {
+      align-items: center;
+    }
+
+    .pagination-controls {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .pagination-numbers {
+      order: -1;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .pagination-btn {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .pagination-number {
+      min-width: 32px;
+      height: 32px;
+      font-size: 0.8rem;
+    }
+  }
+
+.view-buttons {
+  display: flex;
+  gap: var(--spacing-xs);
+  background: var(--color-light);
+  padding: var(--spacing-xs);
+  border-radius: var(--border-radius);
+}
+
+.view-btn {
+  padding: var(--spacing-xs);
+  border: none;
+  background: transparent;
+  border-radius: var(--border-radius-small);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.view-btn:hover {
+  background: rgba(92, 191, 238, 0.1);
+  color: var(--color-primary);
+}
+
+.view-btn.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  box-shadow: var(--shadow-small);
+}
+
+.view-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Product Grid - Optimized for Performance */
+.products-section-optimized {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  overflow: visible;
+  min-height: 0;
+}
+
+.product-grid-optimized {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+  contain: layout style;
+}
+
+.product-grid-optimized[data-view="grid-3"] {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.product-grid-optimized[data-view="grid-4"] {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.product-grid-optimized[data-view="list"] {
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
+}
+
+.product-grid-optimized[data-view="list"] .product-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+}
+
+.product-grid-optimized[data-view="list"] .product-image {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+}
+
+.product-grid-optimized[data-view="list"] .product-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.product-grid-optimized[data-view="list"] .product-actions {
+  margin: 0;
+  flex-direction: row;
+  gap: var(--spacing-sm);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .controls-left,
+  .controls-right {
+    justify-content: space-between;
+  }
+  
+  .product-grid-optimized[data-view="grid-3"] {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .product-grid-optimized[data-view="grid-4"] {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .collection-hero-new {
+    padding: var(--spacing-lg) var(--spacing-sm);
+    text-align: center;
+  }
+  
+  .collection-stats {
+    justify-content: center;
+  }
+  
+      .products-section-optimized {
+      padding: 1rem 0.5rem;
+    }
+
+    .product-grid-optimized {
+      gap: 1rem;
+    }
+  
+  .product-grid-optimized[data-view="grid-3"],
+  .product-grid-optimized[data-view="grid-4"] {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  
+  .quick-filters {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  
+  .quick-filters::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .product-grid-optimized[data-view="list"] .product-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .product-grid-optimized[data-view="list"] .product-info {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+  }
+}
+
+/* Simple fade-in animation for initial load only */
+.collection-page-optimized {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Remove reduce motion queries - keep simple */
+.product-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-large);
+}
+
+/* ===============================================
+   KEYFRAME ANIMATIONS
+   =============================================== */
+
+@keyframes pageReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-20px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translate3d(30px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0) scale3d(0.95, 0.95, 1);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+/* ===============================================
+   PERFORMANCE OPTIMIZATIONS
+   =============================================== */
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .collection-page-optimized,
+  .collection-breadcrumb,
+  .collection-title-new,
+  .collection-description-new,
+  .collection-stats,
+  .controls-left,
+  .controls-right,
+  .product-card {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  
+  .product-card:hover {
+    transform: none;
+  }
+  
+  .product-card:hover .product-image img {
+    transform: none;
+  }
+}
+
+/* GPU acceleration hints */
+.collection-hero-new,
+.product-grid-optimized,
+.product-card {
+  contain: layout style paint;
+  will-change: auto;
+}
+
+/* Remove will-change after animations complete */
+.collection-page-optimized.animations-complete * {
+  will-change: auto;
+}
+</style>
+
+{% comment %} JavaScript included inline below - removed external dependency {% endcomment %}
+
+<!-- Enhanced Collection Layout JavaScript -->
+<script>
+// Modern Collection Controls - Performance Optimized
+document.addEventListener('DOMContentLoaded', function() {
+  initCollectionControls();
+});
+
+function initCollectionControls() {
+  const sortTrigger = document.getElementById('sortTrigger');
+  const sortMenu = document.getElementById('sortMenu');
+  const sortOptions = document.querySelectorAll('.sort-option');
+  const viewBtns = document.querySelectorAll('.view-btn');
+  const quickFilters = document.querySelectorAll('.quick-filter');
+  const productGrid = document.getElementById('productGrid');
+  
+  // Initialize pagination scroll
+  initPaginationScroll();
+  
+  // Sort dropdown functionality
+  if (sortTrigger && sortMenu) {
+    sortTrigger.addEventListener('click', function() {
+      const isActive = sortMenu.classList.contains('active');
+      sortMenu.classList.toggle('active', !isActive);
+      sortTrigger.classList.toggle('active', !isActive);
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!sortTrigger.contains(e.target) && !sortMenu.contains(e.target)) {
+        sortMenu.classList.remove('active');
+        sortTrigger.classList.remove('active');
+      }
+    });
+  }
+  
+  // Sort option selection
+  sortOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      const sortType = this.dataset.sort;
+      const sortLabel = this.textContent.trim();
+      
+      // Update active state
+      sortOptions.forEach(opt => opt.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update trigger text
+      const triggerLabel = sortTrigger.querySelector('.sort-label');
+      if (triggerLabel) {
+        triggerLabel.textContent = `Sort: ${sortLabel}`;
+      }
+      
+      // Close dropdown
+      sortMenu.classList.remove('active');
+      sortTrigger.classList.remove('active');
+      
+      // Apply sort
+      applySorting(sortType);
+    });
+  });
+  
+  // View controls
+  viewBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const viewType = this.dataset.view;
+      
+      // Update active state
+      viewBtns.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Apply view
+      if (productGrid) {
+        productGrid.setAttribute('data-view', viewType);
+      }
+    });
+  });
+  
+  // Smart Filter Implementation (Homepage Style)
+  const filterToggle = document.getElementById('filterToggle');
+  const filterContent = document.getElementById('filterContent');
+  
+  if (filterToggle && filterContent) {
+    filterToggle.addEventListener('click', function() {
+      const isExpanded = this.getAttribute('aria-expanded') === 'true';
+      this.setAttribute('aria-expanded', !isExpanded);
+      filterContent.classList.toggle('active', !isExpanded);
+    });
+  }
+  
+  // Initialize product discovery filters
+  if (typeof ProductDiscovery !== 'undefined') {
+    console.log('🔄 Integrating with ProductDiscovery system');
+  }
+  
+
+}
+
+function applySorting(sortType) {
+  const productCards = Array.from(document.querySelectorAll('.product-card'));
+  const productGrid = document.getElementById('productGrid');
+  
+  if (!productCards.length || !productGrid) return;
+  
+  let sortedCards = [...productCards];
+  
+  switch (sortType) {
+    case 'price-low':
+      sortedCards.sort((a, b) => getPrice(a) - getPrice(b));
+      break;
+    case 'price-high':
+      sortedCards.sort((a, b) => getPrice(b) - getPrice(a));
+      break;
+    case 'title-a':
+      sortedCards.sort((a, b) => getTitle(a).localeCompare(getTitle(b)));
+      break;
+    case 'title-z':
+      sortedCards.sort((a, b) => getTitle(b).localeCompare(getTitle(a)));
+      break;
+    case 'created-new':
+      sortedCards.sort((a, b) => getDate(b) - getDate(a));
+      break;
+    case 'best-selling':
+      sortedCards.sort(() => Math.random() - 0.5);
+      break;
+    default: // featured
+      break;
+  }
+  
+  // Re-append sorted cards
+  sortedCards.forEach(card => productGrid.appendChild(card));
+  
+  // Update grid attribute
+  productGrid.setAttribute('data-sort', sortType);
+}
+
+// Smooth scroll to products on pagination click
+function initPaginationScroll() {
+  document.addEventListener('click', function(e) {
+    if (e.target.matches('.pagination-btn, .pagination-number')) {
+      // Small delay to allow page load, then scroll
+      setTimeout(() => {
+        const productsSection = document.querySelector('.products-section-optimized');
+        if (productsSection) {
+          productsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  });
+}
+
+// Filter functionality will be handled by the filter snippet renders
+
+// Helper functions
+function getPrice(card) {
+  const priceElement = card.querySelector('.price-regular, .price-current');
+  if (!priceElement) return 0;
+  const priceText = priceElement.textContent.replace(/[^0-9.]/g, '');
+  return parseFloat(priceText) || 0;
+}
+
+function getTitle(card) {
+  const titleElement = card.querySelector('.product-name a');
+  return titleElement ? titleElement.textContent.trim() : '';
+}
+
+function getDate(card) {
+  // Simulate creation date - in real implementation, this would come from product data
+  return new Date().getTime() - Math.random() * 10000000000;
+}
+</script>
+
+<!-- Performance Optimized Quick View JavaScript -->
+<script>
+
+function openQuickView(productData) {
+  const modal = document.getElementById('quickViewModal');
+  
+  if (!modal) {
+    window.location.href = productData.url;
+    return;
+  }
+  
+  // Batch DOM updates
+  const titleElement = document.getElementById('quickViewTitle');
+  const imageElement = document.getElementById('quickViewImage');
+  const linkElement = document.getElementById('quickViewDetailsLink');
+  const priceElement = document.querySelector('#quickViewPrice .price-current');
+  
+  if (titleElement) titleElement.textContent = productData.title || 'Product Name';
+  if (imageElement) {
+    imageElement.src = productData.image || '';
+    imageElement.alt = productData.title || 'Product';
+  }
+  if (linkElement) linkElement.href = productData.url || '#';
+  if (priceElement) {
+    priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
+  }
+  
+  // Simple modal display
+  modal.style.display = 'flex';
+  modal.style.visibility = 'visible';
+  modal.classList.remove('closing');
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeQuickView() {
+  const modal = document.getElementById('quickViewModal');
+  if (modal) {
+    modal.classList.add('closing');
+    modal.classList.remove('active');
+    
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.remove('closing');
+      document.body.style.overflow = '';
+    }, 200);
+  }
+}
+
+function updateQuantity(change) {
+  const input = document.getElementById('quickViewQuantity');
+  if (input) {
+    const currentValue = parseInt(input.value) || 1;
+    const newValue = Math.max(1, Math.min(99, currentValue + change));
+    input.value = newValue;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const modal = document.getElementById('quickViewModal');
+  const modalContent = modal?.querySelector('.quick-view-modal');
+  
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal?.classList.contains('active')) {
+      closeQuickView();
+    }
+  });
+  
+  if (modal && modalContent) {
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) closeQuickView();
+    });
+    
+    modalContent.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  }
+  
+  document.addEventListener('click', function(e) {
+    const button = e.target.closest('.quick-view-btn');
+    if (button) {
+      e.preventDefault();
+      
+      openQuickView({
+        id: button.dataset.productId,
+        handle: button.dataset.productHandle,
+        title: button.dataset.productTitle,
+        vendor: button.dataset.productVendor,
+        image: button.dataset.productImage,
+        price: button.dataset.productPrice,
+        comparePrice: button.dataset.productComparePrice,
+        url: button.dataset.productUrl
+      });
+    }
+  });
+});
+
+// ================================================
+// SIMPLIFIED COLLECTION CONTROLS
+// Works with existing ProductDiscovery system
+// ================================================
+
+// Clear all filters function - compatible with ProductDiscovery
+window.clearAllFilters = function() {
+  if (typeof resetAllFilters === 'function') {
+    resetAllFilters();
+  } else {
+    // Fallback manual reset
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+      tab.classList.remove('active');
+      tab.setAttribute('aria-pressed', 'false');
+    });
+    
+    // Activate "All" filter
+    const allTab = document.querySelector('.filter-tab[data-filter="all"]');
+    if (allTab) {
+      allTab.classList.add('active');
+      allTab.setAttribute('aria-pressed', 'true');
+    }
+  }
+};
+
+// Generate pagination numbers dynamically
+function generatePaginationNumbers(currentPage, totalPages) {
+  const paginationNumbers = document.getElementById('paginationNumbers');
+  if (!paginationNumbers) return;
+  
+  paginationNumbers.innerHTML = '';
+  
+  // If only 1 page, don't show pagination numbers
+  if (totalPages <= 1) return;
+  
+  // Calculate which pages to show
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, currentPage + 2);
+  
+  // Show first page if not in range
+  if (startPage > 1) {
+    const firstBtn = document.createElement('button');
+    firstBtn.className = 'pagination-number';
+    firstBtn.textContent = '1';
+    firstBtn.dataset.page = '1';
+    paginationNumbers.appendChild(firstBtn);
+    
+    if (startPage > 2) {
+      const ellipsis = document.createElement('span');
+      ellipsis.className = 'pagination-ellipsis';
+      ellipsis.textContent = '...';
+      paginationNumbers.appendChild(ellipsis);
+    }
+  }
+  
+  // Show page range
+  for (let i = startPage; i <= endPage; i++) {
+    const btn = document.createElement('button');
+    btn.className = `pagination-number ${i === currentPage ? 'active' : ''}`;
+    btn.textContent = i;
+    btn.dataset.page = i;
+    paginationNumbers.appendChild(btn);
+  }
+  
+  // Show last page if not in range
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      const ellipsis = document.createElement('span');
+      ellipsis.className = 'pagination-ellipsis';
+      ellipsis.textContent = '...';
+      paginationNumbers.appendChild(ellipsis);
+    }
+    
+    const lastBtn = document.createElement('button');
+    lastBtn.className = 'pagination-number';
+    lastBtn.textContent = totalPages;
+    lastBtn.dataset.page = totalPages;
+    paginationNumbers.appendChild(lastBtn);
+  }
+}
+
+// Extend ProductDiscovery to use our pagination generation
+window.extendProductDiscovery = function() {
+  if (typeof window.productDiscovery !== 'undefined' && window.productDiscovery) {
+    // Override updatePaginationControls to include our pagination number generation
+    const originalUpdatePaginationControls = window.productDiscovery.updatePaginationControls.bind(window.productDiscovery);
+    
+    window.productDiscovery.updatePaginationControls = function() {
+      // Call original method first
+      originalUpdatePaginationControls();
+      
+      // Then generate pagination numbers
+      generatePaginationNumbers(this.currentPage, this.totalPages);
+    };
+    
+    console.log('✅ ProductDiscovery pagination extended');
+  }
+};
+
+// Initialize simplified collection controls
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Collection page initialized');
+  
+  // Let ProductDiscovery handle the filtering
+  if (typeof ProductDiscovery !== 'undefined') {
+    console.log('✅ ProductDiscovery available');
+    
+    // Show pagination if we have enough products
+    setTimeout(() => {
+      const productGrid = document.getElementById('productGrid');
+      const paginationSection = document.getElementById('paginationSection');
+      
+      if (productGrid && paginationSection) {
+        const totalProducts = parseInt(productGrid.dataset.totalProducts) || 0;
+        const productsPerPage = parseInt(productGrid.dataset.productsPerPage) || 12;
+        const totalPages = Math.ceil(totalProducts / productsPerPage);
+        
+        if (totalProducts > productsPerPage) {
+          paginationSection.style.display = 'block';
+          generatePaginationNumbers(1, totalPages);
+        }
+      }
+      
+      // Extend ProductDiscovery after initialization
+      setTimeout(() => {
+        extendProductDiscovery();
+      }, 100);
+    }, 500);
+  }
+});
+</script>
+
+{% comment %} Include standardized product card styles {% endcomment %}
+{% render 'product-card-styles' %}
+
 {% stylesheet %}
-  .collection-products {
+  /* Collection Page Styles */
+  .collection-page {
+    font-family: 'Poppins', sans-serif;
+    color: #2c1810;
+    background-color: #fafafa;
+    min-height: 100vh;
+  }
+
+  /* Collection Header */
+  .collection-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 4rem 2rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .collection-hero {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .collection-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: 3rem;
+    font-weight: 400;
+    margin: 0;
+    color: #2c1810;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .collection-description {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin: 0.5rem 0 0 0;
+    line-height: 1.6;
+    max-width: 600px;
+  }
+
+  .collection-meta {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .product-count {
+    font-weight: 400;
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+
+  /* Main Layout - Optimized */
+  .collection-main-optimized {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    overflow: visible;
+    min-height: 0;
+  }
+
+  /* Smart Filters - Copy from product-discovery styles */
+  .smart-filters-wrapper {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 2rem;
+  }
+
+  .smart-filters-sticky {
+    position: sticky;
+    top: 80px;
+    z-index: 10;
+    background: rgba(250, 250, 250, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 1.5rem 0;
+  }
+
+  .smart-filters {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  }
+
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .filter-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-main-title {
+    font-family: 'Special Gothic Expanded One', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin: 0;
+    color: #2c1810;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  .filter-icon {
+    width: 20px;
+    height: 20px;
+    color: #5CBFEE;
+  }
+
+  #filterSummary.filter-results-summary {
+    color: #495057 !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  #filterSummary .results-count {
+    color: #2c1810 !important;
+    font-weight: 600 !important;
+    background: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    display: inline !important;
+  }
+
+  .filter-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .filter-toggle-mobile {
+    display: none;
+    background: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .clear-all-filters {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .clear-all-filters:hover {
+    background: rgba(220, 53, 69, 0.15);
+    border-color: rgba(220, 53, 69, 0.3);
+  }
+
+  .filter-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Filter Styles - Performance Optimized */
+  .filter-section {
+    margin-bottom: 16px;
+  }
+
+  .filter-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .filter-section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 10px;
+  }
+
+  /* Category Filter Tabs - Simplified */
+  .filter-tabs {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .filter-tab {
+    background: white !important;
+    border: 2px solid #e9ecef !important;
+    border-radius: 16px !important;
+    padding: 0 !important;
+    font-family: 'Poppins', sans-serif !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    color: #495057 !important;
+    min-width: 120px !important;
+    overflow: hidden !important;
+  }
+
+  .tab-content {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 10px 14px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .tab-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+
+  .tab-text-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+  }
+
+  .tab-text {
+    font-weight: 500;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .tab-count {
+    background: rgba(92, 191, 238, 0.1);
+    color: #5CBFEE;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 18px;
+    text-align: center;
+  }
+
+  .filter-tab:hover {
+    border-color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.02);
+    color: #2C3E50;
+  }
+
+  .filter-tab.active {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+    color: white !important;
+    border-color: #5CBFEE !important;
+  }
+
+  /* Colorful Category Themes */
+  .filter-tab[data-filter="daily-driver"].active {
+    background: linear-gradient(135deg, #E6983B 0%, #d18a35 100%) !important;
+    box-shadow: 0 8px 25px rgba(230, 152, 59, 0.3) !important;
+    border-color: #E6983B !important;
+  }
+
+  .filter-tab[data-filter="premium-brews"].active {
+    background: linear-gradient(135deg, #9B59B6 0%, #8E44AD 100%) !important;
+    box-shadow: 0 8px 25px rgba(155, 89, 182, 0.3) !important;
+    border-color: #9B59B6 !important;
+  }
+
+  .filter-tab[data-filter="direct-trade"].active {
+    background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%) !important;
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3) !important;
+    border-color: #2ECC71 !important;
+  }
+
+  .filter-tab[data-filter="equipment"].active {
+    background: linear-gradient(135deg, #FF6B7A 0%, #E74C3C 100%) !important;
+    box-shadow: 0 8px 25px rgba(255, 107, 122, 0.3) !important;
+    border-color: #FF6B7A !important;
+  }
+
+  .filter-tab.active .tab-count {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+  }
+
+  .filter-tab.active .tab-icon {
+    color: white;
+  }
+
+  /* Taste Profile Filters - Premium Compact Design */
+  .vibe-buttons-compact {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .vibe-btn-compact {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: white !important;
+    border: 1.5px solid #e9ecef !important;
+    border-radius: 20px !important;
+    padding: 8px 14px !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: #495057 !important;
+    white-space: nowrap !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .vibe-icon-compact {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2.5;
+    color: #5CBFEE;
+    flex-shrink: 0;
+  }
+
+  .vibe-label {
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .vibe-count {
+    background: #f8f9fa;
+    color: #6c757d;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1;
+  }
+
+  .vibe-btn-compact:hover {
+    border-color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.06);
+    color: #2C3E50;
+  }
+
+  .vibe-btn-compact:hover .vibe-icon-compact {
+    color: #4A9CDB;
+  }
+
+  .vibe-btn-compact.active,
+  .vibe-btn-compact[aria-pressed="true"] {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+    border-color: #5CBFEE !important;
+    color: white !important;
+    font-weight: 600 !important;
+  }
+
+  /* Colorful Vibe Themes - High Specificity */
+  .vibe-btn-compact[data-vibe="smooth-sweet"].active,
+  .vibe-btn-compact[data-vibe="smooth-sweet"][aria-pressed="true"] {
+    background: linear-gradient(135deg, #F1C40F 0%, #F39C12 100%) !important;
+    border-color: #F1C40F !important;
+    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.25) !important;
+  }
+
+  .vibe-btn-compact[data-vibe="light-bright"].active,
+  .vibe-btn-compact[data-vibe="light-bright"][aria-pressed="true"] {
+    background: linear-gradient(135deg, #FF6B7A 0%, #E74C3C 100%) !important;
+    border-color: #FF6B7A !important;
+    box-shadow: 0 4px 12px rgba(255, 107, 122, 0.25) !important;
+  }
+
+  .vibe-btn-compact[data-vibe="complex-expressive"].active,
+  .vibe-btn-compact[data-vibe="complex-expressive"][aria-pressed="true"] {
+    background: linear-gradient(135deg, #1ABC9C 0%, #16A085 100%) !important;
+    border-color: #1ABC9C !important;
+    box-shadow: 0 4px 12px rgba(26, 188, 156, 0.25) !important;
+  }
+
+  .vibe-btn-compact.active .vibe-icon-compact,
+  .vibe-btn-compact[aria-pressed="true"] .vibe-icon-compact {
+    color: white;
+  }
+
+  .vibe-btn-compact.active .vibe-count,
+  .vibe-btn-compact[aria-pressed="true"] .vibe-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+  }
+
+  /* Quick View Styles - Performance Optimized */
+  .quick-view-overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: rgba(0, 0, 0, 0) !important;
+    z-index: 9999 !important;
+    display: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity 0.2s ease, background-color 0.2s ease !important;
+  }
+
+  .quick-view-overlay[style*="display: flex"] {
+    display: flex !important;
+    visibility: visible !important;
+  }
+
+  .quick-view-overlay.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .quick-view-overlay.closing {
+    opacity: 0 !important;
+    transition: opacity 0.2s ease !important;
+  }
+
+  .quick-view-modal {
+    background: white !important;
+    border: 1px solid rgba(92, 191, 238, 0.2) !important;
+    border-radius: 16px !important;
+    max-width: 1000px !important;
+    width: 95% !important;
+    max-height: 85vh !important;
+    overflow: hidden !important;
+    transform: scale(0.98) !important;
+    transition: transform 0.2s ease !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    position: relative !important;
+  }
+
+  .quick-view-overlay.active .quick-view-modal {
+    transform: scale(1) !important;
+  }
+
+  .quick-view-content {
+    display: grid !important;
+    grid-template-columns: 1.2fr 1fr !important;
+    height: 100% !important;
+    max-height: 85vh !important;
+    min-height: 500px !important;
+    overflow: hidden !important;
+  }
+
+  .quick-view-close {
+    position: absolute !important;
+    top: 20px !important;
+    right: 20px !important;
+    background: white !important;
+    border: 1px solid #e9ecef !important;
+    border-radius: 50% !important;
+    width: 40px !important;
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    z-index: 20 !important;
+    color: #6c757d !important;
+    font-size: 16px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .quick-view-close:hover {
+    background: #f8f9fa !important;
+    border-color: #5CBFEE !important;
+    color: #5CBFEE !important;
+  }
+
+  .quick-view-image-section {
+    background: #f8f9fa !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 40px !important;
+    border-radius: 16px 0 0 16px !important;
+  }
+
+  .quick-view-image-container {
+    width: 100% !important;
+    max-width: 350px !important;
+    aspect-ratio: 1 !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    background: white !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    transition: transform 0.2s ease !important;
+  }
+
+  .quick-view-image-container:hover {
+    transform: scale(1.02) !important;
+  }
+
+  .quick-view-image {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+
+  .quick-view-details-section {
+    padding: 40px !important;
+    overflow-y: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: white !important;
+    border-radius: 0 16px 16px 0 !important;
+  }
+
+  .quick-view-title {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
+    color: #2c1810 !important;
+    margin: 0 0 8px 0 !important;
+    line-height: 1.2 !important;
+    position: relative !important;
+    z-index: 1 !important;
+    letter-spacing: -0.02em !important;
+  }
+
+  .quick-view-subtitle {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    color: #6c757d !important;
+    margin: 0 0 24px 0 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .quick-view-price {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 16px !important;
+    margin-bottom: 32px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .price-current {
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    color: #5CBFEE !important;
+    font-family: 'Poppins', sans-serif !important;
+    letter-spacing: -0.03em !important;
+    text-shadow: 0 2px 4px rgba(92, 191, 238, 0.1) !important;
+  }
+
+  .price-compare {
+    font-size: 1.1rem !important;
+    font-weight: 500 !important;
+    color: #adb5bd !important;
+    text-decoration: line-through !important;
+    font-family: 'Poppins', sans-serif !important;
+  }
+
+  /* Quantity Section */
+  .quick-view-quantity {
+    margin-bottom: 32px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .quantity-label {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #495057 !important;
+    margin-bottom: 12px !important;
+    display: block !important;
+  }
+
+  .quantity-controls {
+    display: flex !important;
+    align-items: center !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 2px solid rgba(92, 191, 238, 0.1) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+    width: fit-content !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .quantity-btn {
+    background: none !important;
+    border: none !important;
+    width: 44px !important;
+    height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    color: #6c757d !important;
+    font-size: 18px !important;
+    font-weight: 600 !important;
+  }
+
+  .quantity-btn:hover {
+    background: rgba(92, 191, 238, 0.1) !important;
+    color: #5CBFEE !important;
+  }
+
+  .quantity-input {
+    border: none !important;
+    background: none !important;
+    width: 60px !important;
+    text-align: center !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #2c1810 !important;
+    outline: none !important;
+  }
+
+  /* Button Styling */
+  .quick-view-buttons {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-bottom: 32px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  .quick-view-btn {
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    padding: 16px 32px !important;
+    border-radius: 16px !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
+    position: relative !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+    color: white !important;
+    box-shadow: 0 8px 25px rgba(92, 191, 238, 0.3) !important;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #4A9CDB 0%, #3A87C7 100%) !important;
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #5CBFEE !important;
+    border: 2px solid rgba(92, 191, 238, 0.2) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 1) !important;
+    border-color: rgba(92, 191, 238, 0.4) !important;
+    color: #4A9CDB !important;
+  }
+
+  /* View Details Link */
+  .quick-view-details-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #5CBFEE !important;
+    text-decoration: none !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+    z-index: 1 !important;
+    margin-top: auto !important;
+    padding-top: 20px !important;
+  }
+
+  .quick-view-details-link:hover {
+    color: #4A9CDB !important;
+  }
+
+  .quick-view-details-link::after {
+    content: '→';
+  }
+
+  /* Active Filters Premium Styling */
+  .active-filters-section {
+    margin-top: 1.5rem;
+    padding: 1.2rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(92, 191, 238, 0.15);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+  }
+
+  .active-filters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .active-filters-label {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #495057;
+    margin: 0;
+  }
+
+  .clear-all-filters-inline {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, #ff6b6b, #e74c3c) !important;
+    border: none !important;
+    border-radius: 20px !important;
+    padding: 6px 12px !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.7rem !important;
+    font-weight: 500 !important;
+    color: white !important;
+    text-decoration: none !important;
+  }
+
+  .clear-all-filters-inline:hover {
+    background: linear-gradient(135deg, #e74c3c, #c0392b) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3) !important;
+  }
+
+  .clear-icon-inline {
+    width: 12px !important;
+    height: 12px !important;
+    stroke-width: 2.5 !important;
+  }
+
+  .active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .active-filter-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 249, 250, 0.9)) !important;
+    border: 1.5px solid rgba(92, 191, 238, 0.2) !important;
+    border-radius: 20px !important;
+    padding: 6px 12px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    color: #495057 !important;
+    backdrop-filter: blur(5px) !important;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  .active-filter-chip:hover {
+    background: linear-gradient(135deg, #5CBFEE, #4A9CDB) !important;
+    border-color: #5CBFEE !important;
+    color: white !important;
+  }
+
+  .filter-remove-btn {
+    background: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    padding: 2px !important;
+    border-radius: 50% !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .filter-remove-btn:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .filter-remove-icon {
+    width: 12px !important;
+    height: 12px !important;
+    stroke-width: 2.5 !important;
+  }
+
+  /* Collection Content */
+  .collection-content {
+    flex: 1;
+  }
+
+  .collection-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+  }
+
+  .sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .sort-label {
+    font-weight: 500;
+    color: #6c757d;
+  }
+
+  .sort-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .view-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .view-toggle {
+    background: rgba(108, 117, 125, 0.1);
+    border: 1px solid rgba(108, 117, 125, 0.2);
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #6c757d;
+    transition: all 0.2s ease;
+  }
+
+  .view-toggle.active {
+    background: #5CBFEE;
+    border-color: #5CBFEE;
+    color: white;
+  }
+
+  /* Products Grid - Match product discovery styles */
+  .instant-products {
+    margin-top: 2rem;
+  }
+
+  .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  /* Product card styles now handled by product-card-styles.liquid */
+
+  /* Button states handled by standardized product card styles */
+
+  /* Empty State */
+  .empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    text-align: center;
+  }
+
+  .empty-state-content {
+    max-width: 400px;
+  }
+
+  .empty-state-icon {
+    width: 64px;
+    height: 64px;
+    color: #6c757d;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c1810;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state-message {
+    color: #6c757d;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #5CBFEE, #4A9FD1);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, #4A9FD1, #3A8BC1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(92, 191, 238, 0.3);
+  }
+
+  /* Optimized Pagination - Performance First */
+  .pagination-optimized {
+    margin: 2rem 0 0 0;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(229, 229, 229, 0.3);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    overflow: visible;
+  }
+
+  .pagination-container {
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .pagination-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .page-info {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #2c1810;
+    font-size: 0.9rem;
+  }
+
+  .items-info {
+    font-family: 'Poppins', sans-serif;
+    color: #666;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    color: #495057;
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .pagination-btn:hover:not(.disabled) {
+    border-color: #5CBFEE;
+    color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.05);
+    text-decoration: none;
+  }
+
+  .pagination-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .btn-icon {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+
+  .pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0 0.5rem;
+  }
+
+  .pagination-number {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #495057;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    padding: 0 0.5rem;
+  }
+
+  .pagination-number:hover {
+    border-color: #5CBFEE;
+    color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.05);
+    text-decoration: none;
+  }
+
+  .pagination-number.current {
+    background: #5CBFEE;
+    color: white;
+    border-color: #5CBFEE;
+    font-weight: 600;
+  }
+
+  .pagination-ellipsis {
+    padding: 0 0.5rem;
+    color: #999;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+
+  /* Pagination */
+  .pagination-wrapper {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+  }
+
+  /* Filter Styles */
+  {% render 'filter-styles-css' %}
+
+  /* Pagination Section - Full Width & Minimal */
+  .pagination-section-fullwidth {
+    width: 100vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    margin-top: 40px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border-top: 1px solid #e9ecef;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .pagination-content {
+    padding: 30px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .pagination-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .pagination-info span {
+    font-family: 'Poppins', sans-serif;
+    color: #666;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .current-page, .total-pages {
+    font-weight: 700;
+    color: #2c1810;
+  }
+
+  .products-count {
+    font-size: 0.85rem !important;
+    opacity: 0.8;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: white;
+    color: #666;
+    border: 1px solid #ddd;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pagination-btn:hover:not(:disabled) {
+    border-color: #5CBFEE;
+    color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.05);
+  }
+
+  .pagination-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .pagination-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+  }
+
+  .pagination-numbers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 8px;
+  }
+
+  .pagination-number {
+    min-width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .pagination-number:hover {
+    border-color: #5CBFEE;
+    color: #5CBFEE;
+    background: rgba(92, 191, 238, 0.05);
+  }
+
+  .pagination-number.active {
+    background: #5CBFEE;
+    color: white;
+    border-color: #5CBFEE;
+    font-weight: 700;
+  }
+
+  .pagination-ellipsis {
+    padding: 0 8px;
+    color: #999;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    .collection-title {
+      font-size: 2rem;
+    }
+
+    .collection-hero {
+      flex-direction: column;
+      text-align: center;
+    }
+
+          .collection-main-optimized {
+        padding: 0 0.5rem;
+        overflow: visible;
+      }
+
+    .smart-filters {
+      padding: 1rem;
+    }
+
+    .filter-toggle-mobile {
+      display: flex;
+    }
+
+    .filter-content {
+      display: none;
+    }
+
+    .filter-content.show {
+      display: flex;
+    }
+
+    .collection-products {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .collection-controls {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    .sort-controls {
+      justify-content: space-between;
+    }
+
+    .view-controls {
+      justify-content: center;
+    }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "t:general.collection",
-  "settings": []
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per Page",
+      "min": 2,
+      "max": 20,
+      "step": 2,
+      "default": 12
+    }
+  ]
 }
 {% endschema %}
+
+

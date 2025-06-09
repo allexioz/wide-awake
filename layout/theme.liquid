@@ -1,23 +1,501 @@
 <!doctype html>
-<html lang="{{ request.locale.iso_code }}">
+<html lang="{{ request.locale.iso_code }}" class="no-js">
   <head>
-    {% # Inlined CSS Variables %}
-    {% render 'css-variables' %}
-
-    {% # Load and preload the critical CSS %}
-    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
-
-    {% # Social, title, etc. %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    
+    {%- comment -%} Use favicon.png from assets {%- endcomment -%}
+    <link rel="icon" type="image/png" href="{{ 'favicon.png' | asset_url }}">
+    <link rel="shortcut icon" type="image/png" href="{{ 'favicon.png' | asset_url }}">
+    <link rel="apple-touch-icon" href="{{ 'favicon.png' | asset_url }}">{%- comment -%} For iOS devices {%- endcomment -%}
+    
+    {%- comment -%} Preconnect to Google Fonts for performance {%- endcomment -%}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    {%- comment -%} Load Google Fonts - Poppins + Special Gothic Expanded One {%- endcomment -%}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
+    
+    {%- comment -%} Lucide Icons {%- endcomment -%}
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ 'general.meta.tags' | t: tags: current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+    
     {% render 'meta-tags' %}
-
+    {% render 'css-variables' %}
+    
+    {%- comment -%} Load critical CSS inline for performance {%- endcomment -%}
+    <style>
+      {{ 'critical.css' | asset_content }}
+    </style>
+    
+    {%- comment -%} Load custom fonts stylesheet (now just for helper classes) {%- endcomment -%}
+    {{ 'fonts.css.liquid' | asset_url | stylesheet_tag }}
+    
+    {%- comment -%} Product Image 1:1 Aspect Ratio CSS {%- endcomment -%}
+    {{ 'product-image-aspect-ratio.css' | asset_url | stylesheet_tag }}
+    
+    {%- comment -%} Theme script {%- endcomment -%}
+    <script>
+      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+      if (Shopify.designMode) {
+        document.documentElement.classList.add('shopify-design-mode');
+      }
+    </script>
+    
     {{ content_for_header }}
   </head>
 
-  <body>
+  <body class="template-{{ request.page_type }}" style="margin: 0 !important; padding: 0 !important;">
     {% sections 'header-group' %}
 
-    {{ content_for_layout }}
+    <main id="MainContent" class="content-for-layout focus-none" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
 
     {% sections 'footer-group' %}
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
+      <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
+    </ul>
+
+    <script>
+      window.shopUrl = '{{ request.origin }}';
+      window.routes = {
+        cart_add_url: '{{ routes.cart_add_url }}',
+        cart_change_url: '{{ routes.cart_change_url }}',
+        cart_update_url: '{{ routes.cart_update_url }}',
+        cart_url: '{{ routes.cart_url }}',
+        predictive_search_url: '{{ routes.predictive_search_url }}'
+      };
+
+      window.cartStrings = {
+        error: `{{ 'sections.cart.cart_error' | t }}`,
+        quantityError: `{{ 'sections.cart.cart_quantity_error_html' | t: quantity: '[quantity]' }}`
+      }
+
+      window.variantStrings = {
+        addToCart: `{{ 'products.product.add_to_cart' | t }}`,
+        soldOut: `{{ 'products.product.sold_out' | t }}`,
+        unavailable: `{{ 'products.product.unavailable' | t }}`,
+      }
+    </script>
+
+    {%- comment -%} Product Discovery JavaScript {%- endcomment -%}
+    <script src="{{ 'product-discovery.js' | asset_url }}" defer></script>
+    
+    {%- comment -%} Initialize Lucide Icons with Robust Loading {%- endcomment -%}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced Lucide icon initialization with retry logic
+        function initializeLucideIcons(retryCount = 0) {
+          if (typeof lucide !== 'undefined') {
+            try {
+              lucide.createIcons();
+              console.log('✓ Lucide icons initialized successfully');
+              
+              // Re-initialize icons when new content is added dynamically
+              const observer = new MutationObserver(function(mutations) {
+                let shouldReinitialize = false;
+                mutations.forEach(function(mutation) {
+                  if (mutation.type === 'childList') {
+                    mutation.addedNodes.forEach(function(node) {
+                      if (node.nodeType === 1 && (
+                        node.querySelector && node.querySelector('[data-lucide]') ||
+                        node.hasAttribute && node.hasAttribute('data-lucide')
+                      )) {
+                        shouldReinitialize = true;
+                      }
+                    });
+                  }
+                });
+                
+                if (shouldReinitialize) {
+                  setTimeout(() => {
+                    if (typeof lucide !== 'undefined') {
+                      lucide.createIcons();
+                    }
+                  }, 10);
+                }
+              });
+              
+              observer.observe(document.body, {
+                childList: true,
+                subtree: true
+              });
+              
+            } catch (error) {
+              console.warn('Error initializing Lucide icons:', error);
+            }
+          } else if (retryCount < 5) {
+            // Retry up to 5 times with increasing delay
+            setTimeout(() => initializeLucideIcons(retryCount + 1), (retryCount + 1) * 200);
+          } else {
+            console.warn('Lucide icons not available after multiple retries');
+          }
+        }
+        
+                 initializeLucideIcons();
+         
+         // Global icon refresh function for dynamic content
+         window.refreshIcons = function() {
+           if (typeof lucide !== 'undefined') {
+             try {
+               lucide.createIcons();
+             } catch (error) {
+               console.warn('Error refreshing icons:', error);
+             }
+           }
+         };
+         
+         // Global function to ensure specific elements have working icons
+         window.ensureIconsWork = function(container = document) {
+           const iconElements = container.querySelectorAll('[data-lucide]');
+           iconElements.forEach(element => {
+             // If Lucide icon didn't render, add fallback
+             if (!element.querySelector('svg') && element.dataset.lucide) {
+               const iconName = element.dataset.lucide;
+               let fallbackContent = '';
+               
+               // Fallback mapping for common icons
+               const fallbacks = {
+                 'check-circle': '✓',
+                 'check': '✓',
+                 'x-circle': '✗',
+                 'x': '✗',
+                 'info': 'ℹ',
+                 'alert-circle': '⚠',
+                 'shopping-cart': '🛒',
+                 'heart': '♡',
+                 'star': '⭐',
+                 'plus': '+',
+                 'minus': '-',
+                 'arrow-left': '←',
+                 'arrow-right': '→',
+                 'chevron-left': '‹',
+                 'chevron-right': '›',
+                 'chevron-down': '▼',
+                 'chevron-up': '▲'
+               };
+               
+               if (fallbacks[iconName]) {
+                 element.innerHTML = `<span class="icon-fallback" style="font-size: inherit; font-weight: bold;">${fallbacks[iconName]}</span>`;
+                 element.style.display = 'inline-flex';
+                 element.style.alignItems = 'center';
+                 element.style.justifyContent = 'center';
+               }
+             }
+           });
+         };
+
+       });
+    </script>
+
+    <!-- Enhanced Scripts for Colorful Wide Awake -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha512-z4OUqw38qNLpn1libAN9BsoDx6nbNFio5lA6CuTp9NlK83b89hgyCVq+N5FdBJptINztxn1Z3SaKSKUS5UP60Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    
+    <!-- Colorful Background Animation System -->
+    <script>
+      class ColorfulBackgrounds {
+        constructor() {
+          this.init();
+        }
+        
+        init() {
+          this.setupProductDiscovery();
+          this.setupStudioBooking();
+          this.setupNewsletter();
+          this.setupInteractiveElements();
+        }
+        
+        setupProductDiscovery() {
+          const hero = document.querySelector('.product-discovery-hero');
+          if (!hero) return;
+          
+          // Create animated gradient orbs
+          this.createGradientOrbs(hero, [
+            { color: '#5CBFEE', size: 300, speed: 8000 },
+            { color: '#E6983B', size: 200, speed: 12000 },
+            { color: '#2ECC71', size: 250, speed: 10000 },
+            { color: '#9B59B6', size: 180, speed: 15000 }
+          ]);
+        }
+        
+        setupStudioBooking() {
+          const studio = document.querySelector('.studio-booking');
+          if (!studio) return;
+          
+          // Animate experience cards on scroll
+          this.animateCardsOnScroll();
+        }
+        
+        setupNewsletter() {
+          const newsletter = document.querySelector('.newsletter-signup');
+          if (!newsletter) return;
+          
+          // Create pulsing gradient rings
+          this.createPulsingRings(newsletter);
+        }
+        
+        createGradientOrbs(container, orbs) {
+          const orbContainer = document.createElement('div');
+          orbContainer.className = 'gradient-orbs';
+          orbContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+          `;
+          
+          orbs.forEach((orb, index) => {
+            const orbElement = document.createElement('div');
+            orbElement.className = `gradient-orb orb-${index}`;
+            orbElement.style.cssText = `
+              position: absolute;
+              width: ${orb.size}px;
+              height: ${orb.size}px;
+              border-radius: 50%;
+              background: radial-gradient(circle, ${orb.color}40 0%, ${orb.color}20 50%, transparent 100%);
+              filter: blur(40px);
+              opacity: 0.6;
+            `;
+            
+            orbContainer.appendChild(orbElement);
+            
+            // Animate orb movement
+            anime({
+              targets: orbElement,
+              translateX: [
+                { value: Math.random() * window.innerWidth, duration: orb.speed },
+                { value: Math.random() * window.innerWidth, duration: orb.speed }
+              ],
+              translateY: [
+                { value: Math.random() * 400, duration: orb.speed },
+                { value: Math.random() * 400, duration: orb.speed }
+              ],
+              scale: [
+                { value: 1.2, duration: orb.speed / 2 },
+                { value: 0.8, duration: orb.speed / 2 }
+              ],
+              opacity: [
+                { value: 0.8, duration: orb.speed / 3 },
+                { value: 0.3, duration: orb.speed / 3 },
+                { value: 0.6, duration: orb.speed / 3 }
+              ],
+              easing: 'easeInOutSine',
+              loop: true,
+              direction: 'alternate'
+            });
+          });
+          
+          container.style.position = 'relative';
+          container.insertBefore(orbContainer, container.firstChild);
+        }
+        
+
+        
+        createPulsingRings(container) {
+          const ringContainer = document.createElement('div');
+          ringContainer.className = 'pulsing-rings';
+          ringContainer.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 0;
+          `;
+          
+          // Create pulsing rings
+          for (let i = 0; i < 4; i++) {
+            const ring = document.createElement('div');
+            ring.className = `pulsing-ring ring-${i}`;
+            const colors = ['#FF6B7A', '#F1C40F', '#2ECC71', '#9B59B6'];
+            ring.style.cssText = `
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              width: ${100 + i * 100}px;
+              height: ${100 + i * 100}px;
+              border: 2px solid ${colors[i]}40;
+              border-radius: 50%;
+              transform: translate(-50%, -50%);
+              opacity: 0;
+            `;
+            
+            ringContainer.appendChild(ring);
+            
+            // Animate ring pulses
+            anime({
+              targets: ring,
+              scale: [1, 3],
+              opacity: [0.6, 0],
+              duration: 3000,
+              delay: i * 750,
+              easing: 'easeOutQuart',
+              loop: true
+            });
+          }
+          
+          container.style.position = 'relative';
+          container.insertBefore(ringContainer, container.firstChild);
+        }
+        
+        animateCardsOnScroll() {
+          const cards = document.querySelectorAll('.experience-card');
+          if (!cards.length) return;
+          
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+              if (entry.isIntersecting) {
+                anime({
+                  targets: entry.target,
+                  translateY: [50, 0],
+                  opacity: [0, 1],
+                  scale: [0.9, 1],
+                  duration: 800,
+                  delay: index * 200,
+                  easing: 'easeOutElastic(1, .8)'
+                });
+              }
+            });
+          }, { threshold: 0.1 });
+          
+          cards.forEach(card => observer.observe(card));
+        }
+        
+        setupInteractiveElements() {
+          // Interactive filter tabs
+          const filterTabs = document.querySelectorAll('.filter-tab');
+          filterTabs.forEach(tab => {
+            tab.addEventListener('mouseenter', () => {
+              anime({
+                targets: tab,
+                scale: 1.05,
+                rotateY: 5,
+                duration: 300,
+                easing: 'easeOutQuart'
+              });
+            });
+            
+            tab.addEventListener('mouseleave', () => {
+              anime({
+                targets: tab,
+                scale: 1,
+                rotateY: 0,
+                duration: 300,
+                easing: 'easeOutQuart'
+              });
+            });
+          });
+          
+          // Interactive product cards
+          const productCards = document.querySelectorAll('.product-card');
+          productCards.forEach(card => {
+            card.addEventListener('mouseenter', () => {
+              anime({
+                targets: card,
+                translateY: -8,
+                rotateX: 2,
+                duration: 400,
+                easing: 'easeOutQuart'
+              });
+            });
+            
+            card.addEventListener('mouseleave', () => {
+              anime({
+                targets: card,
+                translateY: 0,
+                rotateX: 0,
+                duration: 400,
+                easing: 'easeOutQuart'
+              });
+            });
+          });
+          
+          // Interactive add-to-cart buttons
+          const addToCartBtns = document.querySelectorAll('.quick-add-btn');
+          addToCartBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+              // Success animation
+              anime({
+                targets: btn,
+                scale: [1, 1.2, 1],
+                rotate: [0, 360],
+                duration: 600,
+                easing: 'easeOutElastic(1, .6)'
+              });
+              
+              // Create success particles
+              this.createSuccessParticles(btn);
+            });
+          });
+        }
+        
+        createSuccessParticles(button) {
+          const particles = [];
+          const rect = button.getBoundingClientRect();
+          const centerX = rect.left + rect.width / 2;
+          const centerY = rect.top + rect.height / 2;
+          
+          // Create particle elements
+          for (let i = 0; i < 8; i++) {
+            const particle = document.createElement('div');
+            particle.style.cssText = `
+              position: fixed;
+              top: ${centerY}px;
+              left: ${centerX}px;
+              width: 8px;
+              height: 8px;
+              background: #E6983B;
+              border-radius: 50%;
+              pointer-events: none;
+              z-index: 1000;
+            `;
+            document.body.appendChild(particle);
+            particles.push(particle);
+            
+            // Animate particles
+            anime({
+              targets: particle,
+              translateX: (Math.random() - 0.5) * 200,
+              translateY: (Math.random() - 0.5) * 200,
+              scale: [1, 0],
+              opacity: [1, 0],
+              duration: 1000,
+              easing: 'easeOutQuart',
+              complete: () => {
+                document.body.removeChild(particle);
+              }
+            });
+          }
+        }
+      }
+      
+      // Initialize when DOM is ready
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+          new ColorfulBackgrounds();
+        });
+      } else {
+        new ColorfulBackgrounds();
+      }
+    </script>
   </body>
 </html>

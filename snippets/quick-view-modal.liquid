@@ -1,0 +1,94 @@
+{% comment %}
+  Quick View Modal Component
+  
+  Premium modal for product quick view with glass morphism design
+  Usage: {% render 'quick-view-modal' %}
+{% endcomment %}
+
+<!-- Quick View Modal Overlay -->
+<div id="quickViewModal" class="quick-view-overlay" style="display: none;">
+  <div class="quick-view-modal">
+    <div class="quick-view-content">
+      <!-- Close Button -->
+      <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close quick view">
+        <i data-lucide="x" class="close-icon"></i>
+      </button>
+
+      <!-- Product Image Section -->
+      <div class="quick-view-image-section">
+        <div class="quick-view-image-container">
+          <img id="quickViewImage" src="" alt="" class="quick-view-image">
+          <div class="quick-view-badge" id="quickViewBadge" style="display: none;">
+            <span class="badge-text"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Details Section -->
+      <div class="quick-view-details-section">
+        <div class="quick-view-header">
+          <p class="quick-view-vendor" id="quickViewVendor">QUICK VIEW</p>
+          <h2 class="quick-view-title" id="quickViewTitle">Product Name</h2>
+          <div class="quick-view-price" id="quickViewPrice">
+            <span class="price-current">₱0.00</span>
+            <span class="price-compare" style="display: none;"></span>
+          </div>
+        </div>
+
+        <form class="quick-view-form" id="quickViewForm">
+          <!-- Variant Options Container -->
+          <div class="quick-view-options" id="quickViewOptions">
+            <!-- Dynamically populated variant options -->
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="quantity-section">
+            <label class="quantity-label">Quantity</label>
+            <div class="quantity-controls">
+              <button type="button" class="quantity-btn quantity-decrease" onclick="updateQuantity(-1)" aria-label="Decrease quantity">
+                <i data-lucide="minus" class="quantity-icon"></i>
+              </button>
+              <input type="number" class="quantity-input" id="quickViewQuantity" value="1" min="1" max="99">
+              <button type="button" class="quantity-btn quantity-increase" onclick="updateQuantity(1)" aria-label="Increase quantity">
+                <i data-lucide="plus" class="quantity-icon"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="quick-view-actions">
+            <button type="submit" class="btn-add-to-cart" id="quickViewAddToCart">
+              <i data-lucide="shopping-cart" class="btn-icon"></i>
+              ADD TO CART
+            </button>
+            <button type="button" class="btn-buy-now" id="quickViewBuyNow">
+              BUY IT NOW
+            </button>
+          </div>
+
+          <!-- Subscription Info (if applicable) -->
+          <div class="subscription-info" id="quickViewSubscription" style="display: none;">
+            <div class="subscription-icon-wrapper">
+              <i data-lucide="refresh-cw" class="subscription-icon"></i>
+              <span class="subscription-text">Subscription details</span>
+            </div>
+            <p class="subscription-description" id="subscriptionDescription"></p>
+          </div>
+
+          <!-- Product Features -->
+          <div class="quick-view-features" id="quickViewFeatures">
+            <!-- Dynamically populated features -->
+          </div>
+        </form>
+
+        <!-- View Full Details Link -->
+        <div class="view-details-section">
+          <a href="#" class="view-details-link" id="quickViewDetailsLink">
+            VIEW FULL DETAILS
+            <i data-lucide="arrow-right" class="details-arrow"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

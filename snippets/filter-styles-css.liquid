@@ -1,0 +1,329 @@
+/* Filter Sections */
+.filter-section {
+  margin-bottom: 16px;
+}
+
+.filter-section:last-child {
+  margin-bottom: 0;
+}
+
+.filter-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+/* Category Filter Tabs - Premium Design */
+.filter-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  background: white !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 16px !important;
+  padding: 0 !important;
+  font-family: 'Poppins', sans-serif !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  color: #495057 !important;
+  min-width: 120px !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+.filter-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.filter-tab:hover::before {
+  left: 100%;
+}
+
+.tab-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 10px 14px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.tab-icon {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+  flex-shrink: 0;
+}
+
+.tab-text-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.tab-text {
+  font-weight: 500;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.tab-count {
+  background: rgba(92, 191, 238, 0.1);
+  color: #5CBFEE;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  min-width: 18px;
+  text-align: center;
+}
+
+.filter-tab:hover {
+  border-color: #5CBFEE;
+  background: rgba(92, 191, 238, 0.02);
+  color: #2C3E50;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(92, 191, 238, 0.15);
+}
+
+/* Active state for filter tabs */
+.filter-tab.active {
+  background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+  color: white !important;
+  border-color: transparent !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 32px rgba(92, 191, 238, 0.4) !important;
+}
+
+.filter-tab.active .tab-icon {
+  color: white;
+  transform: scale(1.1);
+}
+
+.filter-tab.active .tab-text {
+  color: white;
+  font-weight: 700;
+}
+
+.filter-tab.active .tab-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  font-weight: 800;
+  transform: scale(1.05);
+}
+
+/* Wide Awake Taste Profile Themes for filter tabs - Higher specificity */
+.filter-tab[data-vibe="smooth-sweet"].active,
+.filter-tabs .filter-tab[data-vibe="smooth-sweet"].active {
+  background: linear-gradient(135deg, #F1C40F 0%, #E6983B 100%) !important;
+  box-shadow: 0 12px 32px rgba(241, 196, 15, 0.35) !important;
+}
+
+.filter-tab[data-vibe="light-bright"].active,
+.filter-tabs .filter-tab[data-vibe="light-bright"].active {
+  background: linear-gradient(135deg, #FF6B7A 0%, #FF8E53 100%) !important;
+  box-shadow: 0 12px 32px rgba(255, 107, 122, 0.35) !important;
+}
+
+.filter-tab[data-vibe="complex-expressive"].active,
+.filter-tabs .filter-tab[data-vibe="complex-expressive"].active {
+  background: linear-gradient(135deg, #1ABC9C 0%, #5CBFEE 100%) !important;
+  box-shadow: 0 12px 32px rgba(26, 188, 156, 0.35) !important;
+}
+
+/* Ensure the "All Coffee" tab uses brand blue gradient */
+.filter-tab[data-filter="all"].active,
+.filter-tabs .filter-tab[data-filter="all"].active {
+  background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%) !important;
+  box-shadow: 0 12px 32px rgba(92, 191, 238, 0.4) !important;
+}
+
+/* Wide Awake Design System - Sophisticated Filter Pills */
+.compact-filters {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  border: 1px solid rgba(229, 229, 229, 0.3);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+}
+
+.filter-pills {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filter-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(92, 191, 238, 0.15) !important;
+  border-radius: 24px !important;
+  padding: 14px 20px !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #1a1a1a !important;
+  white-space: nowrap !important;
+  position: relative !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+}
+
+.filter-pill::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.05) 0%, rgba(230, 152, 59, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.pill-icon {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  color: #5CBFEE;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.pill-text {
+  font-weight: 600;
+  flex: 1;
+  letter-spacing: -0.01em;
+}
+
+.pill-count {
+  background: rgba(92, 191, 238, 0.1);
+  color: #5CBFEE;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: 'Special Gothic Expanded One', monospace;
+  line-height: 1;
+  min-width: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.filter-pill:hover {
+  border-color: rgba(92, 191, 238, 0.3);
+  background: rgba(255, 255, 255, 1) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+.filter-pill:hover::before {
+  opacity: 1;
+}
+
+.filter-pill:hover .pill-icon {
+  color: #4A9CDB;
+  transform: scale(1.1);
+}
+
+.filter-pill:hover .pill-count {
+  background: rgba(92, 191, 238, 0.15);
+  transform: scale(1.05);
+}
+
+.filter-pill.active {
+  background: linear-gradient(135deg, #5CBFEE 0%, #E6983B 100%) !important;
+  color: white !important;
+  border-color: transparent !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 32px rgba(92, 191, 238, 0.4) !important;
+}
+
+.filter-pill.active::before {
+  opacity: 0;
+}
+
+.filter-pill.active .pill-icon {
+  color: white;
+  transform: scale(1.1);
+}
+
+.filter-pill.active .pill-text {
+  color: white;
+  font-weight: 700;
+}
+
+.filter-pill.active .pill-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+  font-weight: 800;
+  transform: scale(1.05);
+}
+
+/* Wide Awake Taste Profile Themes */
+.filter-pill[data-vibe="smooth-sweet"].active {
+  background: linear-gradient(135deg, #F1C40F 0%, #E6983B 100%) !important;
+  box-shadow: 0 12px 32px rgba(241, 196, 15, 0.35) !important;
+}
+
+.filter-pill[data-vibe="light-bright"].active {
+  background: linear-gradient(135deg, #FF6B7A 0%, #FF8E53 100%) !important;
+  box-shadow: 0 12px 32px rgba(255, 107, 122, 0.35) !important;
+}
+
+.filter-pill[data-vibe="complex-expressive"].active {
+  background: linear-gradient(135deg, #1ABC9C 0%, #5CBFEE 100%) !important;
+  box-shadow: 0 12px 32px rgba(26, 188, 156, 0.35) !important;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .compact-filters {
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .filter-pills {
+    gap: 8px;
+  }
+  
+  .filter-pill {
+    padding: 12px 16px !important;
+    font-size: 0.85rem !important;
+    gap: 8px !important;
+  }
+  
+  .pill-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .pill-count {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+  }
+}
+
+ 

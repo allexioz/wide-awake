@@ -1,0 +1,622 @@
+<section class="studio-booking">
+  <div class="decorative-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+  
+  <div class="container">
+    <div class="booking-content">
+      <div class="booking-header">
+        <h1>Wide Awake Studio Sessions</h1>
+        <p class="description">
+          An intimate 2-hour coffee journey with Kyle Gosiaco. Experience 3 premium selections with expertly paired food courses in our private studio setting.
+        </p>
+        <div class="session-details">
+          <span class="detail">
+            <i data-lucide="clock" class="detail-icon"></i>
+            2 Hours
+          </span>
+          <span class="detail">
+            <i data-lucide="users" class="detail-icon"></i>
+            Max 4 Guests
+          </span>
+          <span class="detail">
+            <i data-lucide="coffee" class="detail-icon"></i>
+            3 Selections
+          </span>
+        </div>
+        <div class="pricing">
+          <span class="price">₱{{ section.settings.price | default: "2,500" }}</span>
+          <span class="price-note">per person</span>
+        </div>
+      </div>
+
+      <div class="booking-grid">
+        <div class="booking-info">
+          <div class="experience-overview">
+            <h2>What to Expect</h2>
+            <div class="experience-steps">
+              <div class="step">
+                <span class="step-number">1</span>
+                <div class="step-content">
+                  <h3>Welcome & Origin Stories</h3>
+                  <p>Introduction to featured coffees and their unique origins</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-number">2</span>
+                <div class="step-content">
+                  <h3>Guided Tastings</h3>
+                  <p>Three coffee selections with complementary food pairings</p>
+                </div>
+              </div>
+              <div class="step">
+                <span class="step-number">3</span>
+                <div class="step-content">
+                  <h3>Brewing Techniques</h3>
+                  <p>Watch Kyle demonstrate different brewing methods</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="booking-details">
+            <h3>Booking Information</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <strong>Schedule:</strong> Weekdays 2PM - 8PM
+              </div>
+              <div class="detail-item">
+                <strong>Deposit:</strong> 30% required to confirm
+              </div>
+              <div class="detail-item">
+                <strong>Cancellation:</strong> Free up to 24 hours
+              </div>
+            </div>
+            <div class="testimonial">
+              <blockquote>
+                "{{ section.settings.testimonial | default: "An absolutely incredible experience. Kyle's passion for coffee and attention to detail made this the highlight of our trip to Manila." }}"
+              </blockquote>
+              <cite>{{ section.settings.testimonial_author | default: "Sarah Chen" }}, {{ section.settings.testimonial_location | default: "Makati" }}</cite>
+            </div>
+            <p class="contact-info">
+              Questions? <a href="mailto:hello@wideawake.ph">hello@wideawake.ph</a>
+            </p>
+          </div>
+        </div>
+        
+        <div class="calendar-section">
+          <h3>Reserve Your Experience</h3>
+          <div class="calendar-container">
+            <div class="calendly-inline-widget" 
+                 data-url="https://calendly.com/wideawakeph/wide-awake-specialty-coffee-tasting-menu?hide_gdpr_banner=1&primary_color=E6983B&hide_event_type_details=1" 
+                 style="min-width:320px;height:600px;">
+            </div>
+            <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Special+Gothic+Expanded+One&display=swap');
+
+  .studio-booking {
+    background: linear-gradient(135deg, 
+      rgba(255, 107, 107, 0.03) 0%,
+      rgba(255, 142, 83, 0.03) 15%,
+      rgba(255, 107, 53, 0.03) 30%,
+      rgba(247, 220, 111, 0.03) 45%,
+      rgba(130, 224, 170, 0.03) 60%,
+      rgba(133, 193, 233, 0.03) 75%,
+      rgba(187, 143, 206, 0.03) 100%
+    ) !important;
+    color: #1a1a1a;
+    padding: 80px 0;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle Decorative Elements */
+  .decorative-blobs {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.08;
+  }
+
+  .blob-1 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(45deg, #f59e0b, #d97706);
+    top: 20%;
+    left: 10%;
+    animation: drift-1 40s ease-in-out infinite;
+  }
+
+  .blob-2 {
+    width: 200px;
+    height: 200px;
+    background: linear-gradient(135deg, #6b7280, #374151);
+    bottom: 30%;
+    right: 15%;
+    animation: drift-2 50s ease-in-out infinite;
+  }
+
+  .blob-3 {
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(225deg, #f59e0b, #6b7280);
+    top: 60%;
+    left: 70%;
+    animation: drift-3 45s ease-in-out infinite;
+  }
+
+  @keyframes drift-1 {
+    0%, 100% { 
+      transform: translate(0, 0);
+    }
+    50% { 
+      transform: translate(20px, -15px);
+    }
+  }
+
+  @keyframes drift-2 {
+    0%, 100% { 
+      transform: translate(0, 0);
+    }
+    50% { 
+      transform: translate(-15px, -10px);
+    }
+  }
+
+  @keyframes drift-3 {
+    0%, 100% { 
+      transform: translate(0, 0);
+    }
+    50% { 
+      transform: translate(10px, 15px);
+    }
+  }
+
+  @keyframes gradientFlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 10;
+  }
+
+  .booking-content {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 20px;
+    padding: 50px;
+    color: #1a1a1a;
+    border: 1px solid rgba(229, 229, 229, 0.3);
+    backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Header */
+  .booking-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid rgba(229, 229, 229, 0.5);
+  }
+
+  .booking-header h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 24px 0;
+    background: linear-gradient(-45deg, 
+      #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B
+    );
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    animation: gradientFlow 8s ease infinite;
+  }
+
+  .description {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #1a1a1a;
+    max-width: 650px;
+    margin: 0 auto 32px auto;
+    line-height: 1.6;
+    opacity: 0.85;
+  }
+
+  .session-details {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .detail {
+    background: rgba(255, 255, 255, 0.9) !important;
+    color: #1a1a1a;
+    padding: 12px 20px;
+    border-radius: 24px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid rgba(92, 191, 238, 0.2);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  }
+
+  .detail:hover {
+    background: linear-gradient(135deg, rgba(92, 191, 238, 0.1), rgba(92, 191, 238, 0.05)) !important;
+    border-color: rgba(92, 191, 238, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .detail-icon {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+    color: #666666;
+    flex-shrink: 0;
+  }
+
+  .pricing {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .price {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FF8E53, #F7DC6F);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.02em;
+  }
+
+  .price-note {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    opacity: 0.7;
+  }
+
+  /* Main Grid */
+  .booking-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .booking-info h2,
+  .booking-info h3,
+  .calendar-section h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 20px 0;
+    letter-spacing: -0.015em;
+  }
+
+  /* Experience Steps */
+  .experience-overview {
+    margin-bottom: 32px;
+  }
+
+  .experience-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .step-number {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53) !important;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+    box-shadow: 0 4px 16px rgba(255, 107, 107, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .step:hover .step-number {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+  }
+
+  .step-content h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 4px 0;
+  }
+
+  .step-content p {
+    color: #666666;
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  /* Booking Details */
+  .booking-details {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid rgba(92, 191, 238, 0.15);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .booking-details::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B);
+    background-size: 400% 400%;
+    animation: gradientFlow 6s ease infinite;
+  }
+
+  .detail-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .detail-item {
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    border: 1px solid rgba(92, 191, 238, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+  }
+
+  .detail-item:hover {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-color: rgba(92, 191, 238, 0.2);
+    transform: translateX(4px);
+  }
+
+  .detail-item strong {
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+
+  /* Testimonial */
+  .testimonial {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(229, 229, 229, 0.5);
+    backdrop-filter: blur(5px);
+  }
+
+  .testimonial blockquote {
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+  }
+
+  .testimonial cite {
+    font-style: normal;
+    color: #666666;
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+
+  .contact-info {
+    text-align: center;
+    margin: 0;
+    font-size: 0.8rem;
+    color: #666666;
+  }
+
+  .contact-info a {
+    color: #1a1a1a;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .contact-info a:hover {
+    text-decoration: underline;
+  }
+
+  /* Calendar */
+  .calendar-section {
+    background: rgba(248, 248, 248, 0.8) !important;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid rgba(229, 229, 229, 0.5);
+    backdrop-filter: blur(5px);
+  }
+
+  .calendar-container {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 8px;
+    padding: 12px;
+    border: 1px solid rgba(229, 229, 229, 0.5);
+    backdrop-filter: blur(5px);
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .booking-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .blob-1 { width: 400px; height: 400px; }
+    .blob-2 { width: 300px; height: 300px; }
+    .blob-3 { width: 200px; height: 200px; }
+  }
+
+  @media (max-width: 768px) {
+    .studio-booking {
+      padding: 50px 0;
+    }
+
+    .booking-content {
+      padding: 32px 24px;
+      border-radius: 16px;
+    }
+
+    .booking-header h1 {
+      font-size: 2rem;
+    }
+
+    .description {
+      font-size: 1rem;
+    }
+
+    .session-details {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .price {
+      font-size: 1.8rem;
+    }
+
+    .booking-details,
+    .calendar-section {
+      padding: 20px;
+    }
+
+    .container {
+      padding: 0 16px;
+    }
+
+    .blob-1 { width: 300px; height: 300px; }
+    .blob-2 { width: 250px; height: 250px; }
+    .blob-3 { width: 150px; height: 150px; }
+  }
+
+  @media (max-width: 480px) {
+    .booking-content {
+      padding: 24px 16px;
+    }
+
+    .booking-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .description {
+      font-size: 0.95rem;
+    }
+
+    .calendar-container {
+      padding: 8px;
+    }
+
+    .blob-1 { width: 200px; height: 200px; }
+    .blob-2 { width: 150px; height: 150px; }
+    .blob-3 { width: 100px; height: 100px; }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Studio Booking",
+  "settings": [
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Price (without currency symbol)",
+      "default": "2,500"
+    },
+    {
+      "type": "textarea",
+      "id": "testimonial",
+      "label": "Testimonial",
+      "default": "An absolutely incredible experience. Kyle's passion for coffee and attention to detail made this the highlight of our trip to Manila."
+    },
+    {
+      "type": "text",
+      "id": "testimonial_author",
+      "label": "Testimonial Author",
+      "default": "Sarah Chen"
+    },
+    {
+      "type": "text",
+      "id": "testimonial_location",
+      "label": "Location",
+      "default": "Makati"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Studio Booking"
+    }
+  ]
+}
+{% endschema %} 

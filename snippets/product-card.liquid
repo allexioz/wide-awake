@@ -1,0 +1,190 @@
+{% comment %}
+  Wide Awake Standardized Product Card
+  
+  Usage:
+  {% render 'product-card', 
+    product: product,
+    show_quick_view: true,
+    show_flavor_notes: true,
+    card_class: 'additional-classes',
+    lazy_load: true,
+    image_size: 500
+  %}
+  
+  Parameters:
+  - product: (required) Product object
+  - show_quick_view: (optional) Show quick view button instead of view details
+  - show_flavor_notes: (optional) Show flavor badges for coffee products
+  - card_class: (optional) Additional CSS classes for the card
+  - lazy_load: (optional) Use lazy loading for images (default: true)
+  - image_size: (optional) Image width for loading (default: 500)
+{% endcomment %}
+
+{% comment %} Set default values {% endcomment %}
+{% assign show_quick_view = show_quick_view | default: false %}
+{% assign show_flavor_notes = show_flavor_notes | default: true %}
+{% assign lazy_load = lazy_load | default: true %}
+{% assign image_size = image_size | default: 500 %}
+
+{% comment %} Product segment and vibe mapping {% endcomment %}
+{% assign product_handle = product.handle %}
+{% assign product_segment = 'daily-driver' %}
+{% assign product_vibe = 'smooth-sweet' %}
+
+{% assign product_segments = 'brazil-sao-silvestre:daily-driver,ethiopia-yirgacheffe:premium-brews,mt-apo-natural:direct-trade,buku-sayisa-natural-ethiopia:premium-brews,cofi-teresa:direct-trade,daybreak-espresso:daily-driver,finca-mierisch:premium-brews,fructifero-anaerobic:direct-trade,jeivert-hernandez:premium-brews,koke-shalaye:premium-brews,mt-apo-72hr:direct-trade,mt-apo-lactic-honey:direct-trade,mt-apo-lactic-washed:direct-trade,nensebo:premium-brews,nyeri-kenya:premium-brews,tanzania-kilimanjaro:daily-driver,vietnam-fine-robusta:daily-driver,veracruz-mexico:daily-driver,mola-cafec-filter:equipment,specialty-water-sachets:equipment,christmas-bundle-mt-apo-collection-lactic-honey-lot-g-01-lot-l-01:premium-brews,bundle-ethiopia-yirgacheffe-and-finca-mierisch-super-natural-100g-or-200g:premium-brews,bundle-kenya-nyeri-mexico-veracruz-tanzania-kilimanjaro-100g-x-3-or-200g-x-3:daily-driver' | split: ',' %}
+
+{% assign product_vibes = 'brazil-sao-silvestre:smooth-sweet,ethiopia-yirgacheffe:light-bright,mt-apo-natural:complex-expressive,buku-sayisa-natural-ethiopia:light-bright,cofi-teresa:light-bright,daybreak-espresso:smooth-sweet,finca-mierisch:complex-expressive,fructifero-anaerobic:complex-expressive,jeivert-hernandez:light-bright,koke-shalaye:light-bright,mt-apo-72hr:complex-expressive,mt-apo-lactic-honey:light-bright,mt-apo-lactic-washed:light-bright,nensebo:light-bright,nyeri-kenya:light-bright,tanzania-kilimanjaro:light-bright,vietnam-fine-robusta:smooth-sweet,veracruz-mexico:smooth-sweet,christmas-bundle-mt-apo-collection-lactic-honey-lot-g-01-lot-l-01:complex-expressive,bundle-ethiopia-yirgacheffe-and-finca-mierisch-super-natural-100g-or-200g:light-bright,bundle-kenya-nyeri-mexico-veracruz-tanzania-kilimanjaro-100g-x-3-or-200g-x-3:light-bright' | split: ',' %}
+
+{% comment %} Map product to segment and vibe {% endcomment %}
+{% for segment_mapping in product_segments %}
+  {% assign mapping_parts = segment_mapping | split: ':' %}
+  {% if mapping_parts[0] == product_handle %}
+    {% assign product_segment = mapping_parts[1] %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% for vibe_mapping in product_vibes %}
+  {% assign mapping_parts = vibe_mapping | split: ':' %}
+  {% if mapping_parts[0] == product_handle %}
+    {% assign product_vibe = mapping_parts[1] %}
+    {% break %}
+  {% endif %}
+{% endfor %}
+
+{% comment %} Set vibe display {% endcomment %}
+{% case product_vibe %}
+  {% when 'smooth-sweet' %}
+    {% assign vibe_display = 'Smooth and Sweet' %}
+  {% when 'light-bright' %}
+    {% assign vibe_display = 'Light and Bright' %}
+  {% when 'complex-expressive' %}
+    {% assign vibe_display = 'Complex and Expressive' %}
+  {% else %}
+    {% assign vibe_display = 'Great Coffee' %}
+{% endcase %}
+
+{% comment %} Calculate price variations {% endcomment %}
+{% assign price_varies = false %}
+{% assign min_price = product.price %}
+{% assign max_price = product.price %}
+
+{% for variant in product.variants %}
+  {% if variant.price < min_price %}
+    {% assign min_price = variant.price %}
+  {% endif %}
+  {% if variant.price > max_price %}
+    {% assign max_price = variant.price %}
+  {% endif %}
+{% endfor %}
+
+{% if min_price != max_price %}
+  {% assign price_varies = true %}
+{% endif %}
+
+<div class="product-card {{ card_class }}" 
+     data-segment="{{ product_segment }}" 
+     data-vibe="{{ product_vibe }}" 
+     data-product-id="{{ product.id }}">
+  
+  <!-- Product Image -->
+  <div class="product-image">
+    <a href="{{ product.url }}">
+      {% if product.featured_image %}
+        <img src="{{ product.featured_image | image_url: width: image_size }}" 
+             alt="{{ product.featured_image.alt | default: product.title }}" 
+             {% if lazy_load %}loading="lazy"{% else %}loading="eager"{% endif %}>
+      {% else %}
+        <img src="{{ 'product-placeholder.svg' | asset_url }}" 
+             alt="{{ product.title }}" 
+             {% if lazy_load %}loading="lazy"{% else %}loading="eager"{% endif %}>
+      {% endif %}
+    </a>
+    
+    {% comment %} Flavor notes badge for non-equipment products {% endcomment %}
+    {% if show_flavor_notes and product_segment != 'equipment' %}
+      <div class="product-badge">
+        <span class="flavor-note">{{ vibe_display }}</span>
+      </div>
+    {% endif %}
+  </div>
+  
+  <!-- Product Info -->
+  <div class="product-info">
+    <h3 class="product-name">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    
+    <!-- Product Price -->
+    <div class="product-price">
+      {% if price_varies %}
+        <span class="price-from-wrapper">
+          <span class="price-from-text">From</span>
+          <span class="price-from-amount">{{ min_price | money }}</span>
+        </span>
+      {% else %}
+        {% if product.compare_at_price and product.compare_at_price > 0 and product.compare_at_price > product.price %}
+          <span class="price-sale">{{ product.price | money }}</span>
+          <span class="price-compare">{{ product.compare_at_price | money }}</span>
+          <span class="save-badge">Save {{ product.compare_at_price | minus: product.price | money }}</span>
+        {% else %}
+          <span class="price-regular">{{ product.price | money }}</span>
+        {% endif %}
+      {% endif %}
+    </div>
+    
+    <!-- Product Actions -->
+    <div class="product-actions">
+      {% if product.available %}
+        {% if show_quick_view %}
+          <button class="quick-view-btn"
+                  data-product-id="{{ product.id }}"
+                  data-product-handle="{{ product.handle }}"
+                  data-product-title="{{ product.title | escape }}"
+                  data-product-vendor="{{ product.vendor | escape }}"
+                  data-product-image="{{ product.featured_image | image_url: width: 600 }}"
+                  data-product-price="{{ product.price }}"
+                  data-product-compare-price="{{ product.compare_at_price }}"
+                  data-product-url="{{ product.url }}"
+                  aria-label="Quick view {{ product.title | escape }}"
+                  title="Quick view">
+            <i data-lucide="eye" class="btn-icon"></i>
+            Quick View
+          </button>
+        {% else %}
+          <a href="{{ product.url }}" class="view-product-btn">
+            <i data-lucide="eye" class="btn-icon"></i>
+            View Details
+          </a>
+        {% endif %}
+        
+        <button class="quick-add-btn" 
+                data-add-to-cart="{{ product.variants.first.id }}"
+                data-product-handle="{{ product.handle }}"
+                data-product-title="{{ product.title | escape }}"
+                aria-label="Add {{ product.title | escape }} to cart"
+                title="Add to cart">
+          <span class="btn-content">
+            <i data-lucide="shopping-cart" class="btn-icon" aria-hidden="true"></i>
+            <span class="btn-text visually-hidden">Add to Cart</span>
+          </span>
+          <span class="btn-loading" aria-hidden="true">
+            <i data-lucide="loader-2" class="btn-icon animate-spin"></i>
+          </span>
+          <span class="btn-success" aria-hidden="true">
+            <i data-lucide="check-circle" class="btn-success-icon"></i>
+            <span class="btn-success-fallback">✓</span>
+          </span>
+          <span class="btn-error" aria-hidden="true">
+            <i data-lucide="x" class="btn-icon"></i>
+          </span>
+        </button>
+      {% else %}
+        <button class="view-product-btn sold-out" disabled>
+          <i data-lucide="clock" class="btn-icon"></i>
+          Sold Out
+        </button>
+      {% endif %}
+    </div>
+  </div>
+</div> 
