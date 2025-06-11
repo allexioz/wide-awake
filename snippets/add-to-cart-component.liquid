@@ -410,14 +410,14 @@ class AddToCartComponent {
       const response = await fetch('/cart.js');
       const cart = await response.json();
       
-      // Update all cart badges
-      const cartBadges = document.querySelectorAll('[data-cart-count]');
-      const cartIndicators = document.querySelectorAll('[data-cart-indicator]');
-      
-      cartBadges.forEach(badge => {
-        badge.textContent = cart.item_count;
-        badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
-      });
+          // Update all cart badges
+    const cartBadges = document.querySelectorAll('[data-cart-count], .cart-count:not(.cart-title .cart-count)');
+    const cartIndicators = document.querySelectorAll('[data-cart-indicator]');
+
+    cartBadges.forEach(badge => {
+      badge.textContent = cart.item_count;
+      badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+    });
       
       // Add animation to cart indicators
       cartIndicators.forEach(indicator => {

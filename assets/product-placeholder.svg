@@ -1,0 +1,10 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <rect width="400" height="400" fill="#f8f5f1"/>
+  <g transform="translate(200, 200)">
+    <circle cx="0" cy="-20" r="30" fill="#d4d4d4"/>
+    <rect x="-40" y="10" width="80" height="60" rx="8" fill="#d4d4d4"/>
+    <text x="0" y="90" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#666">
+      No Image
+    </text>
+  </g>
+</svg> 

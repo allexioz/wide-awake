@@ -1,27 +1,32 @@
-# Wide Awake Theme - Shopify 2024 Best Practices Implementation
+# Wide Awake Coffee - Shopify Theme 2025
 
-A modern, performance-optimized Shopify theme featuring responsive design, dynamic localization, and seamless user experience. Built with clean aesthetics, powerful functionality, and following Shopify's 2024 best practices for exceptional e-commerce stores.
+A modern, performance-optimized Shopify theme specifically designed for Wide Awake Coffee, featuring advanced product discovery, responsive design, dynamic localization, and seamless user experience. Built with clean aesthetics, powerful functionality, and following Shopify's 2025 best practices for exceptional coffee e-commerce stores.
 
-## ✨ Features
+## ✨ Key Features
 
 ### 🎨 Design & User Experience
-- **Modern minimalist design** with clean typography and spacious layouts
+- **Coffee-focused design system** with Wide Awake brand identity
+- **Advanced product discovery** with intelligent filtering and categorization
 - **Responsive mobile-first approach** optimized for all devices
-- **Smooth animations** powered by anime.js with CSS fallbacks
+- **Modern minimalist design** with clean typography and spacious layouts
+- **Smooth animations** powered by Lucide icons with CSS fallbacks
 - **Intuitive navigation** with slide-out mobile menu and search modal
-- **Consistent UI elements** with standardized styling throughout
 - **Brand-focused design system** with Wide Awake coffee theme aesthetic
 
-### 🚀 Performance Optimized
-- **Critical CSS inlining** for faster initial page loads
-- **Optimized JavaScript** with error handling and graceful degradation
-- **Lazy loading** implementation for images and non-critical resources
-- **Minimal dependencies** for faster load times
-- **Core Web Vitals optimized** targeting LCP < 2.5s, FID < 100ms, CLS < 0.1
+### 🚀 Advanced Product Features
+- **Smart Product Discovery Hero** with instant filtering and categorization
+- **Product segmentation system** (Daily Driver, Premium Brews, Direct Trade, Equipment)
+- **Coffee vibe filtering** (Smooth & Sweet, Light & Bright, Complex & Expressive)
+- **Real-time product filtering** with category-based navigation
+- **Quick view modals** for enhanced product browsing
+- **Advanced add-to-cart functionality** with size/grind selection
+- **Product image aspect ratio optimization** for consistent layouts
 
-### 🌐 Shopify Integration
+### 🌐 Shopify Integration & E-commerce
 - **Dynamic localization** connected to Shopify's currency and language data
 - **Real-time locale switching** with automatic cart currency updates
+- **Comprehensive cart management** with cart drawer functionality
+- **Studio booking system** integrated into the theme
 - **Metafields support** for extended product information
 - **Online Store 2.0** features fully implemented
 - **Section Groups** for flexible page building
@@ -32,71 +37,110 @@ A modern, performance-optimized Shopify theme featuring responsive design, dynam
 - **Mobile menu slides from left** for natural user flow
 - **Search modal slides from right** maintaining UX conventions
 - **Responsive typography** scaling appropriately across devices
+- **Sticky filters** for improved mobile product discovery
 
-### ♿ Accessibility
+### ♿ Accessibility & Performance
 - **WCAG 2.1 AA Compliance** with proper contrast ratios
 - **Keyboard Navigation** for all interactive elements
 - **Screen Reader Support** with semantic HTML and ARIA labels
-- **Skip Links** for improved navigation
-- **Focus Management** with clear visual indicators
+- **Critical CSS inlining** for faster initial page loads
+- **Optimized JavaScript** with error handling and graceful degradation
+- **Lazy loading** implementation for images and non-critical resources
 
 ## 🏗️ Architecture & Structure
 
-### Theme Structure
-Following Shopify's recommended theme architecture:
+### Current Theme Structure
 ```
 wide-awake-theme/
-├── assets/              # Static assets (CSS, JS, images, fonts)
-│   ├── theme.css       # Main stylesheet with responsive design
-│   ├── theme.js        # Core JavaScript functionality
-│   ├── anime.min.js    # Animation library
-│   └── critical.css    # Above-the-fold critical styles
-├── blocks/              # Reusable UI components
-├── config/              # Theme settings and configurations
-│   ├── settings_data.json
-│   └── settings_schema.json
+├── assets/                    # Static assets (CSS, JS, images, fonts)
+│   ├── critical.css          # Above-the-fold critical styles
+│   ├── collection-layout.css # Collection page styling
+│   ├── product-discovery.js  # Advanced product filtering & discovery
+│   ├── quick-view.js         # Product quick view functionality
+│   ├── studio-booking.css    # Studio booking system styles
+│   ├── fonts.css.liquid      # Font loading optimization
+│   ├── logo.png              # Brand assets
+│   ├── WideAwake_Logo_*.png  # Brand logo variations
+│   └── SpecialGothicExpandedOne-Regular.ttf
+├── blocks/                    # Reusable UI components
+│   ├── group.liquid          # Section groups
+│   └── text.liquid           # Text blocks
+├── config/                    # Theme settings and configurations
+│   ├── settings_data.json    # Theme configuration
+│   └── settings_schema.json  # Theme settings schema
 ├── layout/              
-│   └── theme.liquid    # Main layout with localization
-├── locales/            # Translation files
-├── sections/            # Theme sections
-│   ├── header.liquid   # Navigation with mobile menu & search
-│   ├── footer.liquid   # Footer with locale selector
-│   └── ...             # Other modular sections
-├── snippets/            # Reusable code fragments
-└── templates/           # Page templates combining sections
+│   ├── theme.liquid          # Main layout with advanced features
+│   └── password.liquid       # Password page layout
+├── locales/                   # Translation files
+│   ├── en.default.json       # English translations
+│   └── en.default.schema.json# Schema translations
+├── sections/                  # Modular theme sections
+│   ├── header.liquid         # Advanced header with announcement bar
+│   ├── footer.liquid         # Footer with locale selector
+│   ├── product-discovery-hero.liquid # Main product discovery system
+│   ├── product.liquid        # Product detail pages
+│   ├── collection.liquid     # Collection pages
+│   ├── cart.liquid           # Shopping cart
+│   ├── studio-booking.liquid # Studio booking system
+│   ├── featured-products.liquid # Featured products section
+│   ├── brand-story.liquid    # Brand storytelling
+│   ├── youtube-media.liquid  # YouTube content integration
+│   ├── instagram-feed.liquid # Instagram feed
+│   ├── newsletter-signup.liquid # Email marketing
+│   ├── wholesale-cta.liquid  # Wholesale call-to-action
+│   └── ...                   # Additional sections
+├── snippets/                  # Reusable code fragments
+│   ├── product-card.liquid   # Product card component
+│   ├── add-to-cart-component.liquid # Advanced cart functionality
+│   ├── cart-manager.liquid   # Cart state management
+│   ├── quick-view-modal.liquid # Quick view modal
+│   ├── category-filters.liquid # Product filtering
+│   ├── css-variables.liquid  # Dynamic CSS variables
+│   ├── meta-tags.liquid      # SEO optimization
+│   └── image.liquid          # Image optimization
+└── templates/                 # Page templates combining sections
+    ├── index.json            # Homepage template
+    ├── product.json          # Product page template
+    ├── collection.json       # Collection page template
+    ├── cart.json             # Cart page template
+    ├── page.studio-booking.liquid # Studio booking page
+    └── customers/            # Customer account templates
 ```
 
 ### Section-Based Architecture
-- **Modular Design**: All content areas are built as sections for maximum flexibility
+- **Modular Design**: All content areas built as flexible sections
 - **Block Support**: Sections support blocks for granular customization
-- **JSON Templates**: Using JSON templates for enhanced merchant customization
+- **JSON Templates**: Enhanced merchant customization capabilities
+- **Section Groups**: Header and footer groups for consistent layouts
 
 ## 🛠️ Technical Highlights
 
-### Animation System
-- **Anime.js integration** with smart fallback handling
-- **Fast 200ms animations** for snappy interactions
+### Product Discovery System
+- **Advanced filtering** by coffee type, origin, and flavor profile
+- **Real-time search** with instant results
+- **Category-based navigation** (Daily Driver, Premium Brews, Direct Trade)
+- **Smart product segmentation** based on CSV data mapping
+- **Pagination system** for large product catalogs
+- **Sticky filters** for improved mobile experience
+
+### Animation & Interaction System
+- **Lucide Icons integration** with robust fallback handling
+- **Fast animations** for snappy interactions
 - **CSS transitions as backup** when JavaScript is unavailable
 - **Error handling** prevents broken functionality
-- **Stagger delays of 30ms** for smooth sequential animations
+- **Progressive enhancement** approach
 
-### Localization Features
-- **Dynamic currency display** using `cart.currency.iso_code`
-- **Language switching** connected to `request.locale.name`
-- **Automatic dropdown visibility** only when multiple options available
-- **Fallback to theme settings** for maximum compatibility
-
-### Code Quality
-- **Modular JavaScript** with proper error handling
-- **Clean CSS architecture** using custom properties
-- **Semantic HTML** for accessibility and SEO
-- **Performance monitoring** with debugging capabilities
-- **BEM Methodology** for CSS organization
-- **Modern ES6+** JavaScript without jQuery dependency
+### Coffee-Specific Features
+- **Studio booking system** for coffee experiences
+- **Wholesale integration** for B2B customers
+- **YouTube content integration** for coffee education
+- **Instagram feed** for social proof
+- **Newsletter signup** with coffee-focused messaging
+- **Brand storytelling** sections
 
 ## 🎨 Design System
 
-### Brand Colors
+### Wide Awake Brand Colors
 ```css
 :root {
   /* Wide Awake Brand Colors */
@@ -110,59 +154,49 @@ wide-awake-theme/
 ```
 
 ### Typography
-- **Primary Font**: Poppins (body text)
-- **Heading Font**: Special Gothic Expanded One (brand headings)
-- **Fluid Typography**: Using `clamp()` for responsive font sizing
-- **Line Height**: Optimized for readability (1.6 for body, 1.2 for headings)
+- **Primary Font**: Poppins (body text, loaded via Google Fonts)
+- **Brand Font**: Special Gothic Expanded One (headings, self-hosted)
+- **Fluid Typography**: Using responsive font sizing
+- **Performance optimized**: Font loading with preconnect and display:swap
 
-### Spacing System
-```css
---spacing-xs: 0.5rem;
---spacing-sm: 1rem;
---spacing-md: 1.5rem;
---spacing-lg: 2rem;
---spacing-xl: 3rem;
---spacing-2xl: 4rem;
-```
+### Coffee Product Categorization
+- **Daily Driver**: Everyday coffee for regular consumption
+- **Premium Brews**: High-quality single origins and special processes
+- **Direct Trade**: Ethically sourced, farmer-direct coffees
+- **Equipment**: Coffee brewing equipment and accessories
 
-## 📱 Responsive Design
+### Flavor Profile System
+- **🍯 Smooth and Sweet**: Accessible, balanced coffees
+- **🍋 Light and Bright**: Acidic, fruity, complex coffees
+- **🎭 Complex and Expressive**: Unique processing, experimental coffees
+
+## 📱 Responsive Design & Performance
 
 ### Mobile-First Approach
-- All CSS written mobile-first with progressive enhancement
-- Breakpoints follow Shopify's recommended approach:
-  - Mobile: `max-width: 749px`
-  - Tablet: `750px - 989px`
-  - Desktop: `min-width: 990px`
+- **Advanced mobile navigation** with slide-out menu
+- **Touch-optimized product discovery** with sticky filters
+- **Responsive product grids** adapting to screen size
+- **Mobile-optimized animations** and interactions
 
-### Flexible Grid System
-```css
-.shopify-section {
-  display: grid;
-  grid-template-columns: 
-    minmax(var(--page-margin, 2rem), 1fr) 
-    min(var(--page-width, 120rem), 100% - var(--page-margin, 2rem) * 2) 
-    minmax(var(--page-margin, 2rem), 1fr);
-}
-```
-
-### Responsive Images
-- Using Shopify's responsive image system
-- Multiple image sizes: `375, 550, 750, 1100, 1500, 1780, 2000, 3000, 3840`
-- Lazy loading implemented
-- Proper `alt` attributes for accessibility
+### Performance Optimization
+- **Critical CSS inlined** for above-fold content
+- **Lazy loading** for images and non-critical resources
+- **Optimized font loading** with preconnect and font-display
+- **JavaScript error handling** with graceful degradation
+- **Asset optimization** for faster load times
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - [Shopify CLI](https://shopify.dev/docs/api/shopify-cli)
-- [Node.js](https://nodejs.org/) (v16+)
 - Shopify development store
+- Wide Awake Coffee product catalog
 
 ### Setup
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/allexioz/wide-awake.git
-   cd wide-awake
+   git clone https://github.com/alexis/wide-awake-theme.git
+   cd wide-awake-theme
    ```
 
 2. **Connect to your store**
@@ -175,236 +209,110 @@ wide-awake-theme/
    shopify theme dev
    ```
 
-## 🎛️ Customization
+## 🎛️ Wide Awake Specific Configuration
 
-### Header Configuration
-The header supports multiple customization options:
-- Logo upload and sizing
-- Navigation menu configuration
-- Search functionality toggle
-- Mobile menu behavior
+### Product Setup
+1. **Create collections**: `daily-driver`, `premium-brews`, `direct-trade`, `equipment`
+2. **Set up product metafields** for coffee origin, processing, tasting notes
+3. **Configure product segmentation** based on the CSV mapping system
+4. **Upload coffee product images** with consistent aspect ratios
 
-### Section Settings
-Each section includes comprehensive customization options:
-- Content positioning (9 desktop positions)
-- Mobile alignment options
-- Color scheme selections
-- Typography controls
-- Spacing adjustments
+### Studio Booking Configuration
+1. **Enable studio booking section** in theme settings
+2. **Configure booking prices** and session details
+3. **Set up contact forms** for booking inquiries
 
-### Localization Setup
-1. Enable multiple currencies in Shopify admin
-2. Add language translations in `locales/` folder
-3. Configure market settings for region-specific content
+### Brand Assets
+- **Upload Wide Awake logos** (horizontal black/white versions included)
+- **Configure announcement bar** with shipping information
+- **Set up social media links** (Facebook, Instagram, YouTube)
 
-### Animation Settings
-Animations can be customized in `assets/theme.js`:
-```javascript
-// Animation timings (in milliseconds)
-const ANIMATION_DURATION = 200; // Fast and snappy
-const STAGGER_DELAY = 30;       // Smooth sequential animations
-```
+### Content Sections Setup
+1. **Brand Story**: Configure storytelling content
+2. **YouTube Integration**: Add channel content
+3. **Instagram Feed**: Connect social media
+4. **Newsletter Signup**: Configure email marketing
+5. **Wholesale CTA**: Set up B2B messaging
 
-### Theme Settings
-Global theme customization through `config/settings_schema.json`:
-- Brand colors
-- Typography choices
-- Layout options
-- Feature toggles
+## 🧹 Code Quality & Best Practices
 
-## 📱 Browser Support
+### Liquid Best Practices
+- **Semantic HTML5** structure throughout
+- **Performance-optimized** Liquid loops and filters
+- **Security-focused** with proper input escaping
+- **Accessibility-first** development approach
 
-- **Modern browsers**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
-- **Progressive enhancement**: Graceful degradation for older browsers
-- **Mobile optimized**: iOS Safari 12+, Chrome Mobile 60+
+### CSS Architecture
+- **Component-based** styling with logical organization
+- **CSS Custom Properties** for consistent design tokens
+- **Mobile-first** responsive design approach
+- **Performance-optimized** critical CSS delivery
 
-## 🔧 Development
+### JavaScript Standards
+- **Modern ES6+** without jQuery dependency
+- **Progressive enhancement** philosophy
+- **Error handling** and graceful degradation
+- **Performance-focused** event handling
 
-### Key Components
+## 📊 Performance Targets
 
-**Mobile Menu** (`layout/theme.liquid`)
-- Slides from left with smooth animations
-- Touch-friendly navigation
-- Automatic close on outside click
-
-**Search Modal** (`layout/theme.liquid`)
-- Slides from right with backdrop
-- Real-time search functionality
-- Keyboard navigation support
-
-**Locale Selector** (`sections/footer.liquid`)
-- Dynamic currency/language switching
-- Connected to Shopify localization API
-- Conditional visibility based on available options
-
-### Performance Features
-- Critical CSS inlined for above-fold content
-- Non-blocking JavaScript loading
-- Optimized asset delivery
-- Minimal third-party dependencies
-
-### Development Workflow
-```bash
-# Start development server
-shopify theme dev
-
-# Pull theme updates
-shopify theme pull
-
-# Push changes
-shopify theme push
-```
-
-## ⚡ Performance Optimization
-
-### Critical CSS
-- Inlined critical CSS for above-the-fold content
-- Separated critical styles from non-critical assets
-- Modern CSS reset based on best practices
-
-### Image Optimization
-- WebP format support with fallbacks
-- Responsive images with appropriate sizing
-- Lazy loading for non-critical images
-- Optimized loading with `loading="lazy"`
-
-### Font Loading
-- Preloading critical fonts
-- Font display: swap for better perceived performance
-- Local font fallbacks
-
-### Code Splitting
-```html
-<!-- Critical CSS inlined -->
-<style>{{ 'critical.css' | asset_content }}</style>
-
-<!-- Non-critical CSS loaded asynchronously -->
-{{ 'theme.css' | asset_url | stylesheet_tag }}
-```
-
-## 🚀 Deployment
-
-### Development Store
-```bash
-shopify theme push --unpublished --theme-id=123456789
-```
-
-### Live Store
-```bash
-shopify theme push --live
-```
-
-### Production Checklist
-- [ ] Performance audit with Lighthouse
-- [ ] Accessibility audit with axe
-- [ ] Cross-browser testing
-- [ ] Mobile responsiveness testing
-- [ ] SEO optimization check
-
-## 📊 Performance Metrics
-
-### Core Web Vitals Targets
-- **Lighthouse Score**: 90+ on mobile and desktop
+### Core Web Vitals
 - **LCP (Largest Contentful Paint)**: < 2.5s
 - **FID (First Input Delay)**: < 100ms
 - **CLS (Cumulative Layout Shift)**: < 0.1
+- **Lighthouse Score**: 90+ on mobile and desktop
 
-### Optimization Techniques
-- Critical resource prioritization
-- Efficient CSS delivery
+### Optimization Features
+- Critical CSS inlining
+- Lazy loading for images
 - Optimized font loading
-- Image optimization
-- Minimal JavaScript
-
-## 🧹 Clean Code Practices
-
-### CSS Organization
-- **BEM Methodology**: Block Element Modifier naming convention
-- **CSS Custom Properties**: Consistent design tokens
-- **Logical Grouping**: Related styles grouped together
-- **Mobile-First**: Progressive enhancement approach
-
-### Liquid Best Practices
-- **Semantic HTML**: Proper HTML5 semantic elements
-- **Conditional Rendering**: Efficient use of Liquid conditionals
-- **Performance**: Optimized Liquid loops and filters
-- **Security**: Proper escaping of user inputs
-
-### JavaScript Standards
-- **Modern ES6+**: Using modern JavaScript features
-- **Progressive Enhancement**: JS enhances, doesn't break functionality
-- **Event Delegation**: Efficient event handling
-- **No jQuery**: Vanilla JavaScript for better performance
-
-## 🧪 Testing
-
-### Testing Strategy
-- Cross-browser testing
-- Mobile device testing
-- Accessibility testing with screen readers
-- Performance testing with Lighthouse
-
-### Accessibility Testing
-```html
-<!-- Skip to content link -->
-<a class="skip-to-content-link" href="#MainContent">Skip to content</a>
-
-<!-- Proper heading hierarchy -->
-<h1 id="Banner-heading-{{ section.id }}">...</h1>
-
-<!-- ARIA labels for interactive elements -->
-<button aria-expanded="false" aria-controls="menu">Menu</button>
-```
+- Minimal JavaScript footprint
+- CDN-optimized asset delivery
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
+2. Create a feature branch: `git checkout -b feature/coffee-enhancement`
+3. Commit your changes: `git commit -m 'Add coffee feature'`
+4. Push to the branch: `git push origin feature/coffee-enhancement`
 5. Open a Pull Request
 
-## 📚 Best Practices Summary
+## 📚 Wide Awake Theme Features Summary
 
-### Code Quality
-1. **Semantic HTML**: Use proper HTML5 semantic elements
-2. **CSS Organization**: Follow BEM methodology and logical grouping
-3. **Performance**: Optimize critical rendering path
-4. **Accessibility**: Ensure WCAG 2.1 AA compliance
-5. **Responsive**: Mobile-first, fluid design approach
+### E-commerce Functionality
+- ✅ Advanced product discovery with smart filtering
+- ✅ Product segmentation (Daily Driver, Premium, Direct Trade)
+- ✅ Quick view modals with size/grind selection
+- ✅ Advanced cart management with drawer functionality
+- ✅ Studio booking system integration
+- ✅ Wholesale customer support
 
-### Shopify Specific
-1. **Section Architecture**: Modular, reusable sections
-2. **JSON Templates**: Flexible page building
-3. **Theme Settings**: Comprehensive customization options
-4. **Performance**: Leverage Shopify's CDN and image optimization
-5. **SEO**: Proper meta tags and structured data
+### Content & Marketing
+- ✅ Brand storytelling sections
+- ✅ YouTube content integration
+- ✅ Instagram feed display
+- ✅ Newsletter signup with coffee focus
+- ✅ SEO-optimized structure
+- ✅ Social media integration
 
-### Future-Proofing
-1. **Modern CSS**: Use modern CSS features with fallbacks
-2. **Progressive Enhancement**: Build for resilience
-3. **Performance Budget**: Monitor and maintain performance
-4. **Accessibility First**: Design inclusively from the start
-5. **Sustainable Code**: Write maintainable, scalable code
+### Technical Excellence
+- ✅ Shopify 2.0 Online Store features
+- ✅ Section Groups architecture
+- ✅ JSON template system
+- ✅ Performance optimization
+- ✅ Accessibility compliance
+- ✅ Mobile-first responsive design
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 ## 🆘 Support
 
-- **Issues**: [GitHub Issues](https://github.com/allexioz/wide-awake/issues)
+- **Issues**: [GitHub Issues](https://github.com/alexis/wide-awake-theme/issues)
 - **Documentation**: [Shopify Theme Development](https://shopify.dev/docs/themes)
-- **Community**: [Shopify Partners Slack](https://partners.shopify.com/)
-
-## 🔗 Resources
-
-- [Shopify Theme Development Best Practices](https://shopify.dev/docs/themes/best-practices)
-- [Shopify Performance Best Practices](https://shopify.dev/docs/themes/best-practices/performance)
-- [Shopify Accessibility Guidelines](https://shopify.dev/docs/themes/best-practices/accessibility)
-- [Web Content Accessibility Guidelines (WCAG)](https://www.w3.org/WAI/WCAG21/quickref/)
-- [Core Web Vitals](https://web.dev/vitals/)
+- **Wide Awake Coffee**: [Official Website](https://wideawakecoffee.ph)
 
 ---
 
-**Wide Awake Theme** - Built with ☕ and ❤️ following Shopify 2024 best practices for performance, accessibility, and user experience.
+**Wide Awake Coffee Theme** - Built with ☕ and ❤️ following Shopify 2025 best practices for coffee e-commerce excellence.

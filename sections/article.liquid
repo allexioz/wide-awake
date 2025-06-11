@@ -94,7 +94,8 @@
       {% endif %}
 
       <!-- Related Articles -->
-      {% assign related_articles = blog.articles | where: 'id', '!=', article.id | limit: 3 %}
+      {% assign related_articles = blog.articles | where: 'id', '!=', article.id %}
+  {% assign related_articles = related_articles | slice: 0, 3 %}
       {% if related_articles.size > 0 %}
         <div class="related-articles">
           <h3 class="related-title">More Coffee Insights</h3>

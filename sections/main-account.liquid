@@ -1,0 +1,701 @@
+<div class="account-page">
+  <div class="account-container">
+    <div class="account-header">
+      <div class="welcome-section">
+        <div class="greeting">
+          <h1 class="account-title">☕ Good {{ 'now' | date: '%H' | times: 1 | round | divided_by: 6 | case: 0, 'morning', 1, 'morning', 2, 'afternoon', 3, 'evening' }}, {{ customer.first_name | default: 'Coffee Lover' }}!</h1>
+          <p class="account-subtitle">Your coffee journey awaits</p>
+        </div>
+        <div class="profile-section">
+          <div class="profile-avatar">
+            <span class="avatar-text">{{ customer.first_name | default: 'CL' | slice: 0, 1 | upcase }}{{ customer.last_name | default: '' | slice: 0, 1 | upcase }}</span>
+          </div>
+          <div class="profile-info">
+            <div class="profile-name">{{ customer.first_name | default: 'Coffee' }} {{ customer.last_name | default: 'Lover' }}</div>
+            <div class="profile-email">{{ customer.email }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="{{ routes.account_logout_url }}" class="btn btn-outline">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16,17 21,12 16,7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          Sign Out
+        </a>
+      </div>
+    </div>
+
+  <div class="account-grid">
+    <!-- Account Overview -->
+    <div class="account-card account-overview">
+      <div class="card-header">
+        <h2 class="card-title">Account Overview</h2>
+      </div>
+      <div class="card-content">
+        <div class="overview-stats">
+          <div class="stat-item">
+            <span class="stat-number">{{ customer.orders_count }}</span>
+            <span class="stat-label">Total Orders</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ customer.total_spent | money_without_currency | remove: '.00' }}</span>
+            <span class="stat-label">Total Spent</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">{{ customer.orders_count | at_least: 1 }}</span>
+            <span class="stat-label">Rewards Points</span>
+          </div>
+        </div>
+        
+        <div class="account-info">
+          <div class="info-row">
+            <span class="info-label">Email:</span>
+            <span class="info-value">{{ customer.email }}</span>
+          </div>
+          {% if customer.phone %}
+          <div class="info-row">
+            <span class="info-label">Phone:</span>
+            <span class="info-value">{{ customer.phone }}</span>
+          </div>
+          {% endif %}
+          <div class="info-row">
+            <span class="info-label">Member since:</span>
+            <span class="info-value">{{ customer.created_at | date: '%B %Y' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="account-card recent-orders">
+      <div class="card-header">
+        <h2 class="card-title">Recent Orders</h2>
+        {% if customer.orders_count > 3 %}
+          <a href="{{ routes.account_url }}/orders" class="view-all-link">View All</a>
+        {% endif %}
+      </div>
+      <div class="card-content">
+        {% if customer.orders.size > 0 %}
+          <div class="orders-list">
+            {% for order in customer.orders limit: 3 %}
+              <div class="order-item">
+                <div class="order-info">
+                  <div class="order-number">
+                    <a href="{{ routes.account_url }}/orders/{{ order.id }}">#{{ order.name }}</a>
+                  </div>
+                  <div class="order-date">{{ order.created_at | date: '%B %d, %Y' }}</div>
+                </div>
+                <div class="order-status">
+                  <span class="status-badge status-{{ order.financial_status }}">
+                    {{ order.financial_status | replace: '_', ' ' | capitalize }}
+                  </span>
+                </div>
+                <div class="order-total">{{ order.total_price | money }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </div>
+            <p class="empty-message">No orders yet</p>
+            <a href="/collections/all" class="btn btn-primary">Start Shopping</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Address Book -->
+    <div class="account-card address-book">
+      <div class="card-header">
+        <h2 class="card-title">Default Address</h2>
+        <a href="{{ routes.account_addresses_url }}" class="edit-link">Edit</a>
+      </div>
+      <div class="card-content">
+        {% if customer.default_address %}
+          <div class="address-display">
+            <div class="address-name">{{ customer.default_address.first_name }} {{ customer.default_address.last_name }}</div>
+            <div class="address-line">{{ customer.default_address.address1 }}</div>
+            {% if customer.default_address.address2 != blank %}
+              <div class="address-line">{{ customer.default_address.address2 }}</div>
+            {% endif %}
+            <div class="address-line">
+              {{ customer.default_address.city }}, 
+              {% if customer.default_address.province_code %}{{ customer.default_address.province_code }} {% endif %}
+              {{ customer.default_address.zip }}
+            </div>
+            <div class="address-line">{{ customer.default_address.country }}</div>
+          </div>
+        {% else %}
+          <div class="empty-state">
+            <p class="empty-message">No default address set</p>
+            <a href="{{ routes.account_addresses_url }}" class="btn btn-outline">Add Address</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="account-card quick-actions">
+      <div class="card-header">
+        <h2 class="card-title">Quick Actions</h2>
+      </div>
+      <div class="card-content">
+        <div class="action-grid">
+          <a href="{{ routes.account_addresses_url }}" class="action-item">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+            </div>
+            <span class="action-label">Manage Addresses</span>
+          </a>
+          
+          <a href="/pages/contact" class="action-item">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </div>
+            <span class="action-label">Contact Support</span>
+          </a>
+          
+          <a href="/collections/all" class="action-item">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+              </svg>
+            </div>
+            <span class="action-label">Continue Shopping</span>
+          </a>
+          
+          <a href="/pages/subscription" class="action-item">
+            <div class="action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4.93 2.31a10.09 10.09 0 0 0-.26 1.9C4.48 8.08 7.92 11.5 12 11.5s7.52-3.42 7.33-7.29a10.09 10.09 0 0 0-.26-1.9"></path>
+                <path d="M11 15L5.88 9.88a3.52 3.52 0 0 0 4.24 4.24L11 15ZM8.12 1.8a3.52 3.52 0 0 1 4.24 4.24l-.88.88L8.12 1.8Z"></path>
+              </svg>
+            </div>
+            <span class="action-label">Coffee Subscription</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.account-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8f5f1 0%, #e9ecef 100%);
+  padding: 2rem 0;
+}
+
+.account-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.account-header {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.welcome-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex: 1;
+}
+
+.greeting {
+  flex: 1;
+}
+
+.account-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 0.5rem 0;
+  font-family: var(--font-primary--family);
+  line-height: 1.2;
+}
+
+.account-subtitle {
+  color: #666;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(92, 191, 238, 0.1);
+}
+
+.profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(92, 191, 238, 0.3);
+}
+
+.avatar-text {
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+  font-family: var(--font-primary--family);
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.profile-email {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+}
+
+.account-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(92, 191, 238, 0.1);
+  position: relative;
+}
+
+.account-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+  border-radius: 20px 20px 0 0;
+}
+
+.account-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  border-color: rgba(92, 191, 238, 0.3);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 2rem 1rem 2rem;
+  background: transparent;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2c3e50;
+  font-family: var(--font-primary--family);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-title::before {
+  content: '☕';
+  font-size: 1.25rem;
+}
+
+.card-content {
+  padding: 0 2rem 2rem 2rem;
+}
+
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.1) 0%, rgba(92, 191, 238, 0.05) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(92, 191, 238, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(92, 191, 238, 0.2);
+  border-color: rgba(92, 191, 238, 0.3);
+}
+
+.stat-number {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-primary--family);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.account-info .info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.info-label {
+  font-weight: 500;
+  color: #666;
+}
+
+.info-value {
+  color: #2c3e50;
+}
+
+.orders-list .order-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.order-number a {
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.order-date {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-paid {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.order-total {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.address-display {
+  line-height: 1.6;
+}
+
+.address-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.address-line {
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  text-decoration: none;
+  color: #666;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.05) 0%, rgba(92, 191, 238, 0.02) 100%);
+  border-radius: 16px;
+  border: 2px solid rgba(92, 191, 238, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.action-item:hover {
+  color: var(--color-primary);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(92, 191, 238, 0.2);
+  border-color: rgba(92, 191, 238, 0.3);
+}
+
+.action-item:hover::before {
+  transform: scaleX(1);
+}
+
+.action-icon {
+  margin-bottom: 1rem;
+  color: var(--color-primary);
+  transition: transform 0.3s ease;
+}
+
+.action-item:hover .action-icon {
+  transform: scale(1.1);
+}
+
+.action-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.05) 0%, rgba(92, 191, 238, 0.02) 100%);
+  border-radius: 16px;
+  border: 2px dashed rgba(92, 191, 238, 0.2);
+}
+
+.empty-icon {
+  color: rgba(92, 191, 238, 0.4);
+  margin-bottom: 1.5rem;
+}
+
+.empty-message {
+  color: #666;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  text-align: center;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+  color: white;
+  box-shadow: 0 4px 16px rgba(92, 191, 238, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(92, 191, 238, 0.4);
+}
+
+.btn-outline {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: linear-gradient(135deg, #5CBFEE 0%, #4a9fd1 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(92, 191, 238, 0.3);
+}
+
+.view-all-link,
+.edit-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.view-all-link:hover,
+.edit-link:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .account-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .overview-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-item {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Customer Account",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Account Page Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_order_history",
+      "label": "Show Recent Orders",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_address_book", 
+      "label": "Show Address Book",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "orders_to_show",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "label": "Number of Recent Orders",
+      "default": 3
+    }
+  ]
+}
+{% endschema %} 

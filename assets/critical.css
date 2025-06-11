@@ -225,25 +225,30 @@ dialog {
   outline: none;
 }
 
-/* Section layout utilities - Enhanced for better responsive behavior */
+/* Section layout utilities - Simplified without forced margins */
 .shopify-section {
+  position: relative;
+  width: 100%;
+}
+
+/* Only apply container margins to sections that specifically need them */
+.shopify-section.section-with-margins {
   --content-width: min(
     calc(var(--page-width, 120rem) - var(--page-margin, 2rem) * 2),
     calc(100% - var(--page-margin, 2rem) * 2)
   );
   --content-margin: minmax(var(--page-margin, 2rem), 1fr);
   --content-grid: var(--content-margin) var(--content-width) var(--content-margin);
-
-  position: relative;
+  
   display: grid;
   grid-template-columns: var(--content-grid);
-  width: 100%;
 }
 
-.shopify-section > * {
+.shopify-section.section-with-margins > * {
   grid-column: 2;
 }
 
+.shopify-section.section-with-margins > .full-width,
 .shopify-section > .full-width {
   grid-column: 1 / -1;
 }
@@ -413,6 +418,21 @@ a:focus {
   max-width: var(--container-max-width);
   margin: 0 auto;
   padding: 0 var(--spacing-md);
+}
+
+/* Content container for sections that need proper spacing */
+.section-content {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Full-width sections with no container restrictions */
+.section-full-width {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
 }
 
 .full-width {

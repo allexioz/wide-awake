@@ -97,9 +97,6 @@
                     <button class="view-btn" data-view="grid-4" title="4 Column Grid">
                       <i data-lucide="layout-grid" class="view-icon"></i>
                     </button>
-                    <button class="view-btn" data-view="list" title="List View">
-                      <i data-lucide="list" class="view-icon"></i>
-                    </button>
                   </div>
                 </div>
 
@@ -934,35 +931,268 @@
   gap: var(--spacing-md);
 }
 
-.product-grid-optimized[data-view="list"] {
-  grid-template-columns: 1fr;
-  gap: var(--spacing-sm);
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .controls-left,
+  .controls-right {
+    justify-content: space-between;
+  }
+  
+  .product-grid-optimized[data-view="grid-3"] {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  
+  .product-grid-optimized[data-view="grid-4"] {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
 }
 
-.product-grid-optimized[data-view="list"] .product-card {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+
+
+.product-grid-optimized[data-view="list"] .product-card:hover {
+  border-color: #5CBFEE;
+  box-shadow: 0 8px 32px rgba(92, 191, 238, 0.15);
+  transform: translateY(-2px);
+}
+
+.product-grid-optimized[data-view="list"] .product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #5CBFEE 0%, #7BD0F5 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-grid-optimized[data-view="list"] .product-card:hover::before {
+  opacity: 1;
 }
 
 .product-grid-optimized[data-view="list"] .product-image {
   flex-shrink: 0;
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-secondary, #f8f9fa);
+  position: relative;
+}
+
+.product-grid-optimized[data-view="list"] .product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.product-grid-optimized[data-view="list"] .product-card:hover .product-image img {
+  transform: scale(1.05);
 }
 
 .product-grid-optimized[data-view="list"] .product-info {
   flex: 1;
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
+  min-height: 140px;
+  gap: var(--spacing-sm);
+}
+
+.product-grid-optimized[data-view="list"] .product-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.product-grid-optimized[data-view="list"] .product-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary, #1a1a1a);
+}
+
+
+
+.product-grid-optimized[data-view="list"] .product-name a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.product-grid-optimized[data-view="list"] .product-name a:hover {
+  color: #5CBFEE;
+}
+
+.product-grid-optimized[data-view="list"] .product-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+}
+
+.product-grid-optimized[data-view="list"] .product-badge-list {
+  display: inline-flex;
   align-items: center;
+  gap: 6px;
+  background: rgba(92, 191, 238, 0.1);
+  color: #5CBFEE;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-bottom: var(--spacing-sm);
+  border: 1px solid rgba(92, 191, 238, 0.2);
+}
+
+.product-grid-optimized[data-view="grid-3"] .product-badge-list,
+.product-grid-optimized[data-view="grid-4"] .product-badge-list {
+  display: none;
+}
+
+.product-grid-optimized[data-view="list"] .product-price {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin: var(--spacing-sm) 0;
+}
+
+.product-grid-optimized[data-view="list"] .price-regular,
+.product-grid-optimized[data-view="list"] .price-sale {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a1a1a);
+}
+
+.product-grid-optimized[data-view="list"] .price-compare {
+  font-size: 1rem;
+  color: var(--text-muted, #999);
+  text-decoration: line-through;
+}
+
+.product-grid-optimized[data-view="list"] .save-badge {
+  background: #ef4444;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
 }
 
 .product-grid-optimized[data-view="list"] .product-actions {
-  margin: 0;
+  display: flex;
   flex-direction: row;
   gap: var(--spacing-sm);
+  margin: 0;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.product-grid-optimized[data-view="list"] .quick-view-btn,
+.product-grid-optimized[data-view="list"] .view-product-btn {
+  flex: 1;
+  min-width: 120px;
+  max-width: 160px;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.product-grid-optimized[data-view="list"] .quick-add-btn {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+/* Enhanced mobile layout for list view */
+@media screen and (max-width: 749px) {
+  .product-grid-optimized[data-view="list"] .product-card {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+  }
+  
+  .product-grid-optimized[data-view="list"] .product-image {
+    width: 120px;
+    height: 120px;
+    align-self: center;
+  }
+  
+  .product-grid-optimized[data-view="list"] .product-info {
+    align-items: center;
+    text-align: center;
+    min-height: auto;
+  }
+  
+  .product-grid-optimized[data-view="list"] .product-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .product-grid-optimized[data-view="list"] .quick-view-btn,
+  .product-grid-optimized[data-view="list"] .view-product-btn {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+/* Additional list view enhancements */
+.product-grid-optimized[data-view="list"] .price-from-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary, #666);
+  font-weight: 500;
+  text-transform: lowercase;
+}
+
+.product-grid-optimized[data-view="list"] .product-card .product-badge .flavor-note {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.product-grid-optimized[data-view="list"] .product-badge-list .flavor-note {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.25px;
+}
+
+/* List view hover animations */
+.product-grid-optimized[data-view="list"] .product-card:hover .product-content {
+  transform: translateX(4px);
+  transition: transform 0.2s ease;
+}
+
+.product-grid-optimized[data-view="list"] .product-card:hover .product-actions {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+
+/* Tablet adjustments */
+@media screen and (min-width: 750px) and (max-width: 1024px) {
+  .product-grid-optimized[data-view="list"] .product-image {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .product-grid-optimized[data-view="list"] .product-card {
+    gap: var(--spacing-md);
+  }
 }
 
 /* Responsive Design */
@@ -1153,6 +1383,27 @@
 .collection-page-optimized.animations-complete * {
   will-change: auto;
 }
+
+/* Sorting animation states */
+.product-grid-optimized.sorting {
+  position: relative;
+}
+
+.product-grid-optimized.sorting::after {
+  content: 'Sorting products...';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  color: #5CBFEE;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  pointer-events: none;
+}
 </style>
 
 {% comment %} JavaScript included inline below - removed external dependency {% endcomment %}
@@ -1259,33 +1510,79 @@ function applySorting(sortType) {
   
   if (!productCards.length || !productGrid) return;
   
+  console.log(`🔄 Sorting products by: ${sortType}`);
+  
   let sortedCards = [...productCards];
   
   switch (sortType) {
     case 'price-low':
-      sortedCards.sort((a, b) => getPrice(a) - getPrice(b));
+      sortedCards.sort((a, b) => {
+        const priceA = getPrice(a);
+        const priceB = getPrice(b);
+        console.log(`Price comparison: ${priceA} vs ${priceB}`);
+        return priceA - priceB;
+      });
       break;
     case 'price-high':
-      sortedCards.sort((a, b) => getPrice(b) - getPrice(a));
+      sortedCards.sort((a, b) => {
+        const priceA = getPrice(a);
+        const priceB = getPrice(b);
+        return priceB - priceA;
+      });
       break;
     case 'title-a':
-      sortedCards.sort((a, b) => getTitle(a).localeCompare(getTitle(b)));
+      sortedCards.sort((a, b) => {
+        const titleA = getTitle(a);
+        const titleB = getTitle(b);
+        return titleA.localeCompare(titleB);
+      });
       break;
     case 'title-z':
-      sortedCards.sort((a, b) => getTitle(b).localeCompare(getTitle(a)));
+      sortedCards.sort((a, b) => {
+        const titleA = getTitle(a);
+        const titleB = getTitle(b);
+        return titleB.localeCompare(titleA);
+      });
       break;
     case 'created-new':
-      sortedCards.sort((a, b) => getDate(b) - getDate(a));
+      sortedCards.sort((a, b) => {
+        const dateA = getProductId(a);
+        const dateB = getProductId(b);
+        return dateB - dateA; // Newer products have higher IDs typically
+      });
       break;
     case 'best-selling':
+      // For best selling, we'll randomize since we don't have sales data
+      // In a real implementation, you'd sort by a sales metric
       sortedCards.sort(() => Math.random() - 0.5);
       break;
-    default: // featured
+    default: // featured - restore original order
+      sortedCards = restoreOriginalOrder(productCards);
       break;
   }
   
-  // Re-append sorted cards
-  sortedCards.forEach(card => productGrid.appendChild(card));
+  // Add sorting animation with loading state
+  productGrid.style.transition = 'opacity 0.2s ease';
+  productGrid.style.opacity = '0.6';
+  
+  // Add loading class
+  productGrid.classList.add('sorting');
+  
+  // Re-append sorted cards with animation
+  setTimeout(() => {
+    sortedCards.forEach((card, index) => {
+      productGrid.appendChild(card);
+      // Stagger animation for each card
+      card.style.animation = `fadeInUp 0.3s ease ${index * 0.05}s forwards`;
+    });
+    
+    // Restore opacity and remove loading state
+    setTimeout(() => {
+      productGrid.style.opacity = '1';
+      productGrid.classList.remove('sorting');
+      console.log(`✅ Sorted ${sortedCards.length} products by ${sortType}`);
+    }, 100);
+  }, 200);
   
   // Update grid attribute
   productGrid.setAttribute('data-sort', sortType);
@@ -1308,22 +1605,44 @@ function initPaginationScroll() {
 
 // Filter functionality will be handled by the filter snippet renders
 
-// Helper functions
+// Helper functions for sorting
 function getPrice(card) {
-  const priceElement = card.querySelector('.price-regular, .price-current');
-  if (!priceElement) return 0;
+  // Try multiple price selectors
+  const priceElement = card.querySelector('.price-regular, .price-current, .price-sale, .price-from-amount');
+  if (!priceElement) {
+    console.log('⚠️ No price element found for card:', card);
+    return 0;
+  }
+  
+  // Extract numeric value from price text
   const priceText = priceElement.textContent.replace(/[^0-9.]/g, '');
-  return parseFloat(priceText) || 0;
+  const price = parseFloat(priceText) || 0;
+  
+  console.log(`💰 Extracted price: ${price} from text: "${priceElement.textContent}"`);
+  return price;
 }
 
 function getTitle(card) {
-  const titleElement = card.querySelector('.product-name a');
-  return titleElement ? titleElement.textContent.trim() : '';
+  const titleElement = card.querySelector('.product-name a, .product-name');
+  const title = titleElement ? titleElement.textContent.trim() : '';
+  console.log(`📝 Product title: "${title}"`);
+  return title;
 }
 
-function getDate(card) {
-  // Simulate creation date - in real implementation, this would come from product data
-  return new Date().getTime() - Math.random() * 10000000000;
+function getProductId(card) {
+  // Get product ID from data attribute
+  const productId = card.dataset.productId;
+  return productId ? parseInt(productId) : Math.random() * 1000000;
+}
+
+function restoreOriginalOrder(cards) {
+  // For featured sort, maintain the original server-rendered order
+  // We can do this by using the DOM order or product IDs
+  return cards.sort((a, b) => {
+    const aIndex = Array.from(a.parentNode.children).indexOf(a);
+    const bIndex = Array.from(b.parentNode.children).indexOf(b);
+    return aIndex - bIndex;
+  });
 }
 </script>
 
@@ -1537,6 +1856,8 @@ document.addEventListener('DOMContentLoaded', function() {
       // Success feedback
       targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>ADDED!';
       addToCartBtn.style.background = 'linear-gradient(135deg, #2ECC71 0%, #27AE60 100%)';
+      addToCartBtn.style.color = 'white';
+      addToCartBtn.style.border = 'none';
       
       // Close modal after delay
       setTimeout(() => {
@@ -1553,6 +1874,8 @@ document.addEventListener('DOMContentLoaded', function() {
         addToCartBtn.disabled = false;
         targetElement.innerHTML = originalHTML;
         addToCartBtn.style.background = '';
+        addToCartBtn.style.color = '';
+        addToCartBtn.style.border = '';
       }, 2000);
     });
   }

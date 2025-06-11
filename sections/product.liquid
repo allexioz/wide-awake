@@ -203,7 +203,8 @@
   </div>
 
   <!-- Related Products -->
-  {% assign related_products = collections[product.collections.first.handle].products | where: 'available', true | limit: 4 %}
+  {% assign collection_products = collections[product.collections.first.handle].products | where: 'available', true %}
+  {% assign related_products = collection_products | slice: 0, 4 %}
   {% if related_products.size > 1 %}
     <section class="related-products">
       <div class="section-container">
@@ -525,10 +526,10 @@ class ModernProductPage {
     fetch('/cart.js')
       .then(response => response.json())
       .then(cart => {
-        // Update all cart badges
-        const cartBadges = document.querySelectorAll('[data-cart-count]');
+                // Update all cart badges
+        const cartBadges = document.querySelectorAll('[data-cart-count], .cart-count:not(.cart-title .cart-count)');
         const cartIndicators = document.querySelectorAll('[data-cart-indicator]');
-        
+
         cartBadges.forEach(badge => {
           badge.textContent = cart.item_count;
           badge.style.display = cart.item_count > 0 ? 'flex' : 'none';

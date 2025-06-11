@@ -111,26 +111,30 @@
   
   <!-- Product Info -->
   <div class="product-info">
-    <h3 class="product-name">
-      <a href="{{ product.url }}">{{ product.title }}</a>
-    </h3>
-    
-    <!-- Product Price -->
-    <div class="product-price">
-      {% if price_varies %}
-        <span class="price-from-wrapper">
-          <span class="price-from-text">From</span>
-          <span class="price-from-amount">{{ min_price | money }}</span>
-        </span>
-      {% else %}
-        {% if product.compare_at_price and product.compare_at_price > 0 and product.compare_at_price > product.price %}
-          <span class="price-sale">{{ product.price | money }}</span>
-          <span class="price-compare">{{ product.compare_at_price | money }}</span>
-          <span class="save-badge">Save {{ product.compare_at_price | minus: product.price | money }}</span>
+    <div class="product-content">
+
+      
+      <h3 class="product-name">
+        <a href="{{ product.url }}">{{ product.title }}</a>
+      </h3>
+      
+      <!-- Product Price -->
+      <div class="product-price">
+        {% if price_varies %}
+          <span class="price-from-wrapper">
+            <span class="price-from-text">from</span>
+            <span class="price-from-amount">{{ min_price | money }}</span>
+          </span>
         {% else %}
-          <span class="price-regular">{{ product.price | money }}</span>
+          {% if product.compare_at_price and product.compare_at_price > 0 and product.compare_at_price > product.price %}
+            <span class="price-sale">{{ product.price | money }}</span>
+            <span class="price-compare">{{ product.compare_at_price | money }}</span>
+            <span class="save-badge">Save {{ product.compare_at_price | minus: product.price | money }}</span>
+          {% else %}
+            <span class="price-regular">{{ product.price | money }}</span>
+          {% endif %}
         {% endif %}
-      {% endif %}
+      </div>
     </div>
     
     <!-- Product Actions -->

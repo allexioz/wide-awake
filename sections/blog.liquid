@@ -29,7 +29,7 @@
               
               <div class="article-content">
                 <div class="article-meta">
-                  {% assign date = article.published_at | time_tag: format: 'date' %}
+                
                   <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}" class="article-date">
                     <i data-lucide="calendar" class="meta-icon"></i>
                     {{ article.published_at | date: '%B %d, %Y' }}

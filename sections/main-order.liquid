@@ -1,0 +1,711 @@
+<div class="order-page container">
+  <div class="order-header">
+    <div class="order-breadcrumbs">
+      <a href="{{ routes.account_url }}" class="breadcrumb-link">Account</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">Order #{{ order.name }}</span>
+    </div>
+    
+    <div class="order-title-section">
+      <h1 class="order-title">Order #{{ order.name }}</h1>
+      <div class="order-meta">
+        <span class="order-date">Placed on {{ order.created_at | date: '%B %d, %Y' }}</span>
+        <span class="order-status status-{{ order.financial_status }}">
+          {{ order.financial_status | replace: '_', ' ' | capitalize }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="order-content">
+    <!-- Order Status and Tracking -->
+    <div class="order-card order-status-card">
+      <div class="card-header">
+        <h2 class="card-title">Order Status</h2>
+      </div>
+      <div class="card-content">
+        <div class="status-timeline">
+          <div class="timeline-item {% if order.financial_status == 'paid' or order.financial_status == 'authorized' %}completed{% endif %}">
+            <div class="timeline-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 12l2 2 4-4"></path>
+                <circle cx="12" cy="12" r="10"></circle>
+              </svg>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">Order Confirmed</div>
+              <div class="timeline-date">{{ order.created_at | date: '%B %d, %Y at %l:%M %p' }}</div>
+            </div>
+          </div>
+          
+          {% if order.fulfillment_status %}
+            <div class="timeline-item {% if order.fulfillment_status == 'fulfilled' %}completed{% endif %}">
+              <div class="timeline-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <div class="timeline-content">
+                <div class="timeline-title">
+                  {% if order.fulfillment_status == 'fulfilled' %}
+                    Order Shipped
+                  {% else %}
+                    Preparing for Shipment
+                  {% endif %}
+                </div>
+                {% if order.fulfillment_status == 'fulfilled' %}
+                  <div class="timeline-date">Shipped</div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+        
+        {% if order.tracking_number %}
+          <div class="tracking-info">
+            <div class="tracking-title">Tracking Information</div>
+            <div class="tracking-number">{{ order.tracking_number }}</div>
+            {% if order.tracking_url %}
+              <a href="{{ order.tracking_url }}" class="tracking-link" target="_blank">Track Package</a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="order-card order-items-card">
+      <div class="card-header">
+        <h2 class="card-title">Order Items ({{ order.line_items.size }})</h2>
+      </div>
+      <div class="card-content">
+        <div class="order-items">
+          {% for line_item in order.line_items %}
+            <div class="order-item">
+              <div class="item-image">
+                {% if line_item.image %}
+                  <img src="{{ line_item.image | image_url: width: 100, height: 100 }}" 
+                       alt="{{ line_item.title }}" 
+                       width="100" 
+                       height="100"
+                       loading="lazy">
+                {% else %}
+                  <div class="image-placeholder">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21,15 16,10 5,21"></polyline>
+                    </svg>
+                  </div>
+                {% endif %}
+              </div>
+              
+              <div class="item-details">
+                <h3 class="item-title">{{ line_item.title }}</h3>
+                {% if line_item.variant_title and line_item.variant_title != 'Default Title' %}
+                  <div class="item-variant">{{ line_item.variant_title }}</div>
+                {% endif %}
+                {% if line_item.selling_plan_allocation %}
+                  <div class="item-subscription">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4.93 2.31a10.09 10.09 0 0 0-.26 1.9C4.48 8.08 7.92 11.5 12 11.5s7.52-3.42 7.33-7.29a10.09 10.09 0 0 0-.26-1.9"></path>
+                    </svg>
+                    Subscription: {{ line_item.selling_plan_allocation.selling_plan.name }}
+                  </div>
+                {% endif %}
+                <div class="item-sku">SKU: {{ line_item.sku | default: 'N/A' }}</div>
+              </div>
+              
+              <div class="item-quantity">
+                <span class="quantity-label">Qty:</span>
+                <span class="quantity-value">{{ line_item.quantity }}</span>
+              </div>
+              
+              <div class="item-price">
+                <div class="price-per-item">{{ line_item.price | money }} each</div>
+                <div class="price-total">{{ line_item.final_line_price | money }}</div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-card order-summary-card">
+      <div class="card-header">
+        <h2 class="card-title">Order Summary</h2>
+      </div>
+      <div class="card-content">
+        <div class="summary-rows">
+          <div class="summary-row">
+            <span class="summary-label">Subtotal:</span>
+            <span class="summary-value">{{ order.line_items_subtotal_price | money }}</span>
+          </div>
+          
+          {% for discount in order.discount_applications %}
+            <div class="summary-row discount-row">
+              <span class="summary-label">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                {{ discount.title }}:
+              </span>
+              <span class="summary-value">-{{ discount.total_allocated_amount | money }}</span>
+            </div>
+          {% endfor %}
+          
+          {% for shipping_line in order.shipping_lines %}
+            <div class="summary-row">
+              <span class="summary-label">{{ shipping_line.title }}:</span>
+              <span class="summary-value">{{ shipping_line.price | money }}</span>
+            </div>
+          {% endfor %}
+          
+          {% for tax_line in order.tax_lines %}
+            <div class="summary-row">
+              <span class="summary-label">{{ tax_line.title }}:</span>
+              <span class="summary-value">{{ tax_line.price | money }}</span>
+            </div>
+          {% endfor %}
+          
+          <div class="summary-row total-row">
+            <span class="summary-label">Total:</span>
+            <span class="summary-value">{{ order.total_price | money }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Addresses & Payment -->
+    <div class="order-details-grid">
+      <div class="order-card shipping-address-card">
+        <div class="card-header">
+          <h2 class="card-title">Shipping Address</h2>
+        </div>
+        <div class="card-content">
+          {% if order.shipping_address %}
+            <div class="address-display">
+              <div class="address-name">{{ order.shipping_address.first_name }} {{ order.shipping_address.last_name }}</div>
+              <div class="address-line">{{ order.shipping_address.address1 }}</div>
+              {% if order.shipping_address.address2 != blank %}
+                <div class="address-line">{{ order.shipping_address.address2 }}</div>
+              {% endif %}
+              <div class="address-line">
+                {{ order.shipping_address.city }}, 
+                {% if order.shipping_address.province_code %}{{ order.shipping_address.province_code }} {% endif %}
+                {{ order.shipping_address.zip }}
+              </div>
+              <div class="address-line">{{ order.shipping_address.country }}</div>
+              {% if order.shipping_address.phone %}
+                <div class="address-line">{{ order.shipping_address.phone }}</div>
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="order-card billing-address-card">
+        <div class="card-header">
+          <h2 class="card-title">Billing Address</h2>
+        </div>
+        <div class="card-content">
+          {% if order.billing_address %}
+            <div class="address-display">
+              <div class="address-name">{{ order.billing_address.first_name }} {{ order.billing_address.last_name }}</div>
+              <div class="address-line">{{ order.billing_address.address1 }}</div>
+              {% if order.billing_address.address2 != blank %}
+                <div class="address-line">{{ order.billing_address.address2 }}</div>
+              {% endif %}
+              <div class="address-line">
+                {{ order.billing_address.city }}, 
+                {% if order.billing_address.province_code %}{{ order.billing_address.province_code }} {% endif %}
+                {{ order.billing_address.zip }}
+              </div>
+              <div class="address-line">{{ order.billing_address.country }}</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Actions -->
+    <div class="order-actions">
+      <a href="{{ routes.account_url }}" class="btn btn-outline">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"></path>
+        </svg>
+        Back to Account
+      </a>
+      
+      {% if order.customer_url %}
+        <a href="{{ order.customer_url }}" class="btn btn-primary">
+          Reorder Items
+        </a>
+      {% endif %}
+      
+      <a href="/pages/contact" class="btn btn-outline">
+        Contact Support
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+.order-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.order-header {
+  margin-bottom: 2rem;
+}
+
+.order-breadcrumbs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.breadcrumb-link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.breadcrumb-link:hover {
+  text-decoration: underline;
+}
+
+.breadcrumb-separator {
+  color: #666;
+}
+
+.breadcrumb-current {
+  color: #666;
+}
+
+.order-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.order-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+  font-family: var(--font-primary--family);
+}
+
+.order-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.order-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.order-status {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-paid,
+.status-authorized {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-cancelled {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.order-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  color: #2c3e50;
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.status-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.timeline-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9ecef;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.timeline-item.completed .timeline-icon {
+  background: var(--color-primary);
+  color: white;
+}
+
+.timeline-title {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.timeline-date {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.tracking-info {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.tracking-title {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.tracking-number {
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.tracking-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.tracking-link:hover {
+  text-decoration: underline;
+}
+
+.order-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.order-item {
+  display: grid;
+  grid-template-columns: 100px 1fr auto auto;
+  gap: 1rem;
+  align-items: flex-start;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.order-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.item-image img {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.image-placeholder {
+  width: 100px;
+  height: 100px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+}
+
+.item-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0 0 0.5rem 0;
+}
+
+.item-variant {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.item-subscription {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: var(--color-primary);
+  margin-bottom: 0.25rem;
+}
+
+.item-sku {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.item-quantity {
+  text-align: center;
+}
+
+.quantity-label {
+  display: block;
+  font-size: 0.75rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.quantity-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.item-price {
+  text-align: right;
+}
+
+.price-per-item {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.price-total {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.summary-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.summary-label {
+  color: #666;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.discount-row .summary-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--color-primary);
+}
+
+.discount-row .summary-value {
+  color: var(--color-primary);
+}
+
+.total-row {
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 1.1rem;
+}
+
+.total-row .summary-label,
+.total-row .summary-value {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.order-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.address-display {
+  line-height: 1.6;
+}
+
+.address-name {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+}
+
+.address-line {
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.order-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  text-align: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background: #4a9fd1;
+  border-color: #4a9fd1;
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--color-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+  .order-title-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .order-meta {
+    align-items: flex-start;
+  }
+  
+  .order-item {
+    grid-template-columns: 80px 1fr;
+    gap: 1rem;
+  }
+  
+  .item-quantity,
+  .item-price {
+    grid-column: 2;
+    text-align: left;
+    margin-top: 0.5rem;
+  }
+  
+  .order-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .order-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Customer Order",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Order Page Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_order_timeline",
+      "label": "Show Order Status Timeline",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reorder_option",
+      "label": "Show Reorder Button",
+      "default": true
+    }
+  ]
+}
+{% endschema %} 

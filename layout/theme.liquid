@@ -18,8 +18,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
     
     {%- comment -%} Lucide Icons with fallback {%- endcomment -%}
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" 
-            onerror="console.warn('Lucide icons blocked or failed to load. Using fallbacks.')"></script>
+      <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"
+              onerror="console.warn('Lucide icons blocked or failed to load. Using fallbacks.')" defer></script>
     
     <title>
       {{ page_title }}
@@ -36,9 +36,7 @@
     {% render 'css-variables' %}
     
     {%- comment -%} Load critical CSS inline for performance {%- endcomment -%}
-    <style>
-      {{ 'critical.css' | asset_content }}
-    </style>
+          {{ 'critical.css' | asset_url | stylesheet_tag }}
     
     {%- comment -%} Load custom fonts stylesheet (now just for helper classes) {%- endcomment -%}
     {{ 'fonts.css.liquid' | asset_url | stylesheet_tag }}
@@ -204,7 +202,7 @@
     </script>
 
     <!-- Enhanced Scripts for Colorful Wide Awake -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha512-z4OUqw38qNLpn1libAN9BsoDx6nbNFio5lA6CuTp9NlK83b89hgyCVq+N5FdBJptINztxn1Z3SaKSKUS5UP60Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha512-z4OUqw38qNLpn1libAN9BsoDx6nbNFio5lA6CuTp9NlK83b89hgyCVq+N5FdBJptINztxn1Z3SaKSKUS5UP60Q==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
     
     <!-- Colorful Background Animation System -->
     <script>

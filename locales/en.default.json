@@ -55,5 +55,24 @@
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "general": {
+    "meta": {
+      "tags": "Tagged with {{ tags }}",
+      "page": "Page {{ page }}"
+    }
+  },
+  "sections": {
+    "cart": {
+      "cart_error": "There was an error updating your cart. Please try again.",
+      "cart_quantity_error_html": "You can only add {{ quantity }} of this item to your cart."
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable"
+    }
   }
 }

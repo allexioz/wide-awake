@@ -757,6 +757,9 @@ class ProductDiscovery {
         btn.style.background = 'linear-gradient(-45deg, #FF6B6B, #FF8E53, #FF6B35, #F7DC6F, #82E0AA, #85C1E9, #BB8FCE, #FF6B6B)';
         btn.style.backgroundSize = '400% 400%';
         btn.style.animation = 'gradientFlow 3s ease infinite';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
+        btn.style.textShadow = '0 1px 2px rgba(0, 0, 0, 0.2)';
         
         // Show toast notification
         this.showToast('Added to cart!', 'success');
@@ -765,6 +768,10 @@ class ProductDiscovery {
           btn.innerHTML = originalHTML;
           btn.disabled = false;
           btn.style.background = '';
+          btn.style.animation = '';
+          btn.style.color = '';
+          btn.style.border = '';
+          btn.style.textShadow = '';
           // Re-init lucide icons
           if (typeof lucide !== 'undefined') {
             lucide.createIcons();
@@ -774,6 +781,8 @@ class ProductDiscovery {
       .catch(error => {
         btn.innerHTML = '<i data-lucide="x" class="btn-icon"></i>';
         btn.style.background = '#dc3545';
+        btn.style.color = 'white';
+        btn.style.border = 'none';
         
         this.showToast('Failed to add to cart', 'error');
         
@@ -781,6 +790,10 @@ class ProductDiscovery {
           btn.innerHTML = originalHTML;
           btn.disabled = false;
           btn.style.background = '';
+          btn.style.animation = '';
+          btn.style.color = '';
+          btn.style.border = '';
+          btn.style.textShadow = '';
           if (typeof lucide !== 'undefined') {
             lucide.createIcons();
           }

@@ -8,7 +8,7 @@
   - One-click actions and shortcuts
 {% endcomment %}
 
-<section class="cart-page" data-cart-total="{{ cart.total_price }}">
+<section class="cart-page" data-cart-total="{{ cart.total_price }}" data-section-type="cart" data-section-id="{{ section.id }}" id="main-cart-section">
   <div class="container">
     {% if cart.item_count == 0 %}
       <!-- Empty Cart State -->
@@ -41,9 +41,11 @@
                  <div class="recommendation-card">
                    <a href="{{ product.url }}" class="recommendation-link">
                      <div class="recommendation-image">
-                       <img src="{{ product.featured_image | img_url: '300x300' }}" 
-                            alt="{{ product.title }}"
-                            loading="lazy">
+                                               <img src="{{ product.featured_image | image_url: width: 300, height: 300 }}"
+                             alt="{{ product.title }}"
+                             width="300"
+                             height="300"
+                             loading="lazy">
                      </div>
                      <h3 class="recommendation-title">{{ product.title }}</h3>
                      <div class="recommendation-price">{{ product.price | money }}</div>
@@ -85,9 +87,11 @@
                     <!-- Product Image -->
                     <div class="cart-item-image">
                       <a href="{{ item.product.url }}">
-                        <img src="{{ item.image | img_url: '200x200' }}" 
-                             alt="{{ item.product.title }}"
-                             loading="lazy">
+                                                 <img src="{{ item.image | image_url: width: 200, height: 200 }}"
+                              alt="{{ item.product.title }}"
+                              width="200"
+                              height="200"
+                              loading="lazy">
                       </a>
                     </div>
 
@@ -541,14 +545,7 @@
     margin: 0;
   }
 
-  .cart-count {
-    font-family: 'Poppins', sans-serif;
-    font-weight: var(--font-weight-normal);
-    font-size: var(--font-size-xl);
-    color: var(--color-secondary);
-    display: block;
-    margin-top: var(--space-1);
-  }
+  /* Cart count styling moved to css-variables.liquid for consistency */
 
   .cart-actions {
     display: flex;
@@ -1375,24 +1372,9 @@
        }
      }
 
-     /* Loading State */
-     .cart-loading {
-       pointer-events: none;
-       opacity: 0.7;
-     }
-
-     .cart-loading::after {
-       content: '';
-       position: fixed;
-       top: 0;
-       left: 0;
-       right: 0;
-       bottom: 0;
-       background: rgba(255, 255, 255, 0.8);
-       z-index: 9999;
-       display: flex;
-       align-items: center;
-       justify-content: center;
+     /* Button interaction states */
+     .quantity-btn:active {
+       transform: scale(0.9);
      }
 
   /* Responsive Design */
@@ -1431,9 +1413,7 @@
       font-size: var(--font-size-3xl);
     }
 
-    .cart-count {
-      font-size: var(--font-size-lg);
-    }
+    /* Cart count styling handled by css-variables.liquid */
 
     .cart-actions {
       width: 100%;
@@ -1567,9 +1547,7 @@
       font-size: var(--font-size-3xl);
     }
 
-    .cart-count {
-      font-size: var(--font-size-base);
-    }
+    /* Cart count styling handled by css-variables.liquid */
 
     .cart-item {
       grid-template-columns: 1fr;
@@ -1647,713 +1625,387 @@
     50% { transform: scale(1.05); }
     100% { transform: scale(1); }
   }
+
+  /* Loading and notification styles */
+  .cart-updating {
+    position: relative;
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .cart-updating::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 1000;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .cart-notification {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    display: none;
+  }
+
+  .cart-notification--success {
+    background-color: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+
+  .cart-notification--error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+
+  .cart-notification--info {
+    background-color: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+  }
+
+  /* Ensure buttons don't interfere with form submission */
+  .quantity-btn, .cart-item-remove {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s;
+  }
+
+  .quantity-btn:hover, .cart-item-remove:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .quantity-btn:disabled, .cart-item-remove:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Improved quantity input styling */
+  .quantity-input {
+    text-align: center;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    padding: 0.5rem;
+    width: 4rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .quantity-input:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-color: #3b82f6;
+  }
+
+  /* Cart updating state */
+  .cart-updating {
+    pointer-events: none;
+    position: relative;
+  }
+
+  .cart-updating::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* Smooth transitions for quantity buttons */
+  .quantity-btn {
+    transition: transform 0.1s ease, opacity 0.2s ease;
+  }
+
+  .quantity-btn:active {
+    transform: scale(0.9);
+  }
+
+  /* Cart item animations */
+  .cart-item {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .cart-item.removing {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
 </style>
 
 <script>
- // Enhanced Cart Functionality - 2025 UX Features
- document.addEventListener('DOMContentLoaded', function() {
-   const cartForm = document.getElementById('cart-form');
-   const floatingSummary = document.getElementById('floating-summary');
-   
-   // Initialize Lucide icons
-   if (typeof lucide !== 'undefined') {
-     lucide.createIcons();
-   } else {
-     // Show fallback icons if Lucide isn't loaded
-     document.querySelectorAll('.quantity-icon').forEach(icon => {
-       icon.style.display = 'none';
-     });
-     document.querySelectorAll('.quantity-fallback').forEach(fallback => {
-       fallback.style.display = 'inline';
-     });
-   }
+/**
+ * Simple Cart Manager - No conflicts approach
+ * Uses basic fetch API with standard Shopify cart endpoints
+ */
+(function() {
+  'use strict';
   
-  // Store original values for error recovery
-  document.querySelectorAll('.quantity-input').forEach(input => {
-    input.setAttribute('data-original-value', input.value);
-  });
+  console.log('🛒 Initializing simple cart manager...');
   
-  // Rate limiting and debouncing for cart updates
-  let updateTimeout = null;
   let isUpdating = false;
-  let pendingUpdates = new Map();
   
-  // Global flag to prevent conflicts with AddToCartComponent
-  window.cartPageUpdating = false;
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    // Prevent any existing cart managers from interfering
+    window.cartPageUpdating = false;
+    
+    initializeCartHandlers();
+    console.log('✅ Simple cart manager ready');
+  });
   
-  // Function to check if cart operations are safe
-  window.isCartOperationSafe = function() {
-    return !window.cartPageUpdating && !isUpdating;
-  };
-  
-  // Override AddToCartComponent if needed to check for conflicts
-  if (window.AddToCartComponent) {
-    const originalHandleSubmit = window.AddToCartComponent.prototype.handleSubmit;
-    window.AddToCartComponent.prototype.handleSubmit = function(variantId, quantity, buttonElement, productTitle) {
-      console.log('🛒 AddToCart Debug:', {
-        variantId,
-        quantity,
-        buttonElement,
-        productTitle,
-        cartPageUpdating: window.cartPageUpdating
-      });
-      
-      // Check if cart page is currently updating
-      if (window.cartPageUpdating) {
-        console.warn('Cart page is updating, delaying add to cart');
-        return new Promise((resolve, reject) => {
-          const checkInterval = setInterval(() => {
-            if (!window.cartPageUpdating) {
-              clearInterval(checkInterval);
-              originalHandleSubmit.call(this, variantId, quantity, buttonElement, productTitle)
-                .then(resolve)
-                .catch(reject);
-            }
-          }, 100);
-          
-          // Timeout after 5 seconds
-          setTimeout(() => {
-            clearInterval(checkInterval);
-            reject(new Error('Cart operation timeout'));
-          }, 5000);
-        });
+  function initializeCartHandlers() {
+    // Handle all cart interactions using event delegation
+    document.addEventListener('click', function(e) {
+      if (isUpdating) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
       }
       
-      // Add additional debugging to the original method
-      return originalHandleSubmit.call(this, variantId, quantity, buttonElement, productTitle)
-        .catch(error => {
-          console.error('🚨 AddToCart detailed error:', {
-            error: error.message,
-            variantId,
-            quantity,
-            productTitle,
-            timestamp: new Date().toISOString()
-          });
-          
-          // Try to get more details about the error
-          if (error.message.includes('Failed to add to cart')) {
-            console.warn('Generic cart error detected, this might be a Shopify API issue');
-          }
-          
-          throw error;
-        });
-    };
+      // Handle quantity buttons
+      if (e.target.closest('.quantity-btn')) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleQuantityButton(e.target.closest('.quantity-btn'));
+        return;
+      }
+      
+      // Handle remove buttons
+      if (e.target.closest('[data-action="remove-item"]')) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleRemoveItem(e.target.closest('[data-action="remove-item"]'));
+        return;
+      }
+      
+      // Handle clear cart
+      if (e.target.closest('[data-action="clear-cart"]')) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleClearCart();
+        return;
+      }
+    });
+    
+    // Handle quantity input changes
+    document.addEventListener('change', function(e) {
+      if (e.target.classList.contains('quantity-input') && !isUpdating) {
+        handleQuantityInput(e.target);
+      }
+    });
   }
   
-  // Cart functionality handlers
-  document.addEventListener('click', function(e) {
-    console.log('Click detected:', e.target);
-    
-    const button = e.target.closest('[data-action]');
-    console.log('Button found:', button);
-    
-    if (!button) return;
-    
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const action = button.dataset.action;
-    console.log('Action:', action);
-    
-    switch(action) {
-      case 'increase-quantity':
-        console.log('Increasing quantity');
-        adjustQuantity(button, 1);
-        break;
-      case 'decrease-quantity':
-        console.log('Decreasing quantity');
-        adjustQuantity(button, -1);
-        break;
-      case 'remove-item':
-        removeItem(button);
-        break;
-      case 'save-for-later':
-        saveForLater(button);
-        break;
-      case 'clear-cart':
-        clearCart();
-        break;
-      case 'save-cart':
-        saveCart();
-        break;
-      case 'calculate-shipping':
-        calculateShipping();
-        break;
-    }
-  });
-
-  // Also add direct event listeners to quantity buttons for better reliability
-  document.querySelectorAll('[data-action="increase-quantity"]').forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('Direct click on increase button');
-      adjustQuantity(this, 1);
-    });
-  });
-
-  document.querySelectorAll('[data-action="decrease-quantity"]').forEach(button => {
-    button.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log('Direct click on decrease button');
-      adjustQuantity(this, -1);
-    });
-  });
-
-  // Quantity adjustment with debouncing
-  function adjustQuantity(button, change) {
+  function handleQuantityButton(button) {
     const line = button.dataset.line;
-    const input = document.querySelector(`input[data-line="${line}"]`);
+    const action = button.dataset.action;
+    const input = document.querySelector(`[data-line="${line}"].quantity-input`);
     
-    if (!input) {
-      console.error('Could not find input for line:', line);
-      showCartToast('Error: Could not find quantity input', 'error');
-      return;
-    }
+    if (!input || !line) return;
     
-    const currentQuantity = parseInt(input.value) || 0;
-    const newQuantity = Math.max(0, currentQuantity + change);
+    const currentQty = parseInt(input.value) || 0;
+    const newQty = action === 'increase-quantity' ? currentQty + 1 : Math.max(0, currentQty - 1);
     
-    if (newQuantity !== currentQuantity) {
-      // Update the visual immediately for better UX
-      input.value = newQuantity;
-      
-      // Add visual feedback
-      input.style.background = '#e8f5e8';
-      input.style.transition = 'background 0.3s ease';
-      
-      setTimeout(() => {
-        input.style.background = '';
-      }, 500);
-      
-      // Store the pending update
-      pendingUpdates.set(line, newQuantity);
-      
-      // Clear existing timeout
-      if (updateTimeout) {
-        clearTimeout(updateTimeout);
-      }
-      
-      // Debounce the actual update
-      updateTimeout = setTimeout(() => {
-        processPendingUpdates();
-      }, 800); // Wait 800ms after last change
-      
-      showCartToast('Quantity updated. Changes will save automatically...', 'info');
-    }
+    console.log(`📝 ${action} for line ${line}: ${currentQty} → ${newQty}`);
+    
+    // Update input immediately for visual feedback
+    input.value = newQty;
+    
+    updateCartLine(line, newQty);
   }
-
-  // Process all pending updates at once
-  function processPendingUpdates() {
-    if (isUpdating || pendingUpdates.size === 0) {
-      return;
-    }
+  
+  function handleQuantityInput(input) {
+    const line = input.dataset.line;
+    const newQty = Math.max(0, parseInt(input.value) || 0);
     
-    console.log('Processing pending updates:', pendingUpdates);
+    console.log(`⌨️ Manual input for line ${line}: ${newQty}`);
     
-    // Get the first update to process
-    const [line, quantity] = pendingUpdates.entries().next().value;
-    pendingUpdates.delete(line);
-    
-    // Update this line item
-    updateCartItem(line, quantity);
+    updateCartLine(line, newQty);
   }
-
-  // Helper function to highlight update button
-  function highlightUpdateButton() {
-    const updateButton = document.querySelector('.cart-update-btn');
-    if (updateButton) {
-      updateButton.style.background = '#E6983B';
-      updateButton.style.color = 'white';
-      updateButton.style.animation = 'pulse 1s infinite';
-      
-      // Remove highlight after some time or when clicked
-      const removeHighlight = () => {
-        updateButton.style.background = '';
-        updateButton.style.color = '';
-        updateButton.style.animation = '';
-        updateButton.removeEventListener('click', removeHighlight);
-      };
-      
-      updateButton.addEventListener('click', removeHighlight);
-      setTimeout(removeHighlight, 10000); // Remove after 10 seconds
-    }
-  }
-
-  // Remove item with confirmation
-  function removeItem(button) {
+  
+  function handleRemoveItem(button) {
     const line = button.dataset.line;
     const cartItem = button.closest('.cart-item');
-    const productName = cartItem.querySelector('.cart-item-title a').textContent;
+    const productTitle = cartItem?.querySelector('.cart-item-title a')?.textContent?.trim() || 'item';
     
-    if (confirm(`Remove ${productName} from your cart?`)) {
-      updateCartItem(line, 0);
-    }
+    if (!confirm(`Remove ${productTitle} from your cart?`)) return;
+    
+    console.log(`🗑️ Removing item on line ${line}`);
+    updateCartLine(line, 0);
   }
-
-  // Update cart via AJAX
-  function updateCartItem(line, quantity) {
-    // Set global flag to prevent conflicts
-    window.cartPageUpdating = true;
-    showCartLoadingState();
+  
+  function handleClearCart() {
+    if (!confirm('Are you sure you want to clear your entire cart?')) return;
     
-    console.log('Updating line:', line, 'to quantity:', quantity);
+    console.log('🗑️ Clearing cart');
     
-    // Get the cart form
-    const cartForm = document.getElementById('cart-form');
-    if (!cartForm) {
-      console.error('Cart form not found');
-      window.cartPageUpdating = false;
-      hideCartLoadingState();
-      return;
-    }
+    isUpdating = true;
+    showLoading(true);
     
-    // Get the specific input for this line
-    const input = document.querySelector(`input[data-line="${line}"]`);
-    if (!input) {
-      console.error('Input not found for line:', line);
-      window.cartPageUpdating = false;
-      hideCartLoadingState();
-      return;
-    }
-    
-    // Update the input value
-    input.value = quantity;
-    
-    // Create FormData from the actual cart form
-    const formData = new FormData(cartForm);
-    
-    // Use Shopify's cart route
-    fetch(cartForm.action, {
+    fetch('/cart/clear.js', {
       method: 'POST',
-      body: formData,
       headers: {
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => {
-      console.log('Cart update response status:', response.status);
-      
-      if (response.ok) {
-        // If it's a successful form submission, Shopify returns HTML
-        // We need to get the cart state via the cart.js API
-        return fetch('/cart.js');
-      } else {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        'Content-Type': 'application/json',
       }
     })
     .then(response => response.json())
-    .then(cart => {
-      console.log('Cart state retrieved:', cart);
-      
-      // Update the stored original value to the new quantity
-      input.setAttribute('data-original-value', quantity);
-      
-      if (quantity === 0) {
-        // Reload page for item removal to update layout
-        window.location.reload();
-      } else {
-        refreshCartPageDisplay(cart);
-        showCartToast('Cart updated successfully', 'success');
-      }
+    .then(() => {
+      showNotification('Cart cleared', 'success');
+      setTimeout(() => window.location.reload(), 1000);
     })
     .catch(error => {
-      console.error('Cart update failed:', error);
-      
-      // Fallback: trigger the form submission manually
-      showCartToast('Updating cart...', 'info');
-      setTimeout(() => {
-        cartForm.submit();
-      }, 500);
+      console.error('Clear cart error:', error);
+      showNotification('Error clearing cart', 'error');
+      setTimeout(() => window.location.reload(), 2000);
     })
     .finally(() => {
-      window.cartPageUpdating = false;
-      hideCartLoadingState();
+      isUpdating = false;
+      showLoading(false);
     });
   }
-
-  // Enhanced save for later functionality
-  function saveForLater(button) {
-    const variantId = button.dataset.variantId;
-    const cartItem = button.closest('.cart-item');
-    const productTitle = cartItem.querySelector('.cart-item-title a').textContent;
+  
+  function updateCartLine(line, quantity) {
+    if (isUpdating) return;
     
-    // Save to localStorage for now (you can integrate with customer accounts later)
-    let savedItems = JSON.parse(localStorage.getItem('saved_for_later') || '[]');
-    const itemExists = savedItems.find(item => item.variantId === variantId);
+    isUpdating = true;
+    showLoading(true);
     
-    if (!itemExists) {
-      const itemData = {
-        variantId: variantId,
-        productTitle: productTitle,
-        timestamp: new Date().toISOString()
-      };
-      savedItems.push(itemData);
-      localStorage.setItem('saved_for_later', JSON.stringify(savedItems));
-      showCartToast(`${productTitle} saved for later`, 'success');
-      
-      // Optionally remove from cart
-      const line = button.closest('.cart-item').querySelector('[data-line]').dataset.line;
-      if (confirm('Remove this item from cart and save for later?')) {
-        updateCartItem(line, 0);
+    console.log(`🔄 Updating line ${line} to quantity ${quantity}`);
+    
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        line: parseInt(line),
+        quantity: parseInt(quantity)
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
-    } else {
-      showCartToast('Item already saved for later', 'info');
-    }
-  }
-
-  // Clear entire cart
-  function clearCart() {
-    if (confirm('Are you sure you want to clear your entire cart?')) {
-      showCartLoadingState();
-      fetch(window.Shopify.routes.root + 'cart/clear.js', { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(() => {
-        showCartToast('Cart cleared successfully', 'success');
-        setTimeout(() => window.location.reload(), 1000);
-      })
-      .catch(error => {
-        showCartToast('Error clearing cart', 'error');
-        console.error('Cart clear error:', error);
-        hideCartLoadingState();
-      });
-    }
-  }
-
-  // Enhanced save cart functionality
-  function saveCart() {
-    const cartData = {
-      items: [],
-      timestamp: new Date().toISOString(),
-      total: document.querySelector('[data-cart-total]')?.dataset.cartTotal || '0'
-    };
-    
-    // Collect cart item data
-    document.querySelectorAll('.cart-item').forEach(item => {
-      const variantId = item.dataset.variantId;
-      const quantity = item.querySelector('.quantity-input').value;
-      const title = item.querySelector('.cart-item-title a').textContent;
+      return response.json();
+    })
+    .then(cart => {
+      console.log('✅ Cart update successful');
       
-      cartData.items.push({
-        variantId,
-        quantity: parseInt(quantity),
-        title
-      });
-    });
-    
-    if (cartData.items.length > 0) {
-      localStorage.setItem('saved_cart', JSON.stringify(cartData));
-      showCartToast('Cart saved successfully! You can restore it later.', 'success');
-    } else {
-      showCartToast('No items to save', 'info');
-    }
-  }
-
-  // Shipping calculator
-  function calculateShipping() {
-    // Open shipping calculator modal
-    showCartToast('Shipping calculator coming soon', 'info');
-  }
-
-  // Floating summary scroll behavior
-  function handleFloatingSummary() {
-    if (window.innerWidth <= 1024) {
-      const cartSummary = document.querySelector('.cart-summary');
-      if (cartSummary) {
-        const rect = cartSummary.getBoundingClientRect();
-        const shouldShow = rect.bottom < window.innerHeight;
-        
-        if (shouldShow && !floatingSummary.classList.contains('visible')) {
-          floatingSummary.style.display = 'block';
-          setTimeout(() => floatingSummary.classList.add('visible'), 10);
-        } else if (!shouldShow && floatingSummary.classList.contains('visible')) {
-          floatingSummary.classList.remove('visible');
-          setTimeout(() => floatingSummary.style.display = 'none', 300);
-        }
-      }
-    }
-  }
-
-  // Loading and toast states for cart page
-  function showCartLoadingState() {
-    document.body.classList.add('cart-loading');
-  }
-
-  function hideCartLoadingState() {
-    document.body.classList.remove('cart-loading');
-  }
-
-  function showCartToast(message, type = 'info') {
-    const toast = document.createElement('div');
-    toast.className = `cart-toast cart-toast-${type}`;
-    
-    // Create toast content with icon
-    const toastContent = document.createElement('div');
-    toastContent.className = 'toast-content';
-    
-    // Create icon element
-    const iconElement = document.createElement('div');
-    iconElement.className = 'toast-icon';
-    
-    let iconHTML = '';
-    switch(type) {
-      case 'success':
-        iconHTML = `
-          <i data-lucide="check-circle" class="toast-lucide-icon"></i>
-          <span class="toast-fallback-icon">✓</span>
-        `;
-        break;
-      case 'error':
-        iconHTML = `
-          <i data-lucide="x-circle" class="toast-lucide-icon"></i>
-          <span class="toast-fallback-icon">✗</span>
-        `;
-        break;
-      case 'info':
-        iconHTML = `
-          <i data-lucide="info" class="toast-lucide-icon"></i>
-          <span class="toast-fallback-icon">ℹ</span>
-        `;
-        break;
-      default:
-        iconHTML = `
-          <i data-lucide="bell" class="toast-lucide-icon"></i>
-          <span class="toast-fallback-icon">●</span>
-        `;
-    }
-    
-    iconElement.innerHTML = iconHTML;
-    
-    // Create message element
-    const messageElement = document.createElement('div');
-    messageElement.className = 'toast-message';
-    messageElement.textContent = message;
-    
-    // Assemble toast
-    toastContent.appendChild(iconElement);
-    toastContent.appendChild(messageElement);
-    toast.appendChild(toastContent);
-    
-    document.body.appendChild(toast);
-    
-    // Initialize Lucide icons for this toast
-    setTimeout(() => {
-      if (typeof lucide !== 'undefined') {
-        lucide.createIcons({
-          nameAttr: 'data-lucide',
-          attrs: {
-            class: 'toast-lucide-icon'
-          }
-        });
-        // Hide fallback if Lucide loaded
-        const fallbacks = toast.querySelectorAll('.toast-fallback-icon');
-        fallbacks.forEach(fallback => fallback.style.display = 'none');
+      if (quantity === 0) {
+        showNotification('Item removed', 'success');
       } else {
-        // Hide Lucide icons if not loaded and show fallbacks
-        const lucideIcons = toast.querySelectorAll('.toast-lucide-icon');
-        lucideIcons.forEach(icon => icon.style.display = 'none');
-        const fallbacks = toast.querySelectorAll('.toast-fallback-icon');
-        fallbacks.forEach(fallback => fallback.style.display = 'inline');
+        showNotification('Cart updated', 'success');
       }
       
-      toast.classList.add('visible');
-    }, 10);
-    
-    setTimeout(() => {
-      toast.classList.remove('visible');
+      // Simple approach: reload the page to show updated cart
+      // This prevents any DOM conflicts and ensures accuracy
       setTimeout(() => {
-        if (document.body.contains(toast)) {
-          document.body.removeChild(toast);
-        }
-      }, 300);
+        window.location.reload();
+      }, 1000);
+    })
+    .catch(error => {
+      console.error('❌ Cart update failed:', error);
+      showNotification('Update failed. Refreshing page...', 'error');
+      
+      // Restore input value and reload
+      const input = document.querySelector(`[data-line="${line}"].quantity-input`);
+      if (input) {
+        // Restore to previous value by reloading
+        setTimeout(() => window.location.reload(), 2000);
+      }
+    })
+    .finally(() => {
+      isUpdating = false;
+      showLoading(false);
+    });
+  }
+  
+  function showLoading(show) {
+    const cartSection = document.querySelector('.cart-page');
+    if (!cartSection) return;
+    
+    if (show) {
+      cartSection.classList.add('cart-updating');
+      // Disable all interactive elements
+      const controls = cartSection.querySelectorAll('button, input[type="number"], select');
+      controls.forEach(control => {
+        control.disabled = true;
+        control.style.opacity = '0.6';
+      });
+    } else {
+      cartSection.classList.remove('cart-updating');
+      // Re-enable interactive elements
+      const controls = cartSection.querySelectorAll('button, input[type="number"], select');
+      controls.forEach(control => {
+        control.disabled = false;
+        control.style.opacity = '';
+      });
+    }
+  }
+  
+  function showNotification(message, type = 'info') {
+    // Remove any existing notifications
+    const existing = document.querySelector('.simple-cart-notification');
+    if (existing) existing.remove();
+    
+    // Create simple notification
+    const notification = document.createElement('div');
+    notification.className = 'simple-cart-notification';
+    notification.textContent = message;
+    
+    // Style the notification
+    const bgColor = type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6';
+    Object.assign(notification.style, {
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      background: bgColor,
+      color: 'white',
+      padding: '12px 20px',
+      borderRadius: '8px',
+      fontFamily: 'Poppins, sans-serif',
+      fontSize: '14px',
+      fontWeight: '500',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      zIndex: '9999',
+      maxWidth: '300px'
+    });
+    
+    document.body.appendChild(notification);
+    
+    // Auto-hide after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.remove();
+      }
     }, 3000);
   }
-
-  // Refresh cart display after updates
-  function refreshCartPageDisplay(cart) {
-    console.log('Refreshing cart display with:', cart);
-    
-    // Update cart badges
-    document.querySelectorAll('[data-cart-count]').forEach(badge => {
-      badge.textContent = cart.item_count;
-      badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
-    });
-    
-    // Update totals - Shopify cart.js returns prices in cents
-    document.querySelectorAll('[data-cart-total]').forEach(el => {
-      el.textContent = formatCartMoney(cart.total_price);
-    });
-    
-    // Update subtotal in the summary
-    const subtotalElements = document.querySelectorAll('.summary-line span');
-    if (subtotalElements.length > 1) {
-      subtotalElements[1].textContent = formatCartMoney(cart.items_subtotal_price || cart.total_price);
-    }
-    
-    // Update checkout button price
-    const checkoutPriceElements = document.querySelectorAll('.checkout-price');
-    checkoutPriceElements.forEach(el => {
-      el.textContent = formatCartMoney(cart.total_price);
-    });
-    
-    // Update floating summary
-    const floatingTotal = document.querySelector('.floating-total');
-    const floatingCount = document.querySelector('.floating-count');
-    if (floatingTotal) floatingTotal.textContent = formatCartMoney(cart.total_price);
-    if (floatingCount) floatingCount.textContent = `${cart.item_count} items`;
-
-    // Update individual line item prices
-    cart.items.forEach((item, index) => {
-      const lineNumber = index + 1;
-      const cartItem = document.querySelector(`[data-line="${lineNumber}"]`);
-      
-      if (cartItem) {
-        // Update the quantity input
-        const quantityInput = cartItem.querySelector('.quantity-input');
-        if (quantityInput) {
-          quantityInput.value = item.quantity;
-          quantityInput.setAttribute('data-original-value', item.quantity);
-        }
-        
-        // Update the price display
-        const priceContainer = cartItem.querySelector('.cart-item-price');
-        if (priceContainer) {
-          let priceHTML = '';
-          if (item.original_line_price > item.final_line_price) {
-            priceHTML = `
-              <span class="price-sale">${formatCartMoney(item.final_line_price)}</span>
-              <span class="price-compare">${formatCartMoney(item.original_line_price)}</span>
-            `;
-          } else {
-            priceHTML = `<span class="price-regular">${formatCartMoney(item.final_line_price)}</span>`;
-          }
-          priceContainer.innerHTML = priceHTML;
-        }
-        
-        // Update unit price if quantity > 1
-        const unitPriceContainer = cartItem.querySelector('.cart-item-unit-price');
-        if (unitPriceContainer) {
-          if (item.quantity > 1) {
-            unitPriceContainer.textContent = `${formatCartMoney(item.final_price)} each`;
-            unitPriceContainer.style.display = 'block';
-          } else {
-            unitPriceContainer.style.display = 'none';
-          }
-        }
-      }
-    });
-
-    // Re-initialize Lucide icons after content update
-    if (typeof lucide !== 'undefined') {
-      setTimeout(() => lucide.createIcons(), 50);
-    }
-  }
-
-     // Money formatting helper for cart page
-   function formatCartMoney(cents) {
-     // Shopify cart.js returns prices in cents, so we need to convert
-     const amount = cents / 100;
-     return new Intl.NumberFormat('en-PH', {
-       style: 'currency',
-       currency: 'PHP',
-       minimumFractionDigits: 2
-     }).format(amount);
-   }
-
-  // Handle form submission for cart updates
-  if (cartForm) {
-    cartForm.addEventListener('submit', function(e) {
-      const submitter = e.submitter;
-      if (submitter && submitter.name === 'update') {
-        // Allow normal form submission for cart updates
-        showCartLoadingState();
-      }
-      // For checkout, allow normal form submission
-    });
-  }
-
-  // Initialize floating summary behavior
-  window.addEventListener('scroll', handleFloatingSummary);
-  window.addEventListener('resize', handleFloatingSummary);
   
-  // Initial check
-  handleFloatingSummary();
-
-  // Function to check if cart operations are safe
-  window.isCartOperationSafe = function() {
-    return !window.cartPageUpdating && !isUpdating;
-  };
-
-  // Override AddToCartComponent after it's fully initialized
-  setTimeout(() => {
-    if (window.AddToCartComponent && window.addToCartComponent) {
-      const originalHandleSubmit = window.AddToCartComponent.prototype.handleSubmit;
-      window.AddToCartComponent.prototype.handleSubmit = function(variantId, quantity, buttonElement, productTitle) {
-        console.log('🛒 AddToCart Debug:', {
-          variantId,
-          quantity,
-          buttonElement,
-          productTitle,
-          cartPageUpdating: window.cartPageUpdating
-        });
-        
-        // Check if cart page is currently updating
-        if (window.cartPageUpdating) {
-          console.warn('Cart page is updating, delaying add to cart');
-          return new Promise((resolve, reject) => {
-            const checkInterval = setInterval(() => {
-              if (!window.cartPageUpdating) {
-                clearInterval(checkInterval);
-                originalHandleSubmit.call(this, variantId, quantity, buttonElement, productTitle)
-                  .then(resolve)
-                  .catch(reject);
-              }
-            }, 100);
-            
-            // Timeout after 5 seconds
-            setTimeout(() => {
-              clearInterval(checkInterval);
-              reject(new Error('Cart operation timeout'));
-            }, 5000);
-          });
-        }
-        
-        // Add additional debugging to the original method
-        return originalHandleSubmit.call(this, variantId, quantity, buttonElement, productTitle)
-          .catch(error => {
-            console.error('🚨 AddToCart detailed error:', {
-              error: error.message,
-              variantId,
-              quantity,
-              productTitle,
-              timestamp: new Date().toISOString()
-            });
-            
-            // Try to get more details about the error
-            if (error.message.includes('Failed to add to cart')) {
-              console.warn('Generic cart error detected, this might be a Shopify API issue');
-            }
-            
-            throw error;
-          });
-      };
-      console.log('✅ AddToCartComponent debugging enabled');
-    } else {
-      console.warn('⚠️ AddToCartComponent not found for debugging');
-    }
-  }, 1000);
-});
+  // Override any conflicting cart functions
+  window.updateCartLine = updateCartLine;
+  window.cartUpdating = () => isUpdating;
+  
+})();
 </script>
 
 {% schema %}
