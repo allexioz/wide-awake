@@ -1,0 +1,138 @@
+{% comment %}
+  Wide Awake Coffee - Admin Tagging Guide
+  
+  This snippet provides documentation for the tag-based product categorization system.
+  It can be used in development mode or admin documentation.
+{% endcomment %}
+
+{% comment %}
+  =======================================================
+  WIDE AWAKE COFFEE - ADMIN TAGGING SYSTEM GUIDE
+  =======================================================
+  
+  This theme uses a flexible tag-based system for categorizing coffee products.
+  Admins can easily tag products in Shopify Admin to control filtering and display.
+  
+  HOW TO TAG PRODUCTS:
+  ===================
+  
+  1. Go to Shopify Admin → Products
+  2. Select a product to edit
+  3. In the "Tags" field, add the appropriate tags
+  4. Save the product
+  
+  COFFEE VIBE TAGS:
+  ================
+  These control the flavor badge displayed on product cards and filtering:
+  
+  🍯 Smooth and Sweet:
+     - smooth-sweet
+     - smooth and sweet  
+     - smooth & sweet
+     - vibe:smooth-sweet
+  
+  🍋 Light and Bright:
+     - light-bright
+     - light and bright
+     - light & bright  
+     - vibe:light-bright
+  
+  🎭 Complex and Expressive:
+     - complex-expressive
+     - complex and expressive
+     - complex & expressive
+     - vibe:complex-expressive
+  
+  COFFEE SEGMENT TAGS:
+  ===================
+  These control product categorization and collection display:
+  
+  ☕ Daily Driver (everyday coffee):
+     - daily-driver
+     - daily driver
+     - everyday
+     - segment:daily-driver
+  
+  ⭐ Premium Brews (specialty single origins):
+     - premium-brews
+     - premium brews
+     - premium
+     - specialty
+     - segment:premium-brews
+  
+  🤝 Direct Trade (farmer-direct sourcing):
+     - direct-trade
+     - direct trade
+     - farm-direct
+     - farm direct
+     - segment:direct-trade
+  
+  ⚙️ Equipment (brewing gear):
+     - equipment
+     - gear
+     - accessories
+     - segment:equipment
+  
+  EXAMPLES:
+  =========
+  
+  Example 1: Ethiopia Yirgacheffe
+  Tags: light-bright, premium-brews, ethiopia, single-origin
+  Result: Shows "🍋 Light and Bright" badge, appears in Premium Brews filter
+  
+  Example 2: Daybreak Espresso Blend  
+  Tags: smooth-sweet, daily-driver, espresso, blend
+  Result: Shows "🍯 Smooth and Sweet" badge, appears in Daily Driver filter
+  
+  Example 3: V60 Pour Over Kit
+  Tags: equipment, v60, pour-over
+  Result: No flavor badge (equipment), appears in Equipment filter
+  
+  FLEXIBLE FORMAT:
+  ===============
+  You can use either format:
+  - Direct tags: smooth-sweet, daily-driver
+  - Prefixed tags: vibe:smooth-sweet, segment:daily-driver
+  
+  DEFAULTS:
+  =========
+  If no tags are added:
+  - Vibe: smooth-sweet (🍯 Smooth and Sweet)
+  - Segment: daily-driver (☕ Daily Driver)
+  
+  TIPS:
+  =====
+  - Tags are case-insensitive (Smooth-Sweet = smooth-sweet)
+  - You can add multiple variations for flexibility
+  - Other tags (origin, process, etc.) don't interfere with the system
+  - Changes appear immediately on the frontend
+  
+  =======================================================
+{% endcomment %}
+
+{% if request.design_mode %}
+  <div style="background: #f8f5f1; padding: 20px; margin: 20px 0; border-radius: 8px; font-family: monospace; font-size: 12px; line-height: 1.4;">
+    <h3 style="color: #2c1810; margin-top: 0;">🏷️ Admin Tagging System Active</h3>
+    <p style="color: #666; margin-bottom: 15px;">Use these tags in Shopify Admin to categorize products:</p>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+      <div>
+        <strong style="color: #5CBFEE;">Coffee Vibes:</strong><br>
+        • smooth-sweet<br>
+        • light-bright<br>
+        • complex-expressive
+      </div>
+      <div>
+        <strong style="color: #d4574c;">Coffee Segments:</strong><br>
+        • daily-driver<br>
+        • premium-brews<br>
+        • direct-trade<br>
+        • equipment
+      </div>
+    </div>
+    
+    <p style="color: #666; margin-top: 15px; margin-bottom: 0;">
+      <small>This message only appears in Shopify theme editor mode.</small>
+    </p>
+  </div>
+{% endif %} 

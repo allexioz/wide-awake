@@ -18,6 +18,12 @@
   - card_class: (optional) Additional CSS classes for the card
   - lazy_load: (optional) Use lazy loading for images (default: true)
   - image_size: (optional) Image width for loading (default: 500)
+  
+  Admin Tagging System:
+  Add these tags to products in Shopify Admin:
+  - Coffee Vibes: smooth-sweet, light-bright, complex-expressive
+  - Coffee Segments: daily-driver, premium-brews, direct-trade, equipment
+  - Alternative format: vibe:smooth-sweet, segment:daily-driver
 {% endcomment %}
 
 {% comment %} Set default values {% endcomment %}
@@ -26,30 +32,46 @@
 {% assign lazy_load = lazy_load | default: true %}
 {% assign image_size = image_size | default: 500 %}
 
-{% comment %} Product segment and vibe mapping {% endcomment %}
-{% assign product_handle = product.handle %}
-{% assign product_segment = 'daily-driver' %}
+{% comment %} Set defaults for coffee attributes {% endcomment %}
 {% assign product_vibe = 'smooth-sweet' %}
+{% assign product_segment = 'daily-driver' %}
 
-{% assign product_segments = 'brazil-sao-silvestre:daily-driver,ethiopia-yirgacheffe:premium-brews,mt-apo-natural:direct-trade,buku-sayisa-natural-ethiopia:premium-brews,cofi-teresa:direct-trade,daybreak-espresso:daily-driver,finca-mierisch:premium-brews,fructifero-anaerobic:direct-trade,jeivert-hernandez:premium-brews,koke-shalaye:premium-brews,mt-apo-72hr:direct-trade,mt-apo-lactic-honey:direct-trade,mt-apo-lactic-washed:direct-trade,nensebo:premium-brews,nyeri-kenya:premium-brews,tanzania-kilimanjaro:daily-driver,vietnam-fine-robusta:daily-driver,veracruz-mexico:daily-driver,mola-cafec-filter:equipment,specialty-water-sachets:equipment,christmas-bundle-mt-apo-collection-lactic-honey-lot-g-01-lot-l-01:premium-brews,bundle-ethiopia-yirgacheffe-and-finca-mierisch-super-natural-100g-or-200g:premium-brews,bundle-kenya-nyeri-mexico-veracruz-tanzania-kilimanjaro-100g-x-3-or-200g-x-3:daily-driver' | split: ',' %}
-
-{% assign product_vibes = 'brazil-sao-silvestre:smooth-sweet,ethiopia-yirgacheffe:light-bright,mt-apo-natural:complex-expressive,buku-sayisa-natural-ethiopia:light-bright,cofi-teresa:light-bright,daybreak-espresso:smooth-sweet,finca-mierisch:complex-expressive,fructifero-anaerobic:complex-expressive,jeivert-hernandez:light-bright,koke-shalaye:light-bright,mt-apo-72hr:complex-expressive,mt-apo-lactic-honey:light-bright,mt-apo-lactic-washed:light-bright,nensebo:light-bright,nyeri-kenya:light-bright,tanzania-kilimanjaro:light-bright,vietnam-fine-robusta:smooth-sweet,veracruz-mexico:smooth-sweet,christmas-bundle-mt-apo-collection-lactic-honey-lot-g-01-lot-l-01:complex-expressive,bundle-ethiopia-yirgacheffe-and-finca-mierisch-super-natural-100g-or-200g:light-bright,bundle-kenya-nyeri-mexico-veracruz-tanzania-kilimanjaro-100g-x-3-or-200g-x-3:light-bright' | split: ',' %}
-
-{% comment %} Map product to segment and vibe {% endcomment %}
-{% for segment_mapping in product_segments %}
-  {% assign mapping_parts = segment_mapping | split: ':' %}
-  {% if mapping_parts[0] == product_handle %}
-    {% assign product_segment = mapping_parts[1] %}
-    {% break %}
+{% comment %} Extract coffee attributes from product tags - Admin-friendly system {% endcomment %}
+{% for tag in product.tags %}
+  {% assign tag_lower = tag | downcase %}
+  
+  {% comment %} Check for prefixed tags (vibe:smooth-sweet, segment:daily-driver) {% endcomment %}
+  {% if tag_lower contains 'vibe:' %}
+    {% assign vibe_parts = tag_lower | split: ':' %}
+    {% if vibe_parts.size > 1 %}
+      {% assign product_vibe = vibe_parts[1] %}
+    {% endif %}
   {% endif %}
-{% endfor %}
-
-{% for vibe_mapping in product_vibes %}
-  {% assign mapping_parts = vibe_mapping | split: ':' %}
-  {% if mapping_parts[0] == product_handle %}
-    {% assign product_vibe = mapping_parts[1] %}
-    {% break %}
+  
+  {% if tag_lower contains 'segment:' %}
+    {% assign segment_parts = tag_lower | split: ':' %}
+    {% if segment_parts.size > 1 %}
+      {% assign product_segment = segment_parts[1] %}
+    {% endif %}
   {% endif %}
+  
+  {% comment %} Check for direct tags (admin can use either format) {% endcomment %}
+  {% case tag_lower %}
+    {% when 'smooth-sweet', 'smooth and sweet', 'smooth & sweet' %}
+      {% assign product_vibe = 'smooth-sweet' %}
+    {% when 'light-bright', 'light and bright', 'light & bright' %}
+      {% assign product_vibe = 'light-bright' %}
+    {% when 'complex-expressive', 'complex and expressive', 'complex & expressive' %}
+      {% assign product_vibe = 'complex-expressive' %}
+    {% when 'daily-driver', 'daily driver', 'everyday' %}
+      {% assign product_segment = 'daily-driver' %}
+    {% when 'premium-brews', 'premium brews', 'premium', 'specialty' %}
+      {% assign product_segment = 'premium-brews' %}
+    {% when 'direct-trade', 'direct trade', 'farm-direct', 'farm direct' %}
+      {% assign product_segment = 'direct-trade' %}
+    {% when 'equipment', 'gear', 'accessories' %}
+      {% assign product_segment = 'equipment' %}
+  {% endcase %}
 {% endfor %}
 
 {% comment %} Set vibe display {% endcomment %}
