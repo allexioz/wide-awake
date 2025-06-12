@@ -10,9 +10,9 @@
   <div class="quick-view-modal">
     <div class="quick-view-content">
       <!-- Close Button -->
-      <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close quick view">
-        <i data-lucide="x" class="close-icon"></i>
-      </button>
+              <button class="quick-view-close" onclick="window.closeQuickView()" aria-label="Close quick view">
+          <i data-lucide="x" class="close-icon"></i>
+        </button>
 
       <!-- Product Image Section -->
       <div class="quick-view-image-section">
@@ -33,12 +33,56 @@
             <span class="price-current">₱0.00</span>
             <span class="price-compare" style="display: none;"></span>
           </div>
+          
+          <!-- Customer Reviews -->
+          <div class="quick-view-reviews" id="quickViewReviews" style="display: none;">
+            <div class="review-stars" id="reviewStars"></div>
+            <span class="review-count" id="reviewCount">(0 reviews)</span>
+          </div>
+        </div>
+
+        <!-- Product Description -->
+        <div class="quick-view-description" id="quickViewDescription">
+          <p class="description-text">Product description will appear here...</p>
+        </div>
+
+        <!-- Key Product Highlights -->
+        <div class="quick-view-highlights" id="quickViewHighlights" style="display: none;">
+          <h4 class="highlights-title">What Makes This Special</h4>
+          <ul class="highlights-list" id="highlightsList">
+            <!-- Dynamically populated highlights -->
+          </ul>
+        </div>
+
+        <!-- Brewing/Usage Info (for coffee products) -->
+        <div class="quick-view-brewing" id="quickViewBrewing" style="display: none;">
+          <div class="brewing-info">
+            <div class="brewing-item">
+              <i data-lucide="coffee" class="brewing-icon"></i>
+              <span class="brewing-label">Best For:</span>
+              <span class="brewing-value" id="brewingMethod">Espresso, Pour Over</span>
+            </div>
+            <div class="brewing-item">
+              <i data-lucide="zap" class="brewing-icon"></i>
+              <span class="brewing-label">Intensity:</span>
+              <span class="brewing-value" id="intensityLevel">Medium</span>
+            </div>
+          </div>
         </div>
 
         <form class="quick-view-form" id="quickViewForm">
           <!-- Variant Options Container -->
           <div class="quick-view-options" id="quickViewOptions">
             <!-- Dynamically populated variant options -->
+          </div>
+
+          <!-- Stock Status -->
+          <div class="quick-view-stock" id="quickViewStock">
+            <div class="stock-indicator">
+              <i data-lucide="check-circle" class="stock-icon stock-icon--available"></i>
+              <span class="stock-text" id="stockText">In Stock</span>
+              <span class="stock-count" id="stockCount" style="display: none;"></span>
+            </div>
           </div>
 
           <!-- Quantity Selector -->
@@ -52,6 +96,20 @@
               <button type="button" class="quantity-btn quantity-increase" onclick="updateQuantity(1)" aria-label="Increase quantity">
                 <i data-lucide="plus" class="quantity-icon"></i>
               </button>
+            </div>
+          </div>
+
+          <!-- Shipping Info -->
+          <div class="quick-view-shipping" id="quickViewShipping">
+            <div class="shipping-benefits">
+              <div class="shipping-item">
+                <i data-lucide="truck" class="shipping-icon"></i>
+                <span class="shipping-text">Free shipping on orders over ₱1,500</span>
+              </div>
+              <div class="shipping-item">
+                <i data-lucide="clock" class="shipping-icon"></i>
+                <span class="shipping-text">Same-day delivery in Metro Manila</span>
+              </div>
             </div>
           </div>
 
@@ -84,11 +142,266 @@
         <!-- View Full Details Link -->
         <div class="view-details-section">
           <a href="#" class="view-details-link" id="quickViewDetailsLink">
-            VIEW FULL DETAILS
+            <i data-lucide="coffee" class="details-icon"></i>
+            SEE FULL BREWING GUIDE & REVIEWS
             <i data-lucide="arrow-right" class="details-arrow"></i>
           </a>
         </div>
       </div>
     </div>
   </div>
-</div> 
+</div>
+
+<style>
+/* Enhanced Quick View Styling */
+
+/* Product Description */
+.quick-view-description {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  border: 1px solid rgba(44, 24, 16, 0.1);
+}
+
+.description-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #2c1810;
+  margin: 0;
+}
+
+/* Customer Reviews */
+.quick-view-reviews {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.review-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.review-count {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Product Highlights */
+.quick-view-highlights {
+  margin: 1.5rem 0;
+}
+
+.highlights-title {
+  font-family: 'Special Gothic Expanded One', sans-serif;
+  font-size: 1rem;
+  color: #2c1810;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.highlights-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.highlights-list li {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  color: #2c1810;
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.highlights-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #5CBFEE;
+  font-weight: bold;
+}
+
+/* Brewing Information */
+.quick-view-brewing {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #fef9e7, #f8f9fa);
+  border-radius: 12px;
+  border: 1px solid rgba(230, 152, 59, 0.2);
+}
+
+.brewing-info {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.brewing-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+}
+
+.brewing-icon {
+  width: 16px;
+  height: 16px;
+  color: #E6983B;
+}
+
+.brewing-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.brewing-value {
+  color: #2c1810;
+  font-weight: 600;
+}
+
+/* Stock Status */
+.quick-view-stock {
+  margin: 1rem 0;
+}
+
+.stock-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stock-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.stock-icon--available {
+  color: #10b981;
+}
+
+.stock-icon--low {
+  color: #f59e0b;
+}
+
+.stock-icon--out {
+  color: #ef4444;
+}
+
+.stock-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c1810;
+}
+
+.stock-count {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+/* Shipping Information */
+.quick-view-shipping {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: rgba(92, 191, 238, 0.1);
+  border-radius: 12px;
+  border: 1px solid rgba(92, 191, 238, 0.2);
+}
+
+.shipping-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.shipping-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.shipping-icon {
+  width: 16px;
+  height: 16px;
+  color: #5CBFEE;
+  flex-shrink: 0;
+}
+
+.shipping-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  color: #2c1810;
+  font-weight: 500;
+}
+
+/* Enhanced View Details Link */
+.view-details-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: 'Special Gothic Expanded One', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #E6983B;
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  border: 2px solid rgba(230, 152, 59, 0.3);
+  border-radius: 8px;
+  background: rgba(230, 152, 59, 0.05);
+  transition: all 0.3s ease;
+}
+
+.view-details-link:hover {
+  background: #E6983B;
+  color: white;
+  border-color: #E6983B;
+  transform: translateY(-1px);
+}
+
+.details-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.details-arrow {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s ease;
+}
+
+.view-details-link:hover .details-arrow {
+  transform: translateX(3px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .brewing-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .shipping-benefits {
+    gap: 0.5rem;
+  }
+  
+  .quick-view-description {
+    margin: 1rem 0;
+    padding: 0.75rem;
+  }
+  
+  .description-text {
+    font-size: 0.9rem;
+  }
+}
+</style>

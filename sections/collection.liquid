@@ -280,10 +280,10 @@
 <div id="quickViewModal" class="quick-view-overlay" style="display: none;">
   <div class="quick-view-modal">
     <div class="quick-view-content">
-      <!-- Close Button -->
-      <button class="quick-view-close" onclick="closeQuickView()" aria-label="Close quick view">
-        <i data-lucide="x" class="close-icon"></i>
-      </button>
+              <!-- Close Button -->
+        <button class="quick-view-close" onclick="window.closeQuickView()" aria-label="Close quick view">
+          <i data-lucide="x" class="close-icon"></i>
+        </button>
 
       <!-- Product Image Section -->
       <div class="quick-view-image-section">
@@ -303,6 +303,43 @@
           <div class="quick-view-price" id="quickViewPrice">
             <span class="price-current">₱0.00</span>
             <span class="price-compare" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- Product Description -->
+        <div class="quick-view-description" id="quickViewDescription">
+          <h3 class="description-title">About This Coffee</h3>
+          <p class="description-text">Get the full product details and brewing recommendations by viewing the complete product page.</p>
+        </div>
+
+        <!-- What Makes This Special -->
+        <div class="quick-view-highlights" id="quickViewHighlights" style="display: none;">
+          <h3 class="highlights-title">What Makes This Special</h3>
+          <ul class="highlights-list" id="highlightsList">
+            <!-- Dynamically populated -->
+          </ul>
+        </div>
+
+        <!-- Brewing Information -->
+        <div class="quick-view-brewing" id="quickViewBrewing" style="display: none;">
+          <h3 class="brewing-title">Brewing Recommendations</h3>
+          <div class="brewing-info">
+            <div class="brewing-method">
+              <span class="brewing-label">Best For:</span>
+              <span class="brewing-value" id="brewingMethod">Pour Over, French Press</span>
+            </div>
+            <div class="brewing-intensity">
+              <span class="brewing-label">Intensity:</span>
+              <span class="brewing-value" id="intensityLevel">Medium</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stock Status -->
+        <div class="quick-view-stock" id="quickViewStock">
+          <div class="stock-indicator">
+            <div class="stock-icon stock-icon--available"></div>
+            <span class="stock-text" id="stockText">In Stock</span>
           </div>
         </div>
 
@@ -353,7 +390,7 @@
         <!-- View Full Details Link -->
         <div class="view-details-section">
           <a href="#" class="view-details-link quick-view-details-link" id="quickViewDetailsLink">
-            VIEW FULL DETAILS
+            SEE FULL BREWING GUIDE & REVIEWS
           </a>
         </div>
       </div>
@@ -1682,12 +1719,17 @@ function restoreOriginalOrder(cards) {
 <script>
 
 async function openQuickView(productData) {
+  console.log('🔍 openQuickView called with:', productData);
+  
   const modal = document.getElementById('quickViewModal');
   
   if (!modal) {
+    console.warn('⚠️ Quick view modal not found, redirecting to product page');
     window.location.href = productData.url;
     return;
   }
+  
+  console.log('✅ Modal found, showing quick view');
   
   // Show loading state first
   const titleElement = document.getElementById('quickViewTitle');
@@ -1699,6 +1741,8 @@ async function openQuickView(productData) {
   modal.classList.remove('closing');
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
+  
+  console.log('🔍 Modal should now be visible');
   
   try {
     // Fetch full product data if we have a handle
@@ -1736,11 +1780,18 @@ async function openQuickView(productData) {
     window.currentQuickViewProduct = null;
   }
   
-  // Batch DOM updates
+  // Batch DOM updates - populate all sections
   const imageElement = document.getElementById('quickViewImage');
   const linkElement = document.getElementById('quickViewDetailsLink');
   const priceElement = document.querySelector('#quickViewPrice .price-current');
+  const descriptionElement = document.querySelector('#quickViewDescription .description-text');
+  const highlightsSection = document.getElementById('quickViewHighlights');
+  const brewingSection = document.getElementById('quickViewBrewing');
+  const stockSection = document.getElementById('quickViewStock');
+  const stockText = document.getElementById('stockText');
+  const stockIcon = document.querySelector('.stock-icon');
   
+  // Basic product info
   if (titleElement) titleElement.textContent = productData.title || 'Product Name';
   if (imageElement) {
     imageElement.src = productData.image || '';
@@ -1750,11 +1801,110 @@ async function openQuickView(productData) {
   if (priceElement) {
     priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
   }
+  
+  // Enhanced sections - use full product data if available
+  const product = window.currentQuickViewProduct;
+  console.log('🔍 Populating enhanced sections with product:', product);
+  console.log('🔍 Description element found:', descriptionElement);
+  console.log('🔍 Highlights section found:', highlightsSection);
+  console.log('🔍 Brewing section found:', brewingSection);
+  console.log('🔍 Stock section found:', stockSection);
+  
+  // Product Description
+  if (descriptionElement && product?.description) {
+    descriptionElement.textContent = product.description.replace(/(<([^>]+)>)/gi, "").substring(0, 200) + "...";
+    console.log('✅ Updated description with product data');
+  } else if (descriptionElement) {
+    descriptionElement.textContent = "Get the full product details and brewing recommendations by viewing the complete product page.";
+    console.log('✅ Updated description with default text');
+  }
+  
+  // Product Highlights - show if metafields exist or use defaults
+  if (highlightsSection && product) {
+    const highlights = [];
+    
+    // Try to extract highlights from product data
+    if (product.tags?.includes('single-origin')) highlights.push('Single Origin Coffee');
+    if (product.tags?.includes('organic')) highlights.push('Certified Organic');
+    if (product.tags?.includes('fair-trade')) highlights.push('Fair Trade');
+    if (product.tags?.includes('specialty-grade')) highlights.push('Specialty Grade');
+    if (product.title?.toLowerCase().includes('ethiopia')) highlights.push('Ethiopian Heritage');
+    if (product.title?.toLowerCase().includes('natural')) highlights.push('Natural Processing');
+    
+    // Add generic coffee highlights if no specific ones found
+    if (highlights.length === 0) {
+      highlights.push('Premium Coffee Beans', 'Expertly Roasted', 'Fresh & Aromatic');
+    }
+    
+    if (highlights.length > 0) {
+      const highlightsList = document.getElementById('highlightsList');
+      if (highlightsList) {
+        highlightsList.innerHTML = highlights.map(highlight => `<li>${highlight}</li>`).join('');
+        highlightsSection.style.display = 'block';
+        console.log('✅ Updated highlights:', highlights);
+        console.log('✅ Highlights section now visible');
+      }
+    } else {
+      console.log('⚠️ No highlights found for product');
+    }
+  }
+  
+  // Brewing Information - show for coffee products
+  if (brewingSection && product?.title?.toLowerCase().includes('coffee') !== false) {
+    const brewingMethod = document.getElementById('brewingMethod');
+    const intensityLevel = document.getElementById('intensityLevel');
+    
+    // Determine brewing recommendations based on product name/tags
+    let method = 'Pour Over, French Press';
+    let intensity = 'Medium';
+    
+    if (product?.title?.toLowerCase().includes('espresso')) {
+      method = 'Espresso, Moka Pot';
+      intensity = 'Strong';
+    } else if (product?.title?.toLowerCase().includes('light')) {
+      intensity = 'Light';
+    } else if (product?.title?.toLowerCase().includes('dark')) {
+      intensity = 'Strong';
+    }
+    
+    if (brewingMethod) brewingMethod.textContent = method;
+    if (intensityLevel) intensityLevel.textContent = intensity;
+    brewingSection.style.display = 'block';
+    console.log('✅ Updated brewing info - Method:', method, 'Intensity:', intensity);
+    console.log('✅ Brewing section now visible');
+  }
+  
+  // Stock Status
+  if (stockSection && product?.variants) {
+    const hasStock = product.variants.some(variant => variant.available);
+    const stockCount = product.variants.reduce((total, variant) => total + (variant.inventory_quantity || 0), 0);
+    
+    if (stockText && stockIcon) {
+      if (hasStock) {
+        if (stockCount > 10) {
+          stockText.textContent = 'In Stock';
+          stockIcon.className = 'stock-icon stock-icon--available';
+        } else if (stockCount > 0) {
+          stockText.textContent = `Only ${stockCount} left!`;
+          stockIcon.className = 'stock-icon stock-icon--low';
+        } else {
+          stockText.textContent = 'Limited Stock';
+          stockIcon.className = 'stock-icon stock-icon--low';
+        }
+      } else {
+        stockText.textContent = 'Out of Stock';
+        stockIcon.className = 'stock-icon stock-icon--out';
+      }
+    }
+  }
 }
 
-function closeQuickView() {
+// Global close function that works across all templates
+window.closeQuickView = function() {
+  console.log('🔴 closeQuickView called from collection');
   const modal = document.getElementById('quickViewModal');
   if (modal) {
+    console.log('✅ Modal found, closing...');
     modal.classList.add('closing');
     modal.classList.remove('active');
     
@@ -1762,7 +1912,10 @@ function closeQuickView() {
       modal.style.display = 'none';
       modal.classList.remove('closing');
       document.body.style.overflow = '';
+      console.log('✅ Modal closed');
     }, 200);
+  } else {
+    console.warn('⚠️ No modal found with ID quickViewModal');
   }
 }
 
@@ -1781,13 +1934,13 @@ document.addEventListener('DOMContentLoaded', function() {
   
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && modal?.classList.contains('active')) {
-      closeQuickView();
+      window.closeQuickView();
     }
   });
   
   if (modal && modalContent) {
     modal.addEventListener('click', function(e) {
-      if (e.target === modal) closeQuickView();
+      if (e.target === modal) window.closeQuickView();
     });
     
     modalContent.addEventListener('click', function(e) {
@@ -1797,8 +1950,11 @@ document.addEventListener('DOMContentLoaded', function() {
   
   document.addEventListener('click', function(e) {
     const button = e.target.closest('.quick-view-btn');
-    if (button && !button.id) {
+    // Only handle quick view buttons that aren't inside the modal itself (avoid recursion)
+    if (button && !button.closest('#quickViewModal')) {
       e.preventDefault();
+      console.log('🔍 Quick view button clicked:', button);
+      console.log('🔍 Button dataset:', button.dataset);
       
       openQuickView({
         id: button.dataset.productId,
@@ -1854,7 +2010,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('✅ Quick view add to cart successful:', data);
             // Close modal after successful add with a delay to show the animation
             setTimeout(() => {
-              closeQuickView();
+              window.closeQuickView();
             }, 3000);
           })
           .catch(error => {
@@ -1893,7 +2049,7 @@ document.addEventListener('DOMContentLoaded', function() {
       
       // Close modal after delay
       setTimeout(() => {
-        closeQuickView();
+        window.closeQuickView();
       }, 1500);
       
     })
@@ -2778,6 +2934,183 @@ document.addEventListener('DOMContentLoaded', () => {
 
   .quick-view-details-link::after {
     content: '→';
+  }
+
+  /* Enhanced Quick View Sections */
+  .quick-view-description {
+    margin: 24px 0 !important;
+    padding: 20px !important;
+    background: rgba(248, 249, 250, 0.6) !important;
+    border-radius: 12px !important;
+    border-left: 4px solid #5CBFEE !important;
+  }
+
+  .description-title {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #2c1810 !important;
+    margin: 0 0 12px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .description-title::before {
+    content: '☕';
+    font-size: 1.1rem;
+  }
+
+  .description-text {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    color: #495057 !important;
+    margin: 0 !important;
+  }
+
+  .quick-view-highlights {
+    margin: 20px 0 !important;
+    padding: 16px !important;
+    background: rgba(46, 204, 113, 0.05) !important;
+    border-radius: 12px !important;
+    border-left: 4px solid #2ECC71 !important;
+  }
+
+  .highlights-title {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #2c1810 !important;
+    margin: 0 0 12px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .highlights-title::before {
+    content: '✨';
+    font-size: 1rem;
+  }
+
+  .highlights-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .highlights-list li {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.85rem !important;
+    color: #495057 !important;
+    padding-left: 20px !important;
+    position: relative !important;
+  }
+
+  .highlights-list li::before {
+    content: '•';
+    color: #2ECC71;
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .quick-view-brewing {
+    margin: 20px 0 !important;
+    padding: 16px !important;
+    background: rgba(241, 196, 15, 0.05) !important;
+    border-radius: 12px !important;
+    border-left: 4px solid #F1C40F !important;
+  }
+
+  .brewing-title {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #2c1810 !important;
+    margin: 0 0 12px 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .brewing-title::before {
+    content: '🔥';
+    font-size: 1rem;
+  }
+
+  .brewing-info {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .brewing-method,
+  .brewing-intensity {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+  }
+
+  .brewing-label {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    color: #6c757d !important;
+  }
+
+  .brewing-value {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    color: #2c1810 !important;
+  }
+
+  .quick-view-stock {
+    margin: 20px 0 !important;
+    padding: 12px 16px !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .stock-indicator {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .stock-icon {
+    width: 12px !important;
+    height: 12px !important;
+    border-radius: 50% !important;
+    flex-shrink: 0 !important;
+  }
+
+  .stock-icon--available {
+    background: #2ECC71 !important;
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.2) !important;
+  }
+
+  .stock-icon--low {
+    background: #F39C12 !important;
+    box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.2) !important;
+  }
+
+  .stock-icon--out {
+    background: #E74C3C !important;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2) !important;
+  }
+
+  .stock-text {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: #495057 !important;
   }
 
   /* Active Filters Premium Styling */

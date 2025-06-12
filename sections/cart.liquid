@@ -22,7 +22,7 @@
           <div class="empty-cart-actions">
             <a href="{{ collections.all.url }}" class="btn-primary">
               <i data-lucide="coffee" class="btn-icon"></i>
-              Explore Coffee
+              Discover Coffee
             </a>
             <a href="{{ collections.bundles.url | default: collections.all.url }}" class="btn-secondary">
               <i data-lucide="gift" class="btn-icon"></i>
@@ -35,7 +35,7 @@
          {% assign popular_products = collections.all.products | sort: 'best-selling' %}
          {% if popular_products.size > 0 %}
            <div class="empty-cart-recommendations">
-             <h2>Popular Picks</h2>
+             <h2>What Other Coffee Lovers Are Buying</h2>
              <div class="recommendations-grid">
                {% for product in popular_products limit: 3 %}
                  <div class="recommendation-card">
@@ -68,11 +68,11 @@
           <div class="cart-actions">
             <button class="btn-link save-cart-btn" data-action="save-cart">
               <i data-lucide="bookmark" class="btn-icon"></i>
-              Save Cart
+              Save Cart for Later
             </button>
             <button class="btn-link clear-cart-btn" data-action="clear-cart">
               <i data-lucide="trash-2" class="btn-icon"></i>
-              Clear Cart
+              Empty Cart
             </button>
           </div>
         </div>
@@ -164,7 +164,7 @@
                             {% endif %}
                           </div>
                           {% if item.quantity > 1 %}
-                            <div class="cart-item-unit-price">{{ item.final_price | money }} each</div>
+                            <div class="cart-item-unit-price">{{ item.final_price | money }} per bag</div>
                           {% endif %}
                         </div>
                       </div>
@@ -176,7 +176,7 @@
                                 data-action="save-for-later"
                                 data-variant-id="{{ item.variant.id }}">
                           <i data-lucide="heart" class="btn-icon"></i>
-                          Save for Later
+                          Add to Wishlist
                         </button>
                       </div>
                     </div>
@@ -189,14 +189,14 @@
                 <div class="cart-notes">
                   <label for="cart-note" class="cart-note-label">
                     <i data-lucide="message-circle" class="note-icon"></i>
-                    Special instructions for seller
+                    Roasting preferences or delivery notes
                   </label>
                   <textarea 
                     name="note" 
                     id="cart-note" 
                     form="cart-form"
                     class="cart-note-input"
-                    placeholder="Add any special requests or delivery instructions..."
+                    placeholder="Any special brewing requests or delivery instructions..."
                     rows="3">{{ cart.note }}</textarea>
                 </div>
               {% endif %}
@@ -205,7 +205,7 @@
               <div class="cart-update-actions">
                 <button type="submit" name="update" class="btn-secondary cart-update-btn">
                   <i data-lucide="refresh-cw" class="btn-icon"></i>
-                  Update Cart
+                  Update My Order
                 </button>
               </div>
             </form>
@@ -214,7 +214,7 @@
             <div class="continue-shopping">
               <a href="{{ collections.all.url }}" class="btn-secondary">
                 <i data-lucide="arrow-left" class="btn-icon"></i>
-                Continue Shopping
+                Keep Exploring
               </a>
             </div>
           </div>
@@ -243,7 +243,7 @@
                 <!-- Shipping Notice -->
                 <div class="summary-line shipping-line">
                   <span>Shipping</span>
-                  <span class="shipping-notice">Calculated at checkout</span>
+                  <span class="shipping-notice">Rates shown at checkout</span>
                 </div>
 
                                  <!-- Free Shipping Progress -->
@@ -255,7 +255,7 @@
                        <div class="progress-fill" style="width: {{ cart.total_price | times: 100 | divided_by: free_shipping_threshold }}%"></div>
                      </div>
                      <p class="progress-text">
-                       Add {{ remaining_for_free_shipping | money }} more for <strong>free shipping!</strong>
+                       You're so close! Only {{ remaining_for_free_shipping | money }} away from <strong>FREE shipping!</strong> 🚚
                      </p>
                    </div>
                  {% else %}
@@ -268,7 +268,7 @@
                 <!-- Tax Notice -->
                 <div class="summary-note">
                   <i data-lucide="info" class="note-icon"></i>
-                  <span>Tax calculated at checkout</span>
+                  <span>Tax added at checkout</span>
                 </div>
 
                 <!-- Total -->
@@ -1718,14 +1718,14 @@
     const cartItem = button.closest('.cart-item');
     const productTitle = cartItem?.querySelector('.cart-item-title a')?.textContent?.trim() || 'item';
     
-    if (!confirm(`Remove ${productTitle} from your cart?`)) return;
+    if (!confirm(`Remove ${productTitle}?`)) return;
     
     console.log(`🗑️ Removing item on line ${line}`);
     updateCartLine(line, 0);
   }
   
   function handleClearCart() {
-    if (!confirm('Are you sure you want to clear your entire cart?')) return;
+    if (!confirm('Clear your entire cart? This can\'t be undone.')) return;
     
     console.log('🗑️ Clearing cart');
     
@@ -1740,14 +1740,14 @@
     })
     .then(response => response.json())
     .then(() => {
-      showNotification('Cart cleared', 'success');
+      showNotification('Cart emptied', 'success');
       setTimeout(() => window.location.reload(), 1000);
     })
-    .catch(error => {
-      console.error('Clear cart error:', error);
-      showNotification('Error clearing cart', 'error');
-      setTimeout(() => window.location.reload(), 2000);
-    })
+          .catch(error => {
+        console.error('Clear cart error:', error);
+        showNotification('Unable to empty cart. Please try again or refresh the page.', 'error');
+        setTimeout(() => window.location.reload(), 2000);
+      })
     .finally(() => {
       isUpdating = false;
       showLoading(false);
@@ -1795,7 +1795,7 @@
     })
     .catch(error => {
       console.error('❌ Cart update failed:', error);
-      showNotification('Update failed. Refreshing page...', 'error');
+      showNotification('Oops! Something went wrong. Refreshing to sync your cart...', 'error');
       
       // Restore input value and reload
       const input = document.querySelector(`[data-line="${line}"].quantity-input`);
