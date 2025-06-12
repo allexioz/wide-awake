@@ -34,6 +34,7 @@ class ProductDiscovery {
     this.initializePagination();
     this.trackPageView();
     this.initializeKeyboardNavigation();
+    this.enhanceZeroCountFilters();
   }
 
   bindFilterEvents() {
@@ -254,6 +255,33 @@ class ProductDiscovery {
     // Add keyboard navigation for vibe buttons
     const vibeButtons = document.querySelectorAll('.vibe-btn-compact');
     this.addTabListKeyboard(vibeButtons);
+  }
+
+  enhanceZeroCountFilters() {
+    // Add visual enhancements for filters with zero counts
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    
+    filterTabs.forEach(tab => {
+      const countElement = tab.querySelector('.tab-count');
+      if (countElement) {
+        const count = parseInt(countElement.textContent) || 0;
+        
+        if (count === 0) {
+          tab.classList.add('zero-count');
+          tab.setAttribute('aria-disabled', 'true');
+          tab.style.opacity = '0.5';
+          tab.style.pointerEvents = 'none';
+          
+          // Add tooltip for zero count filters
+          tab.setAttribute('title', 'No products available in this category. Products need to be tagged first.');
+        } else {
+          tab.classList.remove('zero-count');
+          tab.removeAttribute('aria-disabled');
+          tab.style.opacity = '';
+          tab.style.pointerEvents = '';
+        }
+      }
+    });
   }
 
   addTabListKeyboard(elements) {
