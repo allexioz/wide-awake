@@ -1,80 +1,168 @@
 {% comment %}
-  Premium Filter Tabs - Coffee Categories with First Image Styling
+  Enhanced Filter Tabs - Coffee Segments and Vibes
   
   Parameters:
   - all_count: Number for "All Coffee" tab
+  - daily_count: Number for "Daily Driver" segment
+  - premium_count: Number for "Premium Brews" segment  
+  - direct_count: Number for "Direct Trade" segment
+  - equipment_count: Number for "Equipment" segment
   - smooth_count: Number for "Smooth & Sweet" taste profile
   - bright_count: Number for "Light & Bright" taste profile
   - complex_count: Number for "Complex & Expressive" taste profile
 {% endcomment %}
 
-<!-- Premium Filter Tabs -->
+<!-- Enhanced Filter System with Segments and Vibes -->
 <div class="filter-section" role="group" aria-label="Coffee filters">
-  <div class="filter-tabs" role="tablist">
-    <button 
-      class="filter-tab active" 
-      data-filter="all" 
-      data-analytics="filter_all"
-      role="tab"
-      aria-selected="true"
-      tabindex="0"
-      id="tab-all"
-      aria-controls="products-all">
-      <div class="tab-content">
-        <i data-lucide="coffee" class="tab-icon" aria-hidden="true"></i>
-        <div class="tab-text-group">
-          <span class="tab-text">All Coffee</span>
-          <span class="tab-count">{{ all_count | default: 0 }}</span>
+  
+  <!-- Coffee Segment Filters -->
+  <div class="filter-group">
+    <h3 class="filter-group-title">Shop by Category</h3>
+    <div class="filter-tabs" role="tablist" data-filter-type="segment">
+      <button 
+        class="filter-tab active" 
+        data-filter="all" 
+        data-analytics="filter_all"
+        role="tab"
+        aria-selected="true"
+        tabindex="0"
+        id="tab-all"
+        aria-controls="products-all">
+        <div class="tab-content">
+          <i data-lucide="coffee" class="tab-icon" aria-hidden="true"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">All Coffee</span>
+            <span class="tab-count">{{ all_count | default: 0 }}</span>
+          </div>
         </div>
-      </div>
-    </button>
-    
-    <button 
-      class="filter-tab" 
-      data-vibe="smooth-sweet" 
-      data-analytics="vibe_smooth"
-      aria-pressed="false"
-      title="Rich, low acidity coffee with chocolate and caramel notes"
-      aria-label="Filter by smooth and sweet taste profile">
-      <div class="tab-content">
-        <i data-lucide="droplets" class="tab-icon"></i>
-        <div class="tab-text-group">
-          <span class="tab-text">Smooth & Sweet</span>
-          <span class="tab-count">{{ smooth_count | default: 0 }}</span>
+      </button>
+      
+      <button 
+        class="filter-tab" 
+        data-segment="daily-driver" 
+        data-analytics="segment_daily"
+        aria-pressed="false"
+        title="Everyday coffees perfect for your morning routine"
+        aria-label="Filter by daily driver coffees">
+        <div class="tab-content">
+          <i data-lucide="sunrise" class="tab-icon"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">Daily Driver</span>
+            <span class="tab-count">{{ daily_count | default: 0 }}</span>
+          </div>
         </div>
-      </div>
-    </button>
-    
-    <button 
-      class="filter-tab" 
-      data-vibe="light-bright" 
-      data-analytics="vibe_bright"
-      aria-pressed="false"
-      title="Crisp, high acidity with floral and citrus notes"
-      aria-label="Filter by light and bright taste profile">
-      <div class="tab-content">
-        <i data-lucide="sun" class="tab-icon"></i>
-        <div class="tab-text-group">
-          <span class="tab-text">Light & Bright</span>
-          <span class="tab-count">{{ bright_count | default: 0 }}</span>
+      </button>
+      
+      <button 
+        class="filter-tab" 
+        data-segment="premium-brews" 
+        data-analytics="segment_premium"
+        aria-pressed="false"
+        title="Exceptional single-origin specialty coffees"
+        aria-label="Filter by premium brews">
+        <div class="tab-content">
+          <i data-lucide="award" class="tab-icon"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">Premium Brews</span>
+            <span class="tab-count">{{ premium_count | default: 0 }}</span>
+          </div>
         </div>
-      </div>
-    </button>
-    
-    <button 
-      class="filter-tab" 
-      data-vibe="complex-expressive" 
-      data-analytics="vibe_complex"
-      aria-pressed="false"
-      title="Balanced, layered with unique processing notes"
-      aria-label="Filter by complex and expressive taste profile">
-      <div class="tab-content">
-        <i data-lucide="layers" class="tab-icon"></i>
-        <div class="tab-text-group">
-          <span class="tab-text">Complex & Expressive</span>
-          <span class="tab-count">{{ complex_count | default: 0 }}</span>
+      </button>
+      
+      <button 
+        class="filter-tab" 
+        data-segment="direct-trade" 
+        data-analytics="segment_direct"
+        aria-pressed="false"
+        title="Direct from farm relationships supporting farmers"
+        aria-label="Filter by direct trade coffees">
+        <div class="tab-content">
+          <i data-lucide="handshake" class="tab-icon"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">Direct Trade</span>
+            <span class="tab-count">{{ direct_count | default: 0 }}</span>
+          </div>
         </div>
-      </div>
+      </button>
+      
+      <button 
+        class="filter-tab" 
+        data-segment="equipment" 
+        data-analytics="segment_equipment"
+        aria-pressed="false"
+        title="Brewing equipment and accessories"
+        aria-label="Filter by equipment">
+        <div class="tab-content">
+          <i data-lucide="settings" class="tab-icon"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">Equipment</span>
+            <span class="tab-count">{{ equipment_count | default: 0 }}</span>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Coffee Vibe Filters -->
+  <div class="filter-group">
+    <h3 class="filter-group-title">Shop by Taste Profile</h3>
+    <div class="filter-tabs" role="tablist" data-filter-type="vibe">
+      <button 
+        class="filter-tab" 
+        data-vibe="smooth-sweet" 
+        data-analytics="vibe_smooth"
+        aria-pressed="false"
+        title="Higher sweetness and mouthfeel with relatively lower acidity"
+        aria-label="Filter by smooth and sweet taste profile">
+        <div class="tab-content">
+          <i data-lucide="droplets" class="tab-icon"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">🍯 Smooth & Sweet</span>
+            <span class="tab-count">{{ smooth_count | default: 0 }}</span>
+          </div>
+        </div>
+      </button>
+      
+      <button 
+        class="filter-tab" 
+        data-vibe="light-bright" 
+        data-analytics="vibe_bright"
+        aria-pressed="false"
+        title="High acidity (mouthwatering) and lower perceived mouthfeel"
+        aria-label="Filter by light and bright taste profile">
+        <div class="tab-content">
+          <i data-lucide="sun" class="tab-icon"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">🍋 Light & Bright</span>
+            <span class="tab-count">{{ bright_count | default: 0 }}</span>
+          </div>
+        </div>
+      </button>
+      
+      <button 
+        class="filter-tab" 
+        data-vibe="complex-expressive" 
+        data-analytics="vibe_complex"
+        aria-pressed="false"
+        title="Well-balanced in acidity and mouthfeel with well-layered flavor presentation"
+        aria-label="Filter by complex and expressive taste profile">
+        <div class="tab-content">
+          <i data-lucide="layers" class="tab-icon"></i>
+          <div class="tab-text-group">
+            <span class="tab-text">🎭 Complex & Expressive</span>
+            <span class="tab-count">{{ complex_count | default: 0 }}</span>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- Clear Filters -->
+  <div class="filter-actions">
+    <button class="clear-all-filters" onclick="window.clearAllFilters()" aria-label="Clear all filters">
+      <i data-lucide="x-circle" class="clear-icon"></i>
+      Clear All Filters
     </button>
   </div>
+  
 </div> 

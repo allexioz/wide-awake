@@ -16,26 +16,50 @@
 {% assign direct_trade_products = collections.direct-trade.products %}
 {% assign equipment_products = collections.equipment.products %}
 
-{% comment %} Count products by vibe using tag-based system {% endcomment %}
+{% comment %} Count products by segment and vibe using tag-based system {% endcomment %}
+{% assign daily_driver_count = 0 %}
+{% assign premium_brews_count = 0 %}
+{% assign direct_trade_count = 0 %}
+{% assign equipment_count = 0 %}
 {% assign smooth_sweet_count = 0 %}
 {% assign light_bright_count = 0 %}
 {% assign complex_expressive_count = 0 %}
 
 {% for product in all_products %}
   {% comment %} Set defaults {% endcomment %}
+  {% assign current_segment = 'daily-driver' %}
   {% assign current_vibe = 'smooth-sweet' %}
   
-  {% comment %} Extract vibe from product tags {% endcomment %}
+  {% comment %} Extract segment and vibe from product tags {% endcomment %}
   {% for tag in product.tags %}
     {% assign tag_lower = tag | downcase %}
     
     {% comment %} Check for prefixed tags {% endcomment %}
+    {% if tag_lower contains 'segment:' %}
+      {% assign segment_parts = tag_lower | split: ':' %}
+      {% if segment_parts.size > 1 %}
+        {% assign current_segment = segment_parts[1] %}
+      {% endif %}
+    {% endif %}
+    
     {% if tag_lower contains 'vibe:' %}
       {% assign vibe_parts = tag_lower | split: ':' %}
       {% if vibe_parts.size > 1 %}
         {% assign current_vibe = vibe_parts[1] %}
       {% endif %}
     {% endif %}
+    
+    {% comment %} Check for direct segment tags {% endcomment %}
+    {% case tag_lower %}
+      {% when 'daily-driver', 'daily driver', 'everyday' %}
+        {% assign current_segment = 'daily-driver' %}
+      {% when 'premium-brews', 'premium brews', 'premium', 'specialty' %}
+        {% assign current_segment = 'premium-brews' %}
+      {% when 'direct-trade', 'direct trade', 'farm-direct', 'farm direct' %}
+        {% assign current_segment = 'direct-trade' %}
+      {% when 'equipment', 'gear', 'accessories' %}
+        {% assign current_segment = 'equipment' %}
+    {% endcase %}
     
     {% comment %} Check for direct vibe tags {% endcomment %}
     {% case tag_lower %}
@@ -48,6 +72,19 @@
     {% endcase %}
   {% endfor %}
   
+  {% comment %} Count segments {% endcomment %}
+  {% case current_segment %}
+    {% when 'daily-driver' %}
+      {% assign daily_driver_count = daily_driver_count | plus: 1 %}
+    {% when 'premium-brews' %}
+      {% assign premium_brews_count = premium_brews_count | plus: 1 %}
+    {% when 'direct-trade' %}
+      {% assign direct_trade_count = direct_trade_count | plus: 1 %}
+    {% when 'equipment' %}
+      {% assign equipment_count = equipment_count | plus: 1 %}
+  {% endcase %}
+  
+  {% comment %} Count vibes {% endcomment %}
   {% case current_vibe %}
     {% when 'smooth-sweet' %}
       {% assign smooth_sweet_count = smooth_sweet_count | plus: 1 %}
@@ -91,6 +128,10 @@
           <div class="filter-content" id="filterContent">
             {% render 'category-filters', 
               all_count: all_products.size,
+              daily_count: daily_driver_count,
+              premium_count: premium_brews_count,
+              direct_count: direct_trade_count,
+              equipment_count: equipment_count,
               smooth_count: smooth_sweet_count,
               bright_count: light_bright_count,
               complex_count: complex_expressive_count %}

@@ -15,6 +15,68 @@
   margin-bottom: 10px;
 }
 
+/* Enhanced Filter Groups */
+.filter-group {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 16px;
+  border: 1px solid rgba(92, 191, 238, 0.1);
+}
+
+.filter-group-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #2c1810;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-group-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(135deg, #5CBFEE 0%, #4A9CDB 100%);
+  border-radius: 2px;
+}
+
+.filter-actions {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.clear-all-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+  color: #dc3545;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.clear-all-filters:hover {
+  background: rgba(220, 53, 69, 0.05);
+  border-color: #dc3545;
+  transform: translateY(-1px);
+}
+
+.clear-icon {
+  width: 14px;
+  height: 14px;
+}
+
 /* Category Filter Tabs - Premium Design */
 .filter-tabs {
   display: flex;
