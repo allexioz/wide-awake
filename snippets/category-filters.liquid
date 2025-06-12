@@ -2,6 +2,7 @@
   Enhanced Filter Tabs - Coffee Segments and Vibes
   
   Parameters:
+  - collection_handle: Handle of the current collection (for conditional display)
   - all_count: Number for "All Coffee" tab
   - daily_count: Number for "Daily Driver" segment
   - premium_count: Number for "Premium Brews" segment  
@@ -12,9 +13,35 @@
   - complex_count: Number for "Complex & Expressive" taste profile
 {% endcomment %}
 
+{% comment %} Determine what filters to show based on collection {% endcomment %}
+{% assign show_coffee_segments = true %}
+{% assign show_taste_profiles = true %}
+{% assign show_equipment_filter = true %}
+
+{% comment %} Collection-specific filter logic {% endcomment %}
+{% if collection_handle %}
+  {% case collection_handle %}
+    {% when 'equipment' %}
+      {% comment %} Equipment collection: only show equipment filter, no taste profiles {% endcomment %}
+      {% assign show_coffee_segments = false %}
+      {% assign show_taste_profiles = false %}
+    {% when 'merch', 'merchandise' %}
+      {% comment %} Merch collection: only show merch-related filters {% endcomment %}
+      {% assign show_coffee_segments = false %}
+      {% assign show_taste_profiles = false %}
+      {% assign show_equipment_filter = false %}
+    {% when 'coffee', 'all-coffee' %}
+      {% comment %} Coffee collection: show coffee segments and taste profiles, hide equipment {% endcomment %}
+      {% assign show_equipment_filter = false %}
+    {% else %}
+      {% comment %} Default: show all filters {% endcomment %}
+  {% endcase %}
+{% endif %}
+
 <!-- Enhanced Filter System with Segments and Vibes -->
 <div class="filter-section" role="group" aria-label="Coffee filters">
   
+  {% if show_coffee_segments or show_equipment_filter %}
   <!-- Coffee Segment Filters -->
   <div class="filter-group">
     <div class="filter-tabs" role="tablist" data-filter-type="segment">
@@ -30,12 +57,13 @@
         <div class="tab-content">
           <i data-lucide="coffee" class="tab-icon" aria-hidden="true"></i>
           <div class="tab-text-group">
-            <span class="tab-text">All Coffee</span>
+            <span class="tab-text">All {% if collection_handle == 'equipment' %}Equipment{% elsif collection_handle == 'merch' or collection_handle == 'merchandise' %}Items{% else %}Coffee{% endif %}</span>
             <span class="tab-count">{{ all_count | default: 0 }}</span>
           </div>
         </div>
       </button>
       
+      {% if show_coffee_segments %}
       <button 
         class="filter-tab" 
         data-filter="daily-driver" 
@@ -89,7 +117,9 @@
           </div>
         </div>
       </button>
+      {% endif %}
       
+      {% if show_equipment_filter %}
       <button 
         class="filter-tab" 
         data-filter="equipment" 
@@ -107,9 +137,12 @@
           </div>
         </div>
       </button>
+      {% endif %}
     </div>
-      </div>
+  </div>
+  {% endif %}
   
+  {% if show_taste_profiles %}
   <!-- Spacer -->
   <div style="height: 12px;"></div>
   
@@ -165,7 +198,7 @@
       </button>
     </div>
   </div>
-
+  {% endif %}
 
   
 </div> 

@@ -127,6 +127,7 @@
 
           <div class="filter-content" id="filterContent">
             {% render 'category-filters', 
+              collection_handle: 'all',
               all_count: all_products.size,
               daily_count: daily_driver_count,
               premium_count: premium_brews_count,
