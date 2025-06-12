@@ -17,7 +17,6 @@
   
   <!-- Coffee Segment Filters -->
   <div class="filter-group">
-    <h3 class="filter-group-title">Shop by Category</h3>
     <div class="filter-tabs" role="tablist" data-filter-type="segment">
       <button 
         class="filter-tab active" 
@@ -39,9 +38,11 @@
       
       <button 
         class="filter-tab" 
-        data-segment="daily-driver" 
+        data-filter="daily-driver" 
         data-analytics="segment_daily"
-        aria-pressed="false"
+        role="tab"
+        aria-selected="false"
+        tabindex="-1"
         title="Everyday coffees perfect for your morning routine"
         aria-label="Filter by daily driver coffees">
         <div class="tab-content">
@@ -55,9 +56,11 @@
       
       <button 
         class="filter-tab" 
-        data-segment="premium-brews" 
+        data-filter="premium-brews" 
         data-analytics="segment_premium"
-        aria-pressed="false"
+        role="tab"
+        aria-selected="false"
+        tabindex="-1"
         title="Exceptional single-origin specialty coffees"
         aria-label="Filter by premium brews">
         <div class="tab-content">
@@ -71,9 +74,11 @@
       
       <button 
         class="filter-tab" 
-        data-segment="direct-trade" 
+        data-filter="direct-trade" 
         data-analytics="segment_direct"
-        aria-pressed="false"
+        role="tab"
+        aria-selected="false"
+        tabindex="-1"
         title="Direct from farm relationships supporting farmers"
         aria-label="Filter by direct trade coffees">
         <div class="tab-content">
@@ -87,9 +92,11 @@
       
       <button 
         class="filter-tab" 
-        data-segment="equipment" 
+        data-filter="equipment" 
         data-analytics="segment_equipment"
-        aria-pressed="false"
+        role="tab"
+        aria-selected="false"
+        tabindex="-1"
         title="Brewing equipment and accessories"
         aria-label="Filter by equipment">
         <div class="tab-content">
@@ -101,11 +108,13 @@
         </div>
       </button>
     </div>
-  </div>
-
+      </div>
+  
+  <!-- Spacer -->
+  <div style="height: 12px;"></div>
+  
   <!-- Coffee Vibe Filters -->
   <div class="filter-group">
-    <h3 class="filter-group-title">Shop by Taste Profile</h3>
     <div class="filter-tabs" role="tablist" data-filter-type="vibe">
       <button 
         class="filter-tab" 
@@ -117,7 +126,7 @@
         <div class="tab-content">
           <i data-lucide="droplets" class="tab-icon"></i>
           <div class="tab-text-group">
-            <span class="tab-text">🍯 Smooth & Sweet</span>
+            <span class="tab-text">Smooth & Sweet</span>
             <span class="tab-count">{{ smooth_count | default: 0 }}</span>
           </div>
         </div>
@@ -133,7 +142,7 @@
         <div class="tab-content">
           <i data-lucide="sun" class="tab-icon"></i>
           <div class="tab-text-group">
-            <span class="tab-text">🍋 Light & Bright</span>
+            <span class="tab-text">Light & Bright</span>
             <span class="tab-count">{{ bright_count | default: 0 }}</span>
           </div>
         </div>
@@ -149,7 +158,7 @@
         <div class="tab-content">
           <i data-lucide="layers" class="tab-icon"></i>
           <div class="tab-text-group">
-            <span class="tab-text">🎭 Complex & Expressive</span>
+            <span class="tab-text">Complex & Expressive</span>
             <span class="tab-count">{{ complex_count | default: 0 }}</span>
           </div>
         </div>
@@ -157,12 +166,6 @@
     </div>
   </div>
 
-  <!-- Clear Filters -->
-  <div class="filter-actions">
-    <button class="clear-all-filters" onclick="window.clearAllFilters()" aria-label="Clear all filters">
-      <i data-lucide="x-circle" class="clear-icon"></i>
-      Clear All Filters
-    </button>
-  </div>
+
   
 </div> 
