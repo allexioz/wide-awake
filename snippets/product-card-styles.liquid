@@ -501,13 +501,15 @@
   }
 
   .product-actions {
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr 44px; /* full-width button + fixed icon */
+    gap: 8px;
   }
 
   .view-product-btn,
   .quick-view-btn {
-    font-size: 0.95rem;
-    padding: 12px 16px;
+    width: 100%; /* stretch across first column */
+    flex: initial; /* cancel flex:1 from desktop */
   }
 
   .quick-add-btn {

@@ -124,15 +124,11 @@
               <div class="loading-spinner"></div>
             </button>
             
-            <button type="button" class="wishlist-btn button button--outline" aria-label="Add to wishlist">
-              <svg width="20" height="18" viewBox="0 0 20 18" fill="none">
-                <path d="M17.367 1.634a4.89 4.89 0 0 0-6.934 0L10 2.067l-.433-.433a4.89 4.89 0 1 0-6.934 6.933L10 15.933l7.367-7.366a4.89 4.89 0 0 0 0-6.933z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
-
-          <div class="buy-now-wrapper">
-            {{ form | payment_button }}
+            <!-- Wishlist button removed -->
+            
+            <div class="buy-now-wrapper">
+              {{ form | payment_button }}
+            </div>
           </div>
         {% endform %}
       </div>
@@ -239,13 +235,15 @@ class ModernProductPage {
     });
   }
 
-  waitForAddToCartComponent(callback) {
+  waitForAddToCartComponent(callback, attempts = 0) {
     if (window.addToCartComponent) {
       console.log('✅ AddToCartComponent detected for product page');
       callback();
+    } else if (attempts >= 20) { // ~2 s fallback
+      console.warn('⚠️ AddToCartComponent not found – proceeding without it');
+      callback();
     } else {
-      console.log('⏳ Waiting for AddToCartComponent...');
-      setTimeout(() => this.waitForAddToCartComponent(callback), 100);
+      setTimeout(() => this.waitForAddToCartComponent(callback, attempts + 1), 100);
     }
   }
 
@@ -565,6 +563,8 @@ class ModernProductPage {
     
     observer.observe(descriptionContent);
   }
+
+  /* wishlist feature removed */
 }
 
 // Toggle Description Function
@@ -761,6 +761,9 @@ if (document.readyState === 'loading') {
 
 .variant-option {
   cursor: pointer;
+  /* ensure option remains interactive even if overlaid */
+  pointer-events: auto;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -965,11 +968,35 @@ if (document.readyState === 'loading') {
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* let each direct child (button or wrapper) flex equally */
+.product-actions > * {
+  flex: 1 1 0;
+  min-width: 0;  /* prevent overflow */
+}
+
+@media (max-width: 600px) {
+  .product-actions {
+    flex-direction: column;
+  }
+}
+
+/* remove special width rules now redundant */
+.buy-now-wrapper {
+  margin-top: 0 !important;
+}
+
+.buy-now-wrapper .shopify-payment-button,
+.buy-now-wrapper .shopify-payment-button__button {
+  width: 100% !important;
 }
 
 .add-to-cart-btn {
-  flex: 1;
+  flex: 1 1 0;
   height: 56px;
+  width: 100%;
   background-color: #5CBFEE;
   color: var(--color-white);
   border: none;
@@ -1124,36 +1151,6 @@ if (document.readyState === 'loading') {
   }
 }
 
-.wishlist-btn {
-  width: 56px;
-  height: 56px;
-  background-color: transparent;
-  color: var(--color-foreground);
-  border: 2px solid var(--color-border);
-  border-radius: var(--border-radius);
-  font-family: var(--font-primary--family);
-  font-size: var(--font-size-body);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  min-height: 44px;
-  line-height: 1;
-}
-
-.wishlist-btn:hover {
-  background-color: var(--color-foreground);
-  border-color: var(--color-foreground);
-  color: var(--color-background);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-medium);
-}
-
 /* Buy Now Button */
 .buy-now-wrapper {
   margin-top: 16px;
@@ -1164,6 +1161,8 @@ if (document.readyState === 'loading') {
 }
 
 .shopify-payment-button__button {
+  width: 100% !important; /* full width like add-to-cart */
+  flex: 1 1 auto !important;
   border-radius: var(--border-radius) !important;
   height: 56px !important;
   font-family: var(--font-primary--family) !important;
