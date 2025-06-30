@@ -88,29 +88,16 @@
   }
 
   .page-title {
-    font-family: var(--font-heading--family, 'Special Gothic Expanded One', sans-serif);
-    font-size: clamp(2.5rem, 6vw, 4rem);
-    font-weight: 400;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 600;
     color: var(--color-secondary, #2c1810);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    text-transform: none;
+    letter-spacing: 0.02em;
     line-height: 1.1;
     margin: 0 0 var(--spacing-md, 1.5rem) 0;
     position: relative;
     display: inline-block;
   }
-
-     .page-title::after {
-     content: '';
-     position: absolute;
-     bottom: -0.5rem;
-     left: 50%;
-     transform: translateX(-50%);
-     width: 4rem;
-     height: 3px;
-     background: #5CBFEE;
-     border-radius: 2px;
-   }
 
   .page-summary {
     font-size: 1.2rem;
@@ -163,7 +150,7 @@
   .page-content-inner h4,
   .page-content-inner h5,
   .page-content-inner h6 {
-    font-family: var(--font-heading--family, 'Special Gothic Expanded One', sans-serif);
+    font-family: var(--font-primary--family, 'Poppins', sans-serif);
     color: var(--color-secondary, #2c1810);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -199,18 +186,7 @@
     font-size: clamp(1rem, 1.5vw, 1.25rem);
   }
 
-  /* Add accent lines under major headings */
-  .page-content-inner h2::after,
-  .page-content-inner h3::after {
-    content: '';
-    position: absolute;
-    bottom: -0.5rem;
-    left: 0;
-    width: 2.5rem;
-    height: 2px;
-    background: currentColor;
-    opacity: 0.6;
-  }
+  /* Removed center underline for cleaner look */
 
   .page-content-inner p {
     font-size: clamp(1rem, 2vw, 1.125rem);
@@ -224,34 +200,22 @@
     margin-bottom: 0;
   }
 
-     /* Enhanced paragraph styling for coffee content */
-   .page-content-inner p:first-of-type {
-     font-size: clamp(1.1rem, 2.2vw, 1.25rem);
-     font-weight: 500;
-     color: var(--color-secondary, #2c1810);
-     position: relative;
-     padding-left: 1rem;
-     border-left: 3px solid #5CBFEE;
-     background: rgba(92, 191, 238, 0.05);
-     padding: var(--spacing-md, 1.5rem);
-     border-radius: 0 var(--border-radius, 8px) var(--border-radius, 8px) 0;
-     margin-bottom: var(--spacing-lg, 2rem);
-   }
+  /* Removed first-paragraph highlight for simpler hierarchy */
 
-     /* Links */
-   .page-content-inner a {
-     color: #5CBFEE;
-     text-decoration: none;
-     font-weight: 500;
-     transition: all 0.3s ease;
-     position: relative;
-     border-bottom: 1px solid transparent;
-   }
+  /* Links */
+  .page-content-inner a {
+    color: #5CBFEE;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    border-bottom: 1px solid transparent;
+  }
 
-   .page-content-inner a:hover {
-     color: var(--color-secondary, #2c1810);
-     border-bottom-color: #5CBFEE;
-   }
+  .page-content-inner a:hover {
+    color: var(--color-secondary, #2c1810);
+    border-bottom-color: #5CBFEE;
+  }
 
   /* Lists */
   .page-content-inner ul,
