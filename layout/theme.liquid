@@ -53,7 +53,8 @@
     </script>
     
     {{ content_for_header }}
-  </head>
+  {% capture boostersnippet %}{% include "booster-apps-common" %}{% endcapture %}{% unless boostersnippet contains "Liquid error" %}{{ boostersnippet }}{% endunless %}
+</head>
 
   <body class="template-{{ request.page_type }}" style="margin: 0 !important; padding: 0 !important;">
     {% sections 'header-group' %}
