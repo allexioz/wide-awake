@@ -1,0 +1,186 @@
+{% comment %}
+  Wholesale Page Section (2025 custom template)
+  Displays headline, description, and a Shopify contact form that tags messages as wholesale
+{% endcomment %}
+
+<section class="wholesale-page container">
+  <div class="wholesale-hero">
+    <h1 class="wholesale-title">Wholesale Coffee Beans</h1>
+    <p class="wholesale-subtext">Partner with Wide Awake to serve freshly roasted specialty coffee. Tell us a bit about your business and we'll get back to you with pricing &amp; samples.</p>
+  </div>
+
+  <div class="wholesale-contact-form-wrapper">
+    {% form 'contact', id: 'WholesaleContactForm' %}
+      {% if form.posted_successfully? %}
+        <p class="form-success">Thanks for reaching out! We'll reply within one business day.</p>
+      {% endif %}
+
+      {% if form.errors %}
+        <ul class="form-errors" role="alert">
+          {% for field in form.errors %}
+            <li>{{ field }} - {{ form.errors[field] }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <!-- Name -->
+      <div class="form-field">
+        <label for="wholesaleName" class="form-label">Name</label>
+        <input
+          type="text"
+          id="wholesaleName"
+          name="contact[name]"
+          class="form-input"
+          required
+          placeholder="Your full name"
+          value="{{ form.name }}">
+      </div>
+
+      <!-- Email -->
+      <div class="form-field">
+        <label for="wholesaleEmail" class="form-label">Email</label>
+        <input
+          type="email"
+          id="wholesaleEmail"
+          name="contact[email]"
+          class="form-input"
+          required
+          placeholder="you@example.com"
+          value="{{ form.email }}">
+      </div>
+
+      <!-- Message -->
+      <div class="form-field">
+        <label for="wholesaleMessage" class="form-label">Message</label>
+        <textarea
+          id="wholesaleMessage"
+          name="contact[body]"
+          class="form-textarea"
+          rows="6"
+          required
+          placeholder="Tell us about your business, volume needs, timeline, etc.">{{ form.body }}</textarea>
+      </div>
+
+      <!-- Tag the submission so we can filter in Shopify admin -->
+      <input type="hidden" name="contact[tags]" value="wholesale,lead" />
+
+      <!-- (Optional) specify recipient—if store email differs -->
+      <input type="hidden" name="contact[recipient]" value="wideawakeph@gmail.com" />
+
+      <button type="submit" class="btn btn-primary wholesale-submit">Send enquiry</button>
+    {% endform %}
+  </div>
+</section>
+
+<style>
+.wholesale-page.container {
+  max-width: 900px;
+  margin: 60px auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.wholesale-title {
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h1);
+  color: var(--color-secondary);
+  margin-bottom: 16px;
+}
+
+.wholesale-subtext {
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+  color: var(--color-muted);
+  margin-bottom: 48px;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.wholesale-contact-form-wrapper {
+  background: #ffffff;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 20px;
+  padding: 40px 30px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+  text-align: left;
+}
+
+.form-field {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-family: var(--font-primary--family);
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-body);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(92, 191, 238, 0.15);
+}
+
+.btn.wholesale-submit {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 1rem;
+}
+
+.form-success {
+  background: #d4edda;
+  color: #155724;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.form-errors {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  list-style: disc inside;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Wholesale Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Wholesale Coffee Beans"
+    },
+    {
+      "type": "textarea",
+      "id": "subtext",
+      "label": "Sub-headline",
+      "default": "Partner with Wide Awake to serve freshly roasted specialty coffee. Tell us a bit about your business and we'll get back to you with pricing & samples."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Wholesale Page"
+    }
+  ]
+}
+{% endschema %} 

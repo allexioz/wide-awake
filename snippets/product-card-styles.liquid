@@ -239,7 +239,7 @@
   border: none;
   padding: 12px;
   border-radius: 12px;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s ease-out, transform 0.2s ease-out, box-shadow 0.2s ease-out;
@@ -249,8 +249,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
+  text-transform: none;
   height: 44px;
   min-width: 0;
   will-change: transform;
@@ -510,6 +509,7 @@
   .quick-view-btn {
     width: 100%; /* stretch across first column */
     flex: initial; /* cancel flex:1 from desktop */
+    font-size: 0.8rem;
   }
 
   .quick-add-btn {
@@ -662,11 +662,11 @@
   flex: 1;
   background: #5CBFEE;
   color: white;
-  font-size: 1rem;
+  font-size: 0.85rem;
   font-weight: 700;
   padding: 16px;
   height: 56px;
-  text-transform: uppercase;
+  text-transform: none;
   letter-spacing: 0.05em;
   border-radius: 16px;
   display: flex;
@@ -772,5 +772,10 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+}
+
+.product-card .quick-view-btn {
+  text-transform: none !important;
+  font-size: 0.75rem !important;
 }
 </style> 
