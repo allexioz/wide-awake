@@ -1,0 +1,363 @@
+<script>
+// ============================================
+// SHARED QUICK VIEW VARIANT SELECTION LOGIC
+// ============================================
+
+// Global function to set up variant selection in quick view
+window.setupQuickViewVariants = function(fullProduct, form, optionsContainer) {
+  if (!fullProduct || !fullProduct.variants || !form) {
+    console.warn('⚠️ Invalid product data or form for variant setup');
+    return;
+  }
+
+  console.log('🔧 Setting up variant selection for:', fullProduct.title, 'Variants:', fullProduct.variants.length);
+
+  // Remove any existing variant inputs
+  const existingInputs = form.querySelectorAll('input[name="id"]');
+  existingInputs.forEach(input => input.remove());
+  
+  // Clear options container
+  if (optionsContainer) {
+    optionsContainer.innerHTML = '';
+    
+    // Create variant selection UI if more than one variant
+    if (fullProduct.variants.length > 1) {
+      const variantSelector = document.createElement('div');
+      variantSelector.className = 'variant-selector';
+      variantSelector.innerHTML = `
+        <label class="variant-label">Size:</label>
+        <div class="variant-options">
+          ${fullProduct.variants.map((variant, index) => {
+            const isSelected = index === 0;
+            const isAvailable = variant.available;
+            return `
+              <label class="variant-option${isSelected ? ' selected' : ''}${!isAvailable ? ' unavailable' : ''}">
+                <input type="radio" name="id" value="${variant.id}" 
+                       data-price="${variant.price}" 
+                       data-compare-price="${variant.compare_at_price || ''}"
+                       data-available="${variant.available}"
+                       ${isSelected ? 'checked' : ''}
+                       ${!isAvailable ? 'disabled' : ''}>
+                <span class="variant-name">${variant.title}</span>
+                <span class="variant-price">₱${(variant.price / 100).toFixed(2)}</span>
+              </label>
+            `;
+          }).join('')}
+        </div>
+      `;
+      optionsContainer.appendChild(variantSelector);
+      
+      // Add variant change handlers
+      const variantInputs = optionsContainer.querySelectorAll('input[name="id"]');
+      variantInputs.forEach(input => {
+        input.addEventListener('change', () => {
+          window.updateQuickViewVariant(input);
+        });
+      });
+      
+      // Also add click handlers for labels
+      const variantLabels = optionsContainer.querySelectorAll('.variant-option');
+      variantLabels.forEach(option => {
+        option.addEventListener('click', (e) => {
+          if (e.target.type === 'radio') return;
+          const input = option.querySelector('input[name="id"]');
+          if (input && !input.disabled) {
+            input.checked = true;
+            window.updateQuickViewVariant(input);
+          }
+        });
+      });
+      
+    } else {
+      // Single variant - just create hidden input
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = 'id';
+      hiddenInput.value = fullProduct.variants[0].id;
+      form.appendChild(hiddenInput);
+    }
+  }
+  
+  console.log('✅ Variant selection setup complete');
+};
+
+// Global function to update variant in quick view
+window.updateQuickViewVariant = function(variantInput) {
+  console.log('🔄 Quick view variant changed to:', variantInput.value, 'Price:', variantInput.dataset.price);
+  
+  // CRITICAL: Ensure this radio button is actually checked
+  document.querySelectorAll('#quickViewOptions input[name="id"]').forEach(input => {
+    input.checked = false;
+  });
+  variantInput.checked = true;
+  
+  // Update selected variant styling
+  document.querySelectorAll('#quickViewOptions .variant-option').forEach(option => {
+    option.classList.remove('selected');
+  });
+  variantInput.closest('.variant-option').classList.add('selected');
+  
+  // Update price display
+  const price = parseInt(variantInput.dataset.price);
+  const comparePrice = parseInt(variantInput.dataset.comparePrice) || 0;
+  const priceElement = document.querySelector('#quickViewPrice .price-current');
+  
+  if (priceElement) {
+    const formattedPrice = `₱${(price / 100).toFixed(2)}`;
+    priceElement.textContent = formattedPrice;
+  }
+  
+  // Update add to cart button state based on availability
+  const isAvailable = variantInput.dataset.available === 'true';
+  const addToCartBtn = document.getElementById('quickViewAddToCart');
+  
+  if (addToCartBtn) {
+    if (isAvailable) {
+      addToCartBtn.disabled = false;
+      const btnText = addToCartBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'ADD TO CART';
+      } else {
+        addToCartBtn.textContent = 'ADD TO CART';
+      }
+      addToCartBtn.style.opacity = '1';
+    } else {
+      addToCartBtn.disabled = true;
+      const btnText = addToCartBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'SOLD OUT';
+      } else {
+        addToCartBtn.textContent = 'SOLD OUT';
+      }
+      addToCartBtn.style.opacity = '0.6';
+    }
+  }
+  
+  // Debug: Verify form state
+  const form = document.getElementById('quickViewForm');
+  const checkedInput = form?.querySelector('input[name="id"]:checked');
+  console.log('🔍 After variant update - checked input:', checkedInput?.value);
+};
+
+// Global add to cart function for quick view
+window.handleQuickViewAddToCart = function(form) {
+  console.log('🚀 handleQuickViewAddToCart function called with form:', form);
+  
+  if (!form) {
+    console.error('❌ No form provided to handleQuickViewAddToCart');
+    return;
+  }
+  
+  // Get form data
+  const formData = new FormData(form);
+  const variantId = formData.get('id');
+  const quantity = parseInt(formData.get('quantity')) || 1;
+  const productTitle = document.getElementById('quickViewTitle')?.textContent || 'Product';
+  const addToCartBtn = document.getElementById('quickViewAddToCart');
+  const btnText = addToCartBtn?.querySelector('.btn-text');
+  
+  console.log('🛒 Quick view form data:', { variantId, quantity, productTitle });
+  
+  // Validate that we have everything needed
+  if (!variantId) {
+    console.error('❌ No variant ID found in form data. Form inputs:', Array.from(form.querySelectorAll('input')).map(input => ({ name: input.name, value: input.value })));
+    return;
+  }
+  
+  if (!addToCartBtn) {
+    console.error('❌ Add to cart button not found');
+    return;
+  }
+  
+  // Use direct Shopify AJAX cart API (most reliable)
+  console.log('🛒 Using direct Shopify cart API');
+  
+  // Show loading state
+  const targetElement = btnText || addToCartBtn;
+  const originalHTML = targetElement.innerHTML;
+  targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-icon"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> ADDING...';
+  addToCartBtn.disabled = true;
+
+  // Add to cart using Shopify's AJAX API
+  const requestData = {
+    id: variantId,
+    quantity: quantity
+  };
+  
+  console.log('🔄 Sending cart request:', requestData);
+  console.log('🔄 Request URL: /cart/add.js');
+  
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    },
+    body: JSON.stringify(requestData)
+  })
+  .then(response => {
+    console.log('🔄 Cart response status:', response.status);
+    console.log('🔄 Cart response headers:', Object.fromEntries(response.headers.entries()));
+    
+    if (!response.ok) {
+      return response.text().then(errorText => {
+        console.error('❌ Cart API error response text:', errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          console.error('❌ Cart API error data:', errorData);
+          throw new Error(errorData.description || errorData.message || `HTTP ${response.status}`);
+        } catch (parseError) {
+          console.error('❌ Failed to parse error response:', parseError);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+      });
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('✅ Add to cart successful - full response:', data);
+    console.log('✅ Item added:', {
+      id: data.id,
+      title: data.title || data.product_title,
+      variant_title: data.variant_title,
+      quantity: data.quantity,
+      price: data.price
+    });
+    
+    // Success feedback
+    targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> ADDED!';
+    addToCartBtn.style.background = 'linear-gradient(135deg, #2ECC71 0%, #27AE60 100%)';
+    addToCartBtn.style.color = 'white';
+    addToCartBtn.style.border = 'none';
+    
+    // Update cart count using improved global function
+    window.updateGlobalCartCount();
+    
+    // Verify item was added to cart
+    fetch('/cart.js')
+      .then(response => response.json())
+      .then(cartData => {
+        console.log('🛒 Cart contents after add:', cartData);
+        console.log('🛒 Total items in cart:', cartData.item_count);
+        console.log('🛒 Cart items:', cartData.items.map(item => ({
+          id: item.id,
+          title: item.title,
+          variant_title: item.variant_title,
+          quantity: item.quantity
+        })));
+      })
+      .catch(error => console.warn('⚠️ Could not verify cart contents:', error));
+    
+    // Close modal after delay
+    setTimeout(() => {
+      window.closeQuickView();
+    }, 1500);
+  })
+  .catch(error => {
+    console.error('❌ Error adding to cart:', error);
+    
+    // Error feedback
+    targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg> ERROR';
+    addToCartBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #e74c3c)';
+    addToCartBtn.style.color = 'white';
+    
+    // Reset after delay
+    setTimeout(() => {
+      addToCartBtn.disabled = false;
+      targetElement.innerHTML = originalHTML;
+      addToCartBtn.style.background = '';
+      addToCartBtn.style.color = '';
+      addToCartBtn.style.border = '';
+    }, 2000);
+  });
+};
+
+// Global form submission prevention setup
+window.setupQuickViewFormPrevention = function() {
+  const quickViewForm = document.getElementById('quickViewForm');
+  if (quickViewForm) {
+    console.log('🔧 Setting up form prevention for quick view');
+    
+    // Remove any existing action to prevent normal submission
+    quickViewForm.removeAttribute('action');
+    quickViewForm.setAttribute('onsubmit', 'return false;');
+    
+    // Add direct event handler to the form
+    quickViewForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🛑 Form submission prevented via direct handler');
+      window.handleQuickViewAddToCart(this);
+      return false;
+    });
+    
+    // Add handler to the button as well
+    const addToCartBtn = document.getElementById('quickViewAddToCart');
+    if (addToCartBtn) {
+      // Remove any existing listeners by cloning the node
+      const newBtn = addToCartBtn.cloneNode(true);
+      addToCartBtn.parentNode.replaceChild(newBtn, addToCartBtn);
+      
+      newBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🛑 Button click prevented via direct handler');
+        window.handleQuickViewAddToCart(quickViewForm);
+        return false;
+      });
+    }
+  }
+};
+
+// Global cart count update function
+window.updateGlobalCartCount = function() {
+  console.log('🔄 Updating cart count globally');
+  
+  fetch('/cart.js')
+    .then(response => response.json())
+    .then(cart => {
+      console.log('📊 Cart data for count update:', cart.item_count);
+      
+      // Update all cart badges and counters
+      const cartBadges = document.querySelectorAll('[data-cart-count], .cart-count:not(.cart-title .cart-count)');
+      const cartIndicators = document.querySelectorAll('[data-cart-indicator], .cart-link');
+      const cartTitle = document.querySelector('.cart-title');
+
+      cartBadges.forEach(badge => {
+        badge.textContent = cart.item_count;
+        badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+      });
+      
+      // Add animation to cart indicators
+      cartIndicators.forEach(indicator => {
+        indicator.classList.add('cart-updated');
+        setTimeout(() => {
+          indicator.classList.remove('cart-updated');
+        }, 1000);
+      });
+      
+      // Update cart title if present
+      if (cartTitle) {
+        const countSpan = cartTitle.querySelector('.cart-count');
+        if (countSpan) {
+          countSpan.textContent = `(${cart.item_count} ${cart.item_count === 1 ? 'item' : 'items'})`;
+        }
+      }
+      
+      // Trigger custom event for other components that might need to listen
+      window.dispatchEvent(new CustomEvent('cartUpdated', { 
+        detail: { 
+          itemCount: cart.item_count,
+          cart: cart
+        }
+      }));
+      
+      console.log('✅ Cart count updated to:', cart.item_count);
+    })
+    .catch(error => {
+      console.error('❌ Failed to update cart count:', error);
+    });
+};
+
+console.log('✅ Quick view variant logic loaded');
+</script>

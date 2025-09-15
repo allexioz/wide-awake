@@ -43,24 +43,18 @@
       <!-- Navigation Links -->
       <div class="footer-section footer-links">
         <h3 class="footer-heading">Shop</h3>
-        {% if section.settings.footer_menu.links.size > 0 %}
+        {% assign primary_menu_handle = section.settings.primary_menu | default: 'main-menu' %}
+        {% assign primary_menu = linklists[primary_menu_handle] %}
+        {% if primary_menu.links.size > 0 %}
           <nav class="footer-nav" aria-label="Footer navigation">
             <ul class="footer-nav-list">
-              {% for link in section.settings.footer_menu.links %}
+              {% for link in primary_menu.links %}
                 <li class="footer-nav-item">
                   <a href="{{ link.url }}" class="footer-link">{{ link.title }}</a>
                 </li>
               {% endfor %}
             </ul>
           </nav>
-        {% else %}
-          <ul class="footer-nav-list">
-            <li class="footer-nav-item"><a href="/collections/all" class="footer-link">All Coffee</a></li>
-            <li class="footer-nav-item"><a href="/collections/single-origin" class="footer-link">Single Origin</a></li>
-            <li class="footer-nav-item"><a href="/collections/blends" class="footer-link">Blends</a></li>
-            <li class="footer-nav-item"><a href="/pages/about" class="footer-link">About Us</a></li>
-            <li class="footer-nav-item"><a href="/pages/brewing-guide" class="footer-link">Brewing Guide</a></li>
-          </ul>
         {% endif %}
       </div>
 
@@ -115,7 +109,7 @@
       <div class="footer-section footer-newsletter">
         <h3 class="footer-heading">Stay in the Loop</h3>
         
-        {% if section.settings.show_newsletter %}
+        {% if false and section.settings.show_newsletter %}
           <div class="newsletter-wrapper">
             <p class="newsletter-description">Get the freshest updates on new roasts, brewing tips, and exclusive offers.</p>
             {% form 'customer', class: 'newsletter-form' %}
@@ -440,7 +434,7 @@
   }
 
   .footer-link {
-    color: #e0d6c7;
+    color: #f8f5f1;
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: 400;
@@ -508,7 +502,7 @@
 
   .contact-link,
   .contact-text {
-    color: #e0d6c7;
+    color: #f8f5f1;
     text-decoration: none;
     font-size: 0.95rem;
     font-weight: 400;

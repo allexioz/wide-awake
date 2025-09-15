@@ -210,7 +210,12 @@ class AddToCartComponent {
 
       // Success sequence
       await this.playSuccessSequence(buttonElement, productTitle);
-      await this.updateCartCount();
+      // Use global cart count update function
+      if (window.updateGlobalCartCount) {
+        window.updateGlobalCartCount();
+      } else {
+        await this.updateCartCount();
+      }
 
       // Reset button after delay
       setTimeout(() => {

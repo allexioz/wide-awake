@@ -108,7 +108,7 @@
 
 .product-name {
   font-family: var(--font-primary--family);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: #1a1a1a;
   margin: 0;
@@ -186,7 +186,7 @@
 
 .price-from-amount {
   color: #1a1a1a;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 400;
   font-family: var(--font-heading--family);
   text-transform: uppercase;
@@ -229,6 +229,13 @@
   gap: 8px;
   align-items: center;
   margin-top: auto;
+}
+
+/* Single button (quick-add removed) takes full width */
+.product-actions .view-product-btn,
+.product-actions .quick-view-btn {
+  flex: 1;
+  width: 100%;
 }
 
 .view-product-btn,
@@ -500,8 +507,8 @@
   }
 
   .product-actions {
-    display: grid;
-    grid-template-columns: 1fr 44px; /* full-width button + fixed icon */
+    display: flex;
+    flex-direction: column;
     gap: 8px;
   }
 

@@ -457,7 +457,7 @@
 }
 
 .product-grid-new[data-view="list"] .product-name {
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 600;
   line-height: 1.4;
   margin: 0 0 0.5rem 0;
@@ -526,16 +526,7 @@
   transition: all 0.2s ease;
 }
 
-.product-grid-new[data-view="list"] .quick-add-btn {
-  width: 48px;
-  height: 48px;
-  min-width: 48px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
+/* Quick-add button removed - styles no longer needed */
 
 /* ===========================================
    ENHANCED PRODUCT CARDS
@@ -581,7 +572,7 @@
 
 .product-name {
   margin: 0 0 0.5rem 0;
-  font-size: 1.125rem;
+  font-size: 1.2rem;
   font-weight: 600;
   line-height: 1.4;
 }

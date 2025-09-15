@@ -175,10 +175,13 @@ class CartManager {
 
   async handleAddToCart(button) {
     // Get variant ID from multiple possible sources
-    const variantId = button.dataset.addToCart || 
-                     button.dataset.variantId || 
-                     button.form?.querySelector('[name="id"]')?.value ||
-                     document.querySelector('[name="id"]')?.value;
+    const dataAddToCart = button.dataset.addToCart;
+    const dataVariantId = button.dataset.variantId;
+    const formVariantId = button.form?.querySelector('[name="id"]')?.value;
+    const formCheckedVariantId = button.form?.querySelector('input[name="id"]:checked')?.value;
+    const globalVariantId = document.querySelector('[name="id"]')?.value;
+    
+    const variantId = dataAddToCart || dataVariantId || formCheckedVariantId || formVariantId || globalVariantId;
                      
     const quantity = parseInt(button.dataset.quantity) || 
                     parseInt(button.form?.querySelector('[name="quantity"]')?.value) ||
@@ -188,7 +191,19 @@ class CartManager {
                         document.querySelector('.product-title, .product__title, [data-product-title]')?.textContent || 
                         'Product';
 
-    console.log('🛒 handleAddToCart called:', { variantId, quantity, productTitle, button });
+    console.log('🛒 handleAddToCart called:', { 
+      variantId, 
+      quantity, 
+      productTitle, 
+      button,
+      debug: {
+        dataAddToCart,
+        dataVariantId,
+        formVariantId,
+        formCheckedVariantId,
+        globalVariantId
+      }
+    });
 
     if (!variantId) {
       console.error('❌ No variant ID found');
@@ -285,7 +300,12 @@ class CartManager {
 
       // Success sequence
       await this.playSuccessSequence(button, productTitle);
-      await this.updateCartCount();
+      // Use global cart count update function
+      if (window.updateGlobalCartCount) {
+        window.updateGlobalCartCount();
+      } else {
+        await this.updateCartCount();
+      }
 
       // Reset button after delay
       setTimeout(() => {

@@ -127,7 +127,18 @@
             <!-- Wishlist button removed -->
             
             <div class="buy-now-wrapper">
-              {{ form | payment_button }}
+              <!-- Loading placeholder for PayPal button -->
+              <div class="payment-button-placeholder" id="paymentPlaceholder">
+                <div class="placeholder-button">
+                  <div class="placeholder-icon"></div>
+                  <span>Loading payment options...</span>
+                </div>
+              </div>
+              
+              <!-- Actual PayPal button (hidden until loaded) -->
+              <div class="payment-button-container" id="paymentContainer" style="display: none;">
+                {{ form | payment_button }}
+              </div>
             </div>
           </div>
         {% endform %}
@@ -225,13 +236,18 @@
 <script>
 class ModernProductPage {
   constructor() {
-    // Wait for AddToCartComponent to be available before initializing
+    // Initialize UI components immediately (no waiting)
+    this.initImageGallery();
+    this.initQuantitySelector();
+    this.initVariantSelector();
+    this.initReadingProgress();
+    
+    // Initialize payment button monitoring
+    this.initPaymentButtonOptimization();
+    
+    // Only wait for cart component for cart-dependent functionality
     this.waitForAddToCartComponent(() => {
-      this.initImageGallery();
-      this.initQuantitySelector();
-      this.initVariantSelector();
       this.initProductForm();
-      this.initReadingProgress();
     });
   }
 
@@ -329,24 +345,125 @@ class ModernProductPage {
   }
 
   initVariantSelector() {
-    const variantInputs = document.querySelectorAll('input[name="id"]');
+    console.log('🚀 Initializing variant selector immediately');
+    const variantContainer = document.querySelector('.variant-options');
     
-    variantInputs.forEach(input => {
-      input.addEventListener('change', () => {
-        // Update selected variant styling
-        document.querySelectorAll('.variant-option').forEach(option => {
-          option.classList.remove('selected');
+    if (!variantContainer) {
+      console.log('ℹ️ No variant container found (single variant product)');
+      return;
+    }
+    
+    // Use event delegation for better performance
+    variantContainer.addEventListener('click', (e) => {
+      const option = e.target.closest('.variant-option');
+      if (!option) return;
+      
+      // Immediate visual feedback
+      this.updateVariantSelection(option);
+      
+      const input = option.querySelector('input[name="id"]');
+      if (input && !input.disabled) {
+        console.log('🖱️ Variant selected:', input.value);
+        input.checked = true;
+        this.handleVariantChange(input);
+      } else {
+        console.log('❌ Cannot select variant:', input?.value, 'Disabled:', input?.disabled);
+      }
+    });
+  }
+  
+  updateVariantSelection(selectedOption) {
+    // Immediate visual feedback - update selection instantly
+    document.querySelectorAll('.variant-option').forEach(option => {
+      option.classList.remove('selected');
+    });
+    selectedOption.classList.add('selected');
+  }
+  
+  initPaymentButtonOptimization() {
+    console.log('🔄 Initializing PayPal button optimization');
+    
+    const placeholder = document.getElementById('paymentPlaceholder');
+    const container = document.getElementById('paymentContainer');
+    
+    if (!placeholder || !container) {
+      console.log('ℹ️ Payment button elements not found');
+      return;
+    }
+    
+    // Monitor for PayPal button appearance
+    const checkPaymentButton = () => {
+      const paymentButton = container.querySelector('.shopify-payment-button__button');
+      
+      if (paymentButton) {
+        console.log('✅ PayPal button loaded, hiding placeholder');
+        placeholder.style.display = 'none';
+        container.style.display = 'block';
+        
+        // Add fade-in animation
+        container.style.opacity = '0';
+        container.style.transition = 'opacity 0.3s ease';
+        requestAnimationFrame(() => {
+          container.style.opacity = '1';
         });
         
-        input.closest('.variant-option').classList.add('selected');
-        
-        // Update price dynamically
-        this.updatePrice(input);
-        
-        // Update add to cart button state
-        this.updateAddToCartButton(input);
+        return true;
+      }
+      return false;
+    };
+    
+    // Check immediately
+    if (!checkPaymentButton()) {
+      // Use MutationObserver for efficient monitoring
+      const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            if (checkPaymentButton()) {
+              observer.disconnect();
+              break;
+            }
+          }
+        }
       });
+      
+      // Start observing
+      observer.observe(container, {
+        childList: true,
+        subtree: true
+      });
+      
+      // Fallback timeout to prevent infinite placeholder
+      setTimeout(() => {
+        if (placeholder.style.display !== 'none') {
+          console.log('⚠️ PayPal button timeout, showing container anyway');
+          placeholder.style.display = 'none';
+          container.style.display = 'block';
+          observer.disconnect();
+        }
+      }, 10000); // 10 second timeout
+    }
+  }
+  
+  handleVariantChange(input) {
+    console.log('🔄 Variant changed to:', input.value, 'Price:', input.dataset.price);
+    
+    // Update selected variant styling
+    document.querySelectorAll('.variant-option').forEach(option => {
+      option.classList.remove('selected');
     });
+    
+    input.closest('.variant-option').classList.add('selected');
+    
+    // Update price dynamically
+    this.updatePrice(input);
+    
+    // Update add to cart button state
+    this.updateAddToCartButton(input);
+    
+    // Debug: Check if the form actually has the correct variant selected
+    const form = document.querySelector('.product-form');
+    const selectedVariant = form.querySelector('input[name="id"]:checked');
+    console.log('🔍 Form selected variant:', selectedVariant?.value);
   }
 
   updatePrice(variantInput) {
@@ -521,26 +638,30 @@ class ModernProductPage {
   }
 
   updateCartCount() {
-    fetch('/cart.js')
-      .then(response => response.json())
-      .then(cart => {
-                // Update all cart badges
-        const cartBadges = document.querySelectorAll('[data-cart-count], .cart-count:not(.cart-title .cart-count)');
-        const cartIndicators = document.querySelectorAll('[data-cart-indicator]');
+    // Use the global cart count update function
+    if (window.updateGlobalCartCount) {
+      window.updateGlobalCartCount();
+    } else {
+      // Fallback for when global function isn't loaded yet
+      fetch('/cart.js')
+        .then(response => response.json())
+        .then(cart => {
+          const cartBadges = document.querySelectorAll('[data-cart-count], .cart-count:not(.cart-title .cart-count)');
+          const cartIndicators = document.querySelectorAll('[data-cart-indicator]');
 
-        cartBadges.forEach(badge => {
-          badge.textContent = cart.item_count;
-          badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+          cartBadges.forEach(badge => {
+            badge.textContent = cart.item_count;
+            badge.style.display = cart.item_count > 0 ? 'flex' : 'none';
+          });
+          
+          cartIndicators.forEach(indicator => {
+            indicator.classList.add('cart-updated');
+            setTimeout(() => {
+              indicator.classList.remove('cart-updated');
+            }, 1000);
+          });
         });
-        
-        // Add animation to cart indicators
-        cartIndicators.forEach(indicator => {
-          indicator.classList.add('cart-updated');
-          setTimeout(() => {
-            indicator.classList.remove('cart-updated');
-          }, 1000);
-        });
-      });
+    }
   }
 
   initReadingProgress() {
@@ -583,12 +704,25 @@ function toggleDescription(button) {
   }
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => new ModernProductPage());
-} else {
-  new ModernProductPage();
+// Initialize immediately for fastest response
+function initializeProductPageFast() {
+  // Try to initialize variants immediately if elements exist
+  const variantContainer = document.querySelector('.variant-options');
+  if (variantContainer) {
+    console.log('⚡ Fast initializing variant selector');
+    const productPage = new ModernProductPage();
+  } else {
+    // Fallback: wait for DOM if elements not ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => new ModernProductPage());
+    } else {
+      new ModernProductPage();
+    }
+  }
 }
+
+// Try immediate initialization
+initializeProductPageFast();
 </script>
 
 {% stylesheet %}
@@ -771,7 +905,7 @@ if (document.readyState === 'loading') {
   padding: 20px 16px;
   border: 2px solid rgba(92, 191, 238, 0.15);
   border-radius: 16px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 80px;
   text-align: center;
   background: rgba(255, 255, 255, 0.8);
@@ -804,6 +938,11 @@ if (document.readyState === 'loading') {
 
 .variant-option:hover::before {
   opacity: 1;
+}
+
+.variant-option:active {
+  transform: translateY(0px) scale(0.98);
+  transition: all 0.05s ease;
 }
 
 .variant-option.selected {
@@ -966,28 +1105,25 @@ if (document.readyState === 'loading') {
 
 .product-actions {
   display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-/* let each direct child (button or wrapper) flex equally */
+/* Ensure buttons take full width */
 .product-actions > * {
-  flex: 1 1 0;
-  min-width: 0;  /* prevent overflow */
+  width: 100%;
+  min-width: 0;
 }
 
 @media (max-width: 600px) {
   .product-actions {
-    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
   }
 }
 
-/* remove special width rules now redundant */
-.buy-now-wrapper {
-  margin-top: 0 !important;
-}
-
+/* Legacy overrides for payment button width */
 .buy-now-wrapper .shopify-payment-button,
 .buy-now-wrapper .shopify-payment-button__button {
   width: 100% !important;
@@ -1153,15 +1289,77 @@ if (document.readyState === 'loading') {
 
 /* Buy Now Button */
 .buy-now-wrapper {
-  margin-top: 16px;
+  margin-top: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Payment Button Placeholder */
+.payment-button-placeholder {
+  width: 100%;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.placeholder-button {
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(90deg, #ffc439 25%, #ffb800 50%, #ffc439 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #2c2e2f;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: wait;
+  opacity: 0.8;
+}
+
+.placeholder-icon {
+  width: 20px;
+  height: 20px;
+  background: #2c2e2f;
+  border-radius: 50%;
+  animation: pulse 1s infinite alternate;
+  position: relative;
+}
+
+.placeholder-icon::after {
+  content: 'P';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #ffc439;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
 .shopify-payment-button {
   margin: 0;
+  width: 100%;
 }
 
 .shopify-payment-button__button {
-  width: 100% !important; /* full width like add-to-cart */
+  width: 100% !important;
   flex: 1 1 auto !important;
   border-radius: var(--border-radius) !important;
   height: 56px !important;
@@ -1173,11 +1371,33 @@ if (document.readyState === 'loading') {
   transition: all var(--transition-base) !important;
   line-height: 1 !important;
   min-height: 44px !important;
+  margin-bottom: 0 !important;
 }
 
 .shopify-payment-button__button:hover {
   transform: translateY(-2px) !important;
   box-shadow: var(--shadow-medium) !important;
+}
+
+/* Fix payment button additional options positioning */
+.shopify-payment-button__more-options {
+  margin-top: 12px !important;
+  text-align: center !important;
+  clear: both !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.shopify-payment-button__more-options a {
+  font-size: 14px !important;
+  color: var(--color-primary) !important;
+  text-decoration: none !important;
+  padding: 8px 0 !important;
+  display: inline-block !important;
+}
+
+.shopify-payment-button__more-options a:hover {
+  text-decoration: underline !important;
 }
 
 /* Product Details */
@@ -2253,6 +2473,8 @@ if (document.readyState === 'loading') {
 </style>
 
 <!-- Quick View JavaScript -->
+{% render 'quick-view-variant-logic' %}
+
 <script>
 // Quick View Functionality
 async function openQuickView(productData) {
@@ -2280,6 +2502,13 @@ async function openQuickView(productData) {
       const response = await fetch(`/products/${productData.handle}.js`);
       const fullProduct = await response.json();
       window.currentQuickViewProduct = fullProduct;
+      
+      // Set up variant selection using shared logic
+      const form = document.getElementById('quickViewForm');
+      const optionsContainer = document.getElementById('quickViewOptions');
+      if (fullProduct && fullProduct.variants && fullProduct.variants.length > 0) {
+        window.setupQuickViewVariants(fullProduct, form, optionsContainer);
+      }
     } else {
       window.currentQuickViewProduct = null;
     }
@@ -2392,6 +2621,9 @@ async function openQuickView(productData) {
       }
     }
   }
+  
+  // Set up form prevention using shared logic
+  window.setupQuickViewFormPrevention();
 }
 
 // Global close function that works across all templates
@@ -2464,3 +2696,4 @@ document.addEventListener('click', function(e) {
 
 {% comment %} Include standardized product card styles {% endcomment %}
 {% render 'product-card-styles' %}
+

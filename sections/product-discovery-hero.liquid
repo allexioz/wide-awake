@@ -2151,6 +2151,8 @@
 {% endstylesheet %}
 
 <!-- Performance Optimized Quick View JavaScript -->
+{% render 'quick-view-variant-logic' %}
+
 <script>
 async function openQuickView(productData) {
   const modal = document.getElementById('quickViewModal');
@@ -2177,6 +2179,13 @@ async function openQuickView(productData) {
       const response = await fetch(`/products/${productData.handle}.js`);
       const fullProduct = await response.json();
       window.currentQuickViewProduct = fullProduct;
+      
+      // Set up variant selection using shared logic
+      const form = document.getElementById('quickViewForm');
+      const optionsContainer = document.getElementById('quickViewOptions');
+      if (fullProduct && fullProduct.variants && fullProduct.variants.length > 0) {
+        window.setupQuickViewVariants(fullProduct, form, optionsContainer);
+      }
     } else {
       window.currentQuickViewProduct = null;
     }
@@ -2351,6 +2360,9 @@ async function openQuickView(productData) {
       }
     }
   }
+  
+  // Set up form prevention using shared logic
+  window.setupQuickViewFormPrevention();
 }
 
 // Global close function that works across all templates

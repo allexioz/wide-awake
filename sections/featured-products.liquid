@@ -904,6 +904,8 @@
 {% endstylesheet %}
 
 <!-- Ultra-performance Quick View JavaScript -->
+{% render 'quick-view-variant-logic' %}
+
 <script>
 async function openQuickView(productData) {
   console.log('🚀 openQuickView called with:', productData);
@@ -941,30 +943,13 @@ async function openQuickView(productData) {
       console.log('🔍 Loaded full product data for quick view:', fullProduct);
       console.log('🔍 Product variants:', fullProduct.variants);
       
-      // Add hidden variant input to form
+      // Set up variant selection using shared logic
       const form = document.getElementById('quickViewForm');
-      console.log('🔍 Form element found:', !!form);
+      const optionsContainer = document.getElementById('quickViewOptions');
+      console.log('🔍 Form element found:', !!form, 'Options container:', !!optionsContainer);
       
       if (form && fullProduct.variants && fullProduct.variants.length > 0) {
-        // Remove any existing variant input
-        const existingInput = form.querySelector('input[name="id"]');
-        if (existingInput) {
-          console.log('🗑️ Removing existing variant input');
-          existingInput.remove();
-        }
-        
-        // Add new variant input for the first available variant
-        const firstVariant = fullProduct.variants.find(v => v.available) || fullProduct.variants[0];
-        console.log('🎯 Selected variant:', firstVariant);
-        
-        const variantInput = document.createElement('input');
-        variantInput.type = 'hidden';
-        variantInput.name = 'id';
-        variantInput.value = firstVariant.id;
-        form.appendChild(variantInput);
-        
-        console.log('📝 Added variant input to quick view form:', firstVariant.id);
-        console.log('🔍 Form inputs after adding variant:', Array.from(form.querySelectorAll('input')).map(input => ({ name: input.name, value: input.value, type: input.type })));
+        window.setupQuickViewVariants(fullProduct, form, optionsContainer);
       } else {
         console.error('❌ Form not found or no variants available', { form: !!form, variants: fullProduct.variants?.length });
       }
@@ -1081,6 +1066,9 @@ async function openQuickView(productData) {
       }
     }
   }
+  
+  // Set up form prevention using shared logic
+  window.setupQuickViewFormPrevention();
 }
 
 // Global close function that works across all templates

@@ -475,4 +475,186 @@
   .quick-view-actions {
     margin-top: 20px;
   }
+}
+
+/* Quick View Variant Selector Styles */
+.quick-view-modal .variant-selector {
+  margin-bottom: 1.5rem;
+}
+
+.quick-view-modal .variant-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--color-foreground, #1a1a1a);
+  font-size: 1.1rem;
+  font-family: var(--font-primary--family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.quick-view-modal .variant-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.quick-view-modal .variant-option {
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  border: 2px solid rgba(92, 191, 238, 0.15);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 80px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-view-modal .variant-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.05), rgba(92, 191, 238, 0.02));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quick-view-modal .variant-option input {
+  display: none;
+}
+
+.quick-view-modal .variant-option:hover {
+  border-color: rgba(92, 191, 238, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(92, 191, 238, 0.15);
+}
+
+.quick-view-modal .variant-option:hover::before {
+  opacity: 1;
+}
+
+.quick-view-modal .variant-option.selected {
+  border-color: #5CBFEE;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.1), rgba(92, 191, 238, 0.05));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(92, 191, 238, 0.25);
+}
+
+.quick-view-modal .variant-option.selected::before {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.1), rgba(92, 191, 238, 0.05));
+}
+
+.quick-view-modal .variant-option.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: #5CBFEE;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  animation: checkmarkPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(-90deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.quick-view-modal .variant-option.unavailable {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(108, 117, 125, 0.1);
+  border-color: rgba(108, 117, 125, 0.2);
+}
+
+.quick-view-modal .variant-option.unavailable:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: rgba(108, 117, 125, 0.2);
+}
+
+.quick-view-modal .variant-option.unavailable::after {
+  content: '✕';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.quick-view-modal .variant-name {
+  font-weight: 700;
+  color: var(--color-foreground, #1a1a1a);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  font-family: var(--font-primary--family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  letter-spacing: 0.02em;
+}
+
+.quick-view-modal .variant-option.selected .variant-name {
+  color: #5CBFEE;
+}
+
+.quick-view-modal .variant-price {
+  font-size: 1rem !important;
+  color: #5CBFEE;
+  font-weight: 600;
+  font-family: var(--font-primary--family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.quick-view-modal .variant-option.unavailable .variant-name,
+.quick-view-modal .variant-option.unavailable .variant-price {
+  color: var(--color-muted, #666);
+}
+
+/* Responsive design for smaller modals */
+@media (max-width: 768px) {
+  .quick-view-modal .variant-options {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  
+  .quick-view-modal .variant-option {
+    padding: 16px 12px;
+    min-height: 70px;
+  }
+  
+  .quick-view-modal .variant-name {
+    font-size: 1rem;
+  }
 } 

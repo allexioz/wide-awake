@@ -9,6 +9,12 @@
     <p class="wholesale-subtext">Partner with Wide Awake to serve freshly roasted specialty coffee. Tell us a bit about your business and we'll get back to you with pricing &amp; samples.</p>
   </div>
 
+  {% if page.content != blank %}
+    <div class="wholesale-page-content rte">
+      {{ page.content }}
+    </div>
+  {% endif %}
+
   <div class="wholesale-contact-form-wrapper">
     {% form 'contact', id: 'WholesaleContactForm' %}
       {% if form.posted_successfully? %}
@@ -157,6 +163,17 @@
   border-radius: 10px;
   margin-bottom: 24px;
   list-style: disc inside;
+}
+
+.wholesale-page-content {
+  margin: 0 auto 48px;
+  max-width: 720px;
+  text-align: left;
+}
+
+.wholesale-page-content img {
+  max-width: 100%;
+  height: auto;
 }
 </style>
 

@@ -71,6 +71,8 @@
       {% assign product_segment = 'direct-trade' %}
     {% when 'equipment', 'gear', 'accessories' %}
       {% assign product_segment = 'equipment' %}
+    {% when 'merch', 'merchandise', 'apparel' %}
+      {% assign product_segment = 'merch' %}
   {% endcase %}
 {% endfor %}
 
@@ -123,8 +125,8 @@
       {% endif %}
     </a>
     
-    {% comment %} Flavor notes badge for non-equipment products {% endcomment %}
-    {% if show_flavor_notes and product_segment != 'equipment' %}
+    {% comment %} Flavor notes badge for coffee products only (exclude equipment and merchandise) {% endcomment %}
+    {% if show_flavor_notes and product_segment != 'equipment' and product_segment != 'merch' %}
       <div class="product-badge">
         <span class="flavor-note">{{ vibe_display }}</span>
       </div>
@@ -184,27 +186,7 @@
           </a>
         {% endif %}
         
-        <button class="quick-add-btn" 
-                data-add-to-cart="{{ product.variants.first.id }}"
-                data-product-handle="{{ product.handle }}"
-                data-product-title="{{ product.title | escape }}"
-                aria-label="Add {{ product.title | escape }} to cart"
-                title="Add to cart">
-          <span class="btn-content">
-            <i data-lucide="shopping-cart" class="btn-icon" aria-hidden="true"></i>
-            <span class="btn-text visually-hidden">Add to Cart</span>
-          </span>
-          <span class="btn-loading" aria-hidden="true">
-            <i data-lucide="loader-2" class="btn-icon animate-spin"></i>
-          </span>
-          <span class="btn-success" aria-hidden="true">
-            <i data-lucide="check-circle" class="btn-success-icon"></i>
-            <span class="btn-success-fallback">✓</span>
-          </span>
-          <span class="btn-error" aria-hidden="true">
-            <i data-lucide="x" class="btn-icon"></i>
-          </span>
-        </button>
+        {% comment %} Quick-add button removed - doesn't support variant selection {% endcomment %}
       {% else %}
         <button class="view-product-btn sold-out" disabled>
           <i data-lucide="clock" class="btn-icon"></i>

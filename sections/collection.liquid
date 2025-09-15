@@ -1441,6 +1441,188 @@
   z-index: 10;
   pointer-events: none;
 }
+
+/* Quick View Variant Selector Styles */
+.quick-view-modal .variant-selector {
+  margin-bottom: 1.5rem;
+}
+
+.quick-view-modal .variant-label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--color-foreground, #1a1a1a);
+  font-size: 1.1rem;
+  font-family: var(--font-primary--family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.quick-view-modal .variant-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.quick-view-modal .variant-option {
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  border: 2px solid rgba(92, 191, 238, 0.15);
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 80px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.quick-view-modal .variant-option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.05), rgba(92, 191, 238, 0.02));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.quick-view-modal .variant-option input {
+  display: none;
+}
+
+.quick-view-modal .variant-option:hover {
+  border-color: rgba(92, 191, 238, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(92, 191, 238, 0.15);
+}
+
+.quick-view-modal .variant-option:hover::before {
+  opacity: 1;
+}
+
+.quick-view-modal .variant-option.selected {
+  border-color: #5CBFEE;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.1), rgba(92, 191, 238, 0.05));
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(92, 191, 238, 0.25);
+}
+
+.quick-view-modal .variant-option.selected::before {
+  opacity: 1;
+  background: linear-gradient(135deg, rgba(92, 191, 238, 0.1), rgba(92, 191, 238, 0.05));
+}
+
+.quick-view-modal .variant-option.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: #5CBFEE;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  animation: checkmarkPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes checkmarkPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(-90deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.quick-view-modal .variant-option.unavailable {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(108, 117, 125, 0.1);
+  border-color: rgba(108, 117, 125, 0.2);
+}
+
+.quick-view-modal .variant-option.unavailable:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: rgba(108, 117, 125, 0.2);
+}
+
+.quick-view-modal .variant-option.unavailable::after {
+  content: '✕';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.quick-view-modal .variant-name {
+  font-weight: 700;
+  color: var(--color-foreground, #1a1a1a);
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  font-family: var(--font-primary--family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+  letter-spacing: 0.02em;
+}
+
+.quick-view-modal .variant-option.selected .variant-name {
+  color: #5CBFEE;
+}
+
+.quick-view-modal .variant-price {
+  font-size: 1rem !important;
+  color: #5CBFEE;
+  font-weight: 600;
+  font-family: var(--font-primary--family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.quick-view-modal .variant-option.unavailable .variant-name,
+.quick-view-modal .variant-option.unavailable .variant-price {
+  color: var(--color-muted, #666);
+}
+
+/* Responsive design for smaller modals */
+@media (max-width: 768px) {
+  .quick-view-modal .variant-options {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  
+  .quick-view-modal .variant-option {
+    padding: 16px 12px;
+    min-height: 70px;
+  }
+  
+  .quick-view-modal .variant-name {
+    font-size: 1rem;
+  }
+}
 </style>
 
 {% comment %} JavaScript included inline below - removed external dependency {% endcomment %}
@@ -1720,25 +1902,78 @@ async function openQuickView(productData) {
       window.currentQuickViewProduct = fullProduct;
       console.log('🔍 Loaded full product data for quick view:', fullProduct);
       
-      // Add hidden variant input to form
+      // Create variant selection UI and form inputs
       const form = document.getElementById('quickViewForm');
+      const optionsContainer = document.getElementById('quickViewOptions');
+      
       if (form && fullProduct.variants && fullProduct.variants.length > 0) {
-        // Remove any existing variant input
-        const existingInput = form.querySelector('input[name="id"]');
-        if (existingInput) {
-          existingInput.remove();
+        // Remove any existing variant inputs
+        const existingInputs = form.querySelectorAll('input[name="id"]');
+        existingInputs.forEach(input => input.remove());
+        
+        // Clear options container
+        if (optionsContainer) {
+          optionsContainer.innerHTML = '';
+          
+          // Create variant selection UI if more than one variant
+          if (fullProduct.variants.length > 1) {
+            const variantSelector = document.createElement('div');
+            variantSelector.className = 'variant-selector';
+            variantSelector.innerHTML = `
+              <label class="variant-label">Size:</label>
+              <div class="variant-options">
+                ${fullProduct.variants.map((variant, index) => {
+                  const isSelected = index === 0;
+                  const isAvailable = variant.available;
+                  return `
+                    <label class="variant-option${isSelected ? ' selected' : ''}${!isAvailable ? ' unavailable' : ''}">
+                      <input type="radio" name="id" value="${variant.id}" 
+                             data-price="${variant.price}" 
+                             data-compare-price="${variant.compare_at_price || ''}"
+                             data-available="${variant.available}"
+                             ${isSelected ? 'checked' : ''}
+                             ${!isAvailable ? 'disabled' : ''}>
+                      <span class="variant-name">${variant.title}</span>
+                      <span class="variant-price">₱${(variant.price / 100).toFixed(2)}</span>
+                    </label>
+                  `;
+                }).join('')}
+              </div>
+            `;
+            optionsContainer.appendChild(variantSelector);
+            
+            // Add variant change handlers
+            const variantInputs = optionsContainer.querySelectorAll('input[name="id"]');
+            variantInputs.forEach(input => {
+              input.addEventListener('change', () => {
+                updateQuickViewVariant(input);
+              });
+            });
+            
+            // Also add click handlers for labels (same as product page)
+            const variantLabels = optionsContainer.querySelectorAll('.variant-option');
+            variantLabels.forEach(option => {
+              option.addEventListener('click', (e) => {
+                if (e.target.type === 'radio') return;
+                const input = option.querySelector('input[name="id"]');
+                if (input && !input.disabled) {
+                  input.checked = true;
+                  updateQuickViewVariant(input);
+                }
+              });
+            });
+            
+          } else {
+            // Single variant - just create hidden input
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'id';
+            hiddenInput.value = fullProduct.variants[0].id;
+            form.appendChild(hiddenInput);
+          }
         }
         
-        // Add new variant input for the first available variant
-        const firstVariant = fullProduct.variants.find(v => v.available) || fullProduct.variants[0];
-        const variantInput = document.createElement('input');
-        variantInput.type = 'hidden';
-        variantInput.name = 'id';
-        variantInput.value = firstVariant.id;
-        form.appendChild(variantInput);
-        
-        console.log('📝 Added variant input to quick view form:', firstVariant.id);
-        console.log('🔍 Form inputs after adding variant:', Array.from(form.querySelectorAll('input')).map(input => ({ name: input.name, value: input.value, type: input.type })));
+        console.log('📝 Added variant selection to quick view');
       }
     } else {
       window.currentQuickViewProduct = null;
@@ -1865,6 +2100,95 @@ async function openQuickView(productData) {
       }
     }
   }
+  
+  // CRITICAL: Prevent form from submitting normally
+  const quickViewForm = document.getElementById('quickViewForm');
+  if (quickViewForm) {
+    console.log('🔧 Setting up form prevention for quick view');
+    
+    // Remove any existing action to prevent normal submission
+    quickViewForm.removeAttribute('action');
+    quickViewForm.setAttribute('onsubmit', 'return false;');
+    
+    // Add direct event handler to the form
+    quickViewForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🛑 Form submission prevented via direct handler');
+      handleQuickViewAddToCart(this);
+      return false;
+    });
+    
+    // Add handler to the button as well
+    const addToCartBtn = document.getElementById('quickViewAddToCart');
+    if (addToCartBtn) {
+      addToCartBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('🛑 Button click prevented via direct handler');
+        handleQuickViewAddToCart(quickViewForm);
+        return false;
+      });
+    }
+  }
+}
+
+// Update quick view when variant is selected
+function updateQuickViewVariant(variantInput) {
+  console.log('🔄 Quick view variant changed to:', variantInput.value, 'Price:', variantInput.dataset.price);
+  
+  // CRITICAL: Ensure this radio button is actually checked
+  document.querySelectorAll('#quickViewOptions input[name="id"]').forEach(input => {
+    input.checked = false;
+  });
+  variantInput.checked = true;
+  
+  // Update selected variant styling
+  document.querySelectorAll('#quickViewOptions .variant-option').forEach(option => {
+    option.classList.remove('selected');
+  });
+  variantInput.closest('.variant-option').classList.add('selected');
+  
+  // Update price display
+  const price = parseInt(variantInput.dataset.price);
+  const comparePrice = parseInt(variantInput.dataset.comparePrice) || 0;
+  const priceElement = document.querySelector('#quickViewPrice .price-current');
+  
+  if (priceElement) {
+    const formattedPrice = `₱${(price / 100).toFixed(2)}`;
+    priceElement.textContent = formattedPrice;
+  }
+  
+  // Update add to cart button state based on availability
+  const isAvailable = variantInput.dataset.available === 'true';
+  const addToCartBtn = document.getElementById('quickViewAddToCart');
+  
+  if (addToCartBtn) {
+    if (isAvailable) {
+      addToCartBtn.disabled = false;
+      const btnText = addToCartBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'ADD TO CART';
+      } else {
+        addToCartBtn.textContent = 'ADD TO CART';
+      }
+      addToCartBtn.style.opacity = '1';
+    } else {
+      addToCartBtn.disabled = true;
+      const btnText = addToCartBtn.querySelector('.btn-text');
+      if (btnText) {
+        btnText.textContent = 'SOLD OUT';
+      } else {
+        addToCartBtn.textContent = 'SOLD OUT';
+      }
+      addToCartBtn.style.opacity = '0.6';
+    }
+  }
+  
+  // Debug: Verify form state
+  const form = document.getElementById('quickViewForm');
+  const checkedInput = form?.querySelector('input[name="id"]:checked');
+  console.log('🔍 After variant update - checked input:', checkedInput?.value);
 }
 
 // Global close function that works across all templates
@@ -1937,14 +2261,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Handle quick view form submission
+  // Handle quick view form submission (multiple ways to ensure we catch it)
   document.addEventListener('submit', function(e) {
     if (e.target && e.target.id === 'quickViewForm') {
       e.preventDefault();
       e.stopPropagation();
-      console.log('🎯 Quick view form submitted in collection');
+      console.log('🎯 Quick view form submitted via submit event in collection');
       
       const form = e.target;
+      window.handleQuickViewAddToCart(form);
+    }
+  });
+  
+  // Also handle button clicks directly to prevent form submission
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'quickViewAddToCart') {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('🎯 Quick view add to cart button clicked directly');
+      
+      const form = document.getElementById('quickViewForm');
+      if (form) {
+        window.handleQuickViewAddToCart(form);
+      } else {
+        console.error('❌ Quick view form not found when button clicked');
+      }
+    }
+  });
+
+// Extract the add to cart logic into a separate function (GLOBAL SCOPE)
+window.handleQuickViewAddToCart = function(form) {
+      console.log('🚀 handleQuickViewAddToCart function called with form:', form);
+      
+      if (!form) {
+        console.error('❌ No form provided to handleQuickViewAddToCart');
+        return;
+      }
       
       // Get form data like product page does
       const formData = new FormData(form);
@@ -1970,30 +2322,92 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Use the robust AddToCartComponent exactly like product page
-      if (window.addToCartComponent) {
-        console.log('✅ Using AddToCartComponent for quick view form');
-        window.addToCartComponent.handleSubmit(variantId, quantity, addToCartBtn, productTitle)
-          .then(data => {
-            console.log('✅ Quick view add to cart successful:', data);
-            // Close modal after successful add with a delay to show the animation
-            setTimeout(() => {
-              window.closeQuickView();
-            }, 3000);
-          })
-          .catch(error => {
-            console.error('❌ Quick view add to cart failed:', error);
+      // Check what cart components are available
+      console.log('🔍 Available cart components:', {
+        addToCartComponent: !!window.addToCartComponent,
+        cartManager: !!window.cartManager,
+        formHasData: !!variantId
+      });
+      
+      // Use direct Shopify AJAX cart API (most reliable)
+      console.log('🛒 Using direct Shopify cart API');
+      
+      // Show loading state
+      const targetElement = btnText || addToCartBtn;
+      const originalHTML = targetElement.innerHTML;
+      targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-icon"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg> ADDING...';
+      addToCartBtn.disabled = true;
+
+      // Add to cart using Shopify's AJAX API
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: quantity
+        })
+      })
+      .then(response => {
+        console.log('🔄 Cart response status:', response.status);
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            console.error('❌ Cart API error:', errorData);
+            throw new Error(errorData.description || `HTTP ${response.status}`);
           });
-      } else {
-        console.warn('⚠️ AddToCartComponent not available, falling back to legacy method');
-        // Use a simplified legacy method for quick view
-        legacyQuickViewAddToCart(formData, addToCartBtn, btnText, productTitle);
-      }
-    }
-  });
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('✅ Add to cart successful:', data);
+        
+        // Success feedback
+        targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> ADDED!';
+        addToCartBtn.style.background = 'linear-gradient(135deg, #2ECC71 0%, #27AE60 100%)';
+        addToCartBtn.style.color = 'white';
+        addToCartBtn.style.border = 'none';
+        
+        // Update cart count if available
+        if (window.updateCartCount) {
+          window.updateCartCount();
+        }
+        
+        // Close modal after delay
+        setTimeout(() => {
+          window.closeQuickView();
+        }, 1500);
+      })
+      .catch(error => {
+        console.error('❌ Error adding to cart:', error);
+        
+        // Error feedback
+        targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg> ERROR';
+        addToCartBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #e74c3c)';
+        addToCartBtn.style.color = 'white';
+        
+        // Reset after delay
+        setTimeout(() => {
+          addToCartBtn.disabled = false;
+          targetElement.innerHTML = originalHTML;
+          addToCartBtn.style.background = '';
+          addToCartBtn.style.color = '';
+          addToCartBtn.style.border = '';
+        }, 2000);
+      });
+}; // End of handleQuickViewAddToCart function
   
   // Legacy fallback method for quick view (simplified version of product page method)
   function legacyQuickViewAddToCart(formData, addToCartBtn, btnText, productTitle) {
+    console.log('🔄 Legacy add to cart called with formData:', formData);
+    
+    // Extract data from FormData
+    const variantId = formData.get('id');
+    const quantity = parseInt(formData.get('quantity')) || 1;
+    
+    console.log('🔄 Legacy method - variantId:', variantId, 'quantity:', quantity);
+    
     // If btnText doesn't exist, use the button itself
     const targetElement = btnText || addToCartBtn;
     const originalHTML = targetElement.innerHTML;
@@ -2002,13 +2416,30 @@ document.addEventListener('DOMContentLoaded', function() {
     targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-icon"><path d="M21 12a9 9 0 11-6.219-8.56"/></svg>';
     addToCartBtn.disabled = true;
 
-    // Submit form data
+    // Submit as JSON (Shopify cart API expects JSON)
     fetch('/cart/add.js', {
       method: 'POST',
-      body: formData
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        id: variantId,
+        quantity: quantity
+      })
     })
-    .then(response => response.json())
+    .then(response => {
+      console.log('🔄 Legacy cart response status:', response.status);
+      if (!response.ok) {
+        return response.json().then(errorData => {
+          console.error('❌ Legacy cart API error:', errorData);
+          throw new Error(errorData.description || `HTTP ${response.status}`);
+        });
+      }
+      return response.json();
+    })
     .then(data => {
+      console.log('✅ Legacy add to cart successful:', data);
       // Success feedback
       targetElement.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>ADDED!';
       addToCartBtn.style.background = 'linear-gradient(135deg, #2ECC71 0%, #27AE60 100%)';
