@@ -777,9 +777,11 @@ initializeProductPageFast();
 
 .thumbnail-grid {
   display: flex;
-  gap: 12px;
-  overflow-x: auto;
+  flex-wrap: wrap;
+  max-width: 100%;
+  gap: 8px;
   padding: 4px 0;
+  justify-content: flex-start;
 }
 
 .thumbnail {
@@ -2056,6 +2058,12 @@ initializeProductPageFast();
 
     .thumbnail-grid {
       justify-content: center;
+      gap: 6px;
+    }
+    
+    .thumbnail {
+      width: 60px;
+      height: 60px;
     }
 
     .main-image:hover {
@@ -2066,6 +2074,15 @@ initializeProductPageFast();
   @media (max-width: 480px) {
     .product-container {
       padding: var(--spacing-md) var(--page-margin);
+    }
+    
+    .thumbnail {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .thumbnail-grid {
+      gap: 4px;
     }
 
     .product-title {
