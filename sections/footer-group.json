@@ -14,7 +14,20 @@
     "footer": {
       "type": "footer",
       "settings": {
-        "menu": "",
+        "footer_description": "Specialty coffee sourced from quality driven producers. Roasted with passion and precision.",
+        "footer_menu": "",
+        "show_shipping_info": true,
+        "contact_email": "",
+        "contact_phone": "",
+        "contact_address": "",
+        "roast_schedule": "Mondays to Fridays",
+        "show_newsletter": true,
+        "show_social_links": true,
+        "facebook_url": "https://www.facebook.com/wideawakeph",
+        "instagram_url": "https://www.instagram.com/wideawakeph/",
+        "twitter_url": "",
+        "youtube_url": "https://www.youtube.com/@wideawakeph3662",
+        "tiktok_url": "https://www.tiktok.com/@wideawakeph?_t=ZS-8zve3Nu8Eug&_r=1",
         "show_payment_icons": true
       }
     }
