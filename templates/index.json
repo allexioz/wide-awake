@@ -1,10 +1,20 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "product-discovery": {
       "type": "product-discovery-hero",
       "settings": {
         "title": "Find Your Perfect Coffee",
-        "subtitle": "Specialty coffee roasted fresh in the Philippines. From smooth daily drivers to complex single origins."
+        "subtitle": "Specialty coffee roasted fresh in the Philippines. From smooth daily drivers to complex single origins.",
+        "products_per_page": 8
       }
     },
     "brand-story": {
@@ -13,9 +23,10 @@
         "eyebrow": "Our Story",
         "title": "Rooted in Passion, Brewed with Purpose",
         "lead_text": "Wide Awake began with a simple belief: exceptional coffee should tell a story of the people who grow it and the land it comes from.",
+        "story_content": "<p>Born in the Philippines, we're dedicated to showcasing the incredible potential of Southeast Asian coffee. From the volcanic slopes of Mount Apo to partnerships with passionate farmers, every cup represents a commitment to quality, sustainability, and the art of coffee.</p><p>We're not just roasters—we're storytellers, connecting you to the origins, the farmers, and the craftsmanship that makes each bean extraordinary.</p>",
         "show_cta": true,
         "cta_text": "Learn Our Story",
-
+        "cta_link": "",
         "highlight_1_number": "2019",
         "highlight_1_text": "Founded",
         "highlight_2_number": "50+",
@@ -37,9 +48,11 @@
     },
     "featured-products": {
       "type": "featured-products",
+      "disabled": true,
       "settings": {
         "section_title": "Featured Coffee",
         "section_subtitle": "Sourced from quality driven producers. Roasted with passion and precision.",
+        "featured_collection": "",
         "products_to_show": 4,
         "show_view_all": true,
         "view_all_text": "View All Coffee"
@@ -48,14 +61,10 @@
     "studio-booking": {
       "type": "studio-booking",
       "settings": {
-        "eyebrow": "Coffee Experience",
-        "title": "Wide Awake Studio Sessions",
-        "lead_text": "Join us for an immersive coffee journey in our studio. A curated tasting experience that explores the depths of specialty coffee.",
         "price": "2,500",
-        "price_note": "Includes all tastings, food pairings, and take-home samples",
-        "calendar_title": "Book Your Session",
-        "calendar_subtitle": "Select your preferred date and time",
-        "show_contact": true
+        "testimonial": "An absolutely incredible experience. Kyle's passion for coffee and attention to detail made this the highlight of our trip to Manila.",
+        "testimonial_author": "Sarah Chen",
+        "testimonial_location": "Makati"
       }
     },
     "instagram-feed": {
@@ -63,24 +72,17 @@
       "settings": {
         "eyebrow": "Follow the Journey",
         "title": "@wideawakeph",
-        "subtitle": "Join our coffee community and see the latest from our roastery, farm visits, and coffee culture."
+        "subtitle": "Join our coffee community and see the latest from our roastery, farm visits, and coffee culture.",
+        "follow_text": "Follow us for daily coffee inspiration"
       }
     },
     "newsletter-signup": {
       "type": "newsletter-signup",
       "settings": {
-        "eyebrow": "Stay in the Loop",
         "title": "The Coffee Chronicles",
         "lead_text": "Get the latest coffee stories, brewing tips, and first access to new releases delivered to your inbox.",
-        "show_benefits": true,
-        "benefit_1": "Brewing guides & tips",
-        "benefit_2": "New coffee releases",
-        "benefit_3": "Farm stories & origins",
-        "form_title": "Join the Coffee Community",
-        "form_subtitle": "No spam, just great coffee content. Unsubscribe anytime.",
-        "show_social_proof": true,
-        "subscriber_count": "500+",
-        "frequency": "Weekly"
+        "email_placeholder": "Enter your email",
+        "submit_text": "Subscribe"
       }
     },
     "wholesale": {
