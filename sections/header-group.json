@@ -13,10 +13,22 @@
   "sections": {
     "header": {
       "type": "header",
-      "settings": {}
+      "settings": {
+        "announcement_text": "Free shipping for NCR+ orders ₱1000+",
+        "menu": "main-menu",
+        "locale_language": "English",
+        "locale_currency": "PHP",
+        "locale_flag": "🇵🇭",
+        "facebook_url": "",
+        "instagram_url": "",
+        "youtube_url": "",
+        "tiktok_url": "",
+        "popular_collection": "best-sellers",
+        "fallback_searches": "Coffee, Espresso, Arabica, Cold Brew, French Press, Pour Over"
+      }
     }
   },
   "order": [
     "header"
-  ],
+  ]
 }
