@@ -71,8 +71,6 @@
       {% assign product_segment = 'direct-trade' %}
     {% when 'equipment', 'gear', 'accessories' %}
       {% assign product_segment = 'equipment' %}
-    {% when 'merch', 'merchandise', 'apparel' %}
-      {% assign product_segment = 'merch' %}
   {% endcase %}
 {% endfor %}
 
@@ -125,8 +123,8 @@
       {% endif %}
     </a>
     
-    {% comment %} Flavor notes badge for coffee products only (exclude equipment and merchandise) {% endcomment %}
-    {% if show_flavor_notes and product_segment != 'equipment' and product_segment != 'merch' %}
+    {% comment %} Flavor notes badge for non-equipment products {% endcomment %}
+    {% if show_flavor_notes and product_segment != 'equipment' %}
       <div class="product-badge">
         <span class="flavor-note">{{ vibe_display }}</span>
       </div>

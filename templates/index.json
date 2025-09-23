@@ -13,8 +13,7 @@
       "type": "product-discovery-hero",
       "settings": {
         "title": "Find Your Perfect Coffee",
-        "subtitle": "Specialty coffee roasted fresh in the Philippines. From smooth daily drivers to complex single origins.",
-        "products_per_page": 8
+        "subtitle": "Specialty coffee roasted fresh in the Philippines. From smooth daily drivers to complex single origins."
       }
     },
     "brand-story": {
@@ -23,14 +22,12 @@
         "eyebrow": "Our Story",
         "title": "Rooted in Passion, Brewed with Purpose",
         "lead_text": "Wide Awake began with a simple belief: exceptional coffee should tell a story of the people who grow it and the land it comes from.",
-        "story_content": "<p>Born in the Philippines, we're dedicated to showcasing the incredible potential of Asian coffee. From the volcanic slopes of Mount Apo to partnerships with passionate farmers abroad, every cup represents a commitment to quality, sustainability, and the art of coffee.</p><p>We're not just roasters—we're storytellers, connecting you to the origins, the farmers, and the craftsmanship that makes each bean extraordinary.</p>",
         "show_cta": true,
         "cta_text": "Learn Our Story",
-        "cta_link": "",
         "highlight_1_number": "2019",
         "highlight_1_text": "Founded",
-        "highlight_2_number": "4",
-        "highlight_2_text": "Partner Farms",
+        "highlight_2_number": "50+",
+        "highlight_2_text": "Farm Partners",
         "highlight_3_number": "100%",
         "highlight_3_text": "Direct Trade"
       }
@@ -48,11 +45,9 @@
     },
     "featured-products": {
       "type": "featured-products",
-      "disabled": true,
       "settings": {
         "section_title": "Featured Coffee",
         "section_subtitle": "Sourced from quality driven producers. Roasted with passion and precision.",
-        "featured_collection": "",
         "products_to_show": 4,
         "show_view_all": true,
         "view_all_text": "View All Coffee"
@@ -61,10 +56,7 @@
     "studio-booking": {
       "type": "studio-booking",
       "settings": {
-        "price": "2,500",
-        "testimonial": "An absolutely incredible experience. Kyle's passion for coffee and attention to detail made this the highlight of our trip to Manila.",
-        "testimonial_author": "Sarah Chen",
-        "testimonial_location": "Makati"
+        "price": "2,500"
       }
     },
     "instagram-feed": {
@@ -72,17 +64,14 @@
       "settings": {
         "eyebrow": "Follow the Journey",
         "title": "@wideawakeph",
-        "subtitle": "Join our coffee community and see the latest from our roastery, farm visits, and coffee culture.",
-        "follow_text": "Follow us for daily coffee inspiration"
+        "subtitle": "Join our coffee community and see the latest from our roastery, farm visits, and coffee culture."
       }
     },
     "newsletter-signup": {
       "type": "newsletter-signup",
       "settings": {
         "title": "The Coffee Chronicles",
-        "lead_text": "Get the latest coffee stories, brewing tips, and first access to new releases delivered to your inbox.",
-        "email_placeholder": "Enter your email",
-        "submit_text": "Subscribe"
+        "lead_text": "Get the latest coffee stories, brewing tips, and first access to new releases delivered to your inbox."
       }
     },
     "wholesale": {

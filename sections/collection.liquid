@@ -52,7 +52,7 @@
                   <div class="sort-dropdown">
                     <button class="sort-trigger" id="sortTrigger">
                       <i data-lucide="arrow-up-down" class="sort-icon"></i>
-                      <span class="sort-label">Sort: Featured</span>
+                      <span class="sort-label">Featured</span>
                       <i data-lucide="chevron-down" class="dropdown-icon"></i>
                     </button>
                     <div class="sort-menu" id="sortMenu">
@@ -79,6 +79,10 @@
                       <div class="sort-option" data-sort="created-new">
                         <i data-lucide="calendar-plus" class="option-icon"></i>
                         Newest First
+                      </div>
+                      <div class="sort-option" data-sort="updated-new">
+                        <i data-lucide="clock" class="option-icon"></i>
+                        Recently Updated
                       </div>
                       <div class="sort-option" data-sort="best-selling">
                         <i data-lucide="shopping-bag" class="option-icon"></i>
@@ -208,7 +212,9 @@
            data-total-products="{{ collection.products.size }}"
            data-products-per-page="{{ products_per_page }}">
         
-        {% for product in collection.products %}
+        {% assign sort_by = collection.sort_by | default: collection.default_sort_by | default: 'featured' %}
+        {% paginate collection.products by 24 %}
+          {% for product in collection.products %}
           {% comment %} Set defaults for coffee attributes {% endcomment %}
           {% assign product_segment = 'daily-driver' %}
           {% assign product_vibe = 'smooth-sweet' %}
@@ -270,6 +276,7 @@
             card_class: 'product-card--secondary-cart',
             lazy_load: false %}
         {% endfor %}
+        {% endpaginate %}
 
         <!-- Empty State (controlled by JavaScript) -->
         <div class="empty-state" id="emptyState" style="display: none;">
@@ -720,10 +727,10 @@
   cursor: pointer;
   transition: border-color 0.2s ease;
   font-family: var(--font-primary--family);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   color: #495057;
-  min-width: 140px;
+  min-width: 110px;
   white-space: nowrap;
 }
 
@@ -1675,7 +1682,7 @@ function initCollectionControls() {
       // Update trigger text
       const triggerLabel = sortTrigger.querySelector('.sort-label');
       if (triggerLabel) {
-        triggerLabel.textContent = `Sort: ${sortLabel}`;
+        triggerLabel.textContent = sortLabel;
       }
       
       // Close dropdown
@@ -1775,7 +1782,16 @@ function applySorting(sortType) {
       // In a real implementation, you'd sort by a sales metric
       sortedCards.sort(() => Math.random() - 0.5);
       break;
-    default: // featured - restore original order
+    case 'updated-new':
+      // Recently updated - for client-side we'll use product ID as approximation
+      // For true updated_at sorting, this would need server-side implementation
+      sortedCards.sort((a, b) => {
+        const dateA = getProductId(a);
+        const dateB = getProductId(b);
+        return dateB - dateA; // Newer updates typically have higher IDs
+      });
+      break;
+    default: // featured - preserve manual order from Shopify admin
       sortedCards = restoreOriginalOrder(productCards);
       break;
   }

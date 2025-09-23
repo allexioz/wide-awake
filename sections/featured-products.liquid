@@ -14,9 +14,63 @@
     {% endif %}
 
     {% if section.settings.featured_collection != blank %}
+      <!-- Sort Controls for Homepage -->
+      <div class="homepage-sort-controls">
+        <div class="sort-dropdown">
+          <button class="sort-trigger" id="homepageSortTrigger">
+            <i data-lucide="arrow-up-down" class="sort-icon"></i>
+            <span class="sort-label">Featured</span>
+            <i data-lucide="chevron-down" class="dropdown-icon"></i>
+          </button>
+          <div class="sort-menu" id="homepageSortMenu">
+            <div class="sort-option active" data-sort="featured">
+              <i data-lucide="star" class="option-icon"></i>
+              Featured
+            </div>
+            <div class="sort-option" data-sort="price-low">
+              <i data-lucide="trending-up" class="option-icon"></i>
+              Price: Low to High
+            </div>
+            <div class="sort-option" data-sort="price-high">
+              <i data-lucide="trending-down" class="option-icon"></i>
+              Price: High to Low
+            </div>
+            <div class="sort-option" data-sort="title-a">
+              <i data-lucide="a-arrow-down" class="option-icon"></i>
+              Name: A to Z
+            </div>
+            <div class="sort-option" data-sort="title-z">
+              <i data-lucide="arrow-down" class="option-icon"></i>
+              Name: Z to A
+            </div>
+            <div class="sort-option" data-sort="created-new">
+              <i data-lucide="calendar-plus" class="option-icon"></i>
+              Newest First
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="products-grid">
         {% assign featured_collection = collections[section.settings.featured_collection] %}
-        {% for product in featured_collection.products limit: section.settings.products_to_show %}
+        {% assign sort_by = section.settings.sort_by | default: 'featured' %}
+        {% assign sorted_products = featured_collection.products %}
+        {% case sort_by %}
+          {% when 'featured' %}
+            {% comment %} Keep default collection order (manual from admin) {% endcomment %}
+          {% when 'created' %}
+            {% assign sorted_products = featured_collection.products | sort: 'created_at' | reverse %}
+          {% when 'best-selling' %}
+            {% assign sorted_products = featured_collection.products | sort: 'best_selling' | reverse %}
+          {% when 'title-ascending' %}
+            {% assign sorted_products = featured_collection.products | sort: 'title' %}
+          {% when 'title-descending' %}
+            {% assign sorted_products = featured_collection.products | sort: 'title' | reverse %}
+          {% when 'price-ascending' %}
+            {% assign sorted_products = featured_collection.products | sort: 'price' %}
+          {% when 'price-descending' %}
+            {% assign sorted_products = featured_collection.products | sort: 'price' | reverse %}
+        {% endcase %}
+        {% for product in sorted_products limit: section.settings.products_to_show %}
           <div class="product-card">
             <div class="product-image">
               {% if product.featured_image %}
@@ -343,6 +397,111 @@
     padding: 16px 40px;
     font-size: 1.1rem;
     font-family: 'Poppins' !important;
+  }
+
+  /* Homepage Sort Controls */
+  .homepage-sort-controls {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+  }
+
+  .homepage-sort-controls .sort-dropdown {
+    position: relative;
+  }
+
+  .homepage-sort-controls .sort-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #495057;
+    min-width: 110px;
+    white-space: nowrap;
+  }
+
+  .homepage-sort-controls .sort-trigger:hover {
+    border-color: #5CBFEE;
+  }
+
+  .homepage-sort-controls .sort-icon,
+  .homepage-sort-controls .dropdown-icon {
+    width: 14px;
+    height: 14px;
+    color: #6c757d;
+  }
+
+  .homepage-sort-controls .dropdown-icon {
+    transition: transform 0.2s ease;
+    margin-left: auto;
+  }
+
+  .homepage-sort-controls .sort-trigger.active .dropdown-icon {
+    transform: rotate(180deg);
+  }
+
+  .homepage-sort-controls .sort-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: all 0.2s ease;
+    margin-top: 2px;
+  }
+
+  .homepage-sort-controls .sort-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .homepage-sort-controls .sort-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #495057;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #f8f9fa;
+  }
+
+  .homepage-sort-controls .sort-option:last-child {
+    border-bottom: none;
+  }
+
+  .homepage-sort-controls .sort-option:hover {
+    background: #f8f9fa;
+    color: #5CBFEE;
+  }
+
+  .homepage-sort-controls .sort-option.active {
+    background: rgba(92, 191, 238, 0.1);
+    color: #5CBFEE;
+  }
+
+  .homepage-sort-controls .option-icon {
+    width: 14px;
+    height: 14px;
+    color: currentColor;
   }
 
   /* Touch-friendly states for mobile */
@@ -907,6 +1066,154 @@
 {% render 'quick-view-variant-logic' %}
 
 <script>
+// Homepage Sort Functionality
+function initHomepageSorting() {
+  const sortTrigger = document.getElementById('homepageSortTrigger');
+  const sortMenu = document.getElementById('homepageSortMenu');
+  const sortOptions = document.querySelectorAll('#homepageSortMenu .sort-option');
+  
+  if (!sortTrigger || !sortMenu) return;
+
+  // Toggle dropdown
+  sortTrigger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    sortTrigger.classList.toggle('active');
+    sortMenu.classList.toggle('active');
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!sortTrigger.contains(e.target) && !sortMenu.contains(e.target)) {
+      sortTrigger.classList.remove('active');
+      sortMenu.classList.remove('active');
+    }
+  });
+
+  // Handle sort option selection
+  sortOptions.forEach(option => {
+    option.addEventListener('click', function() {
+      const sortType = this.dataset.sort;
+      const sortLabel = this.textContent.trim();
+      
+      // Update active state
+      sortOptions.forEach(opt => opt.classList.remove('active'));
+      this.classList.add('active');
+      
+      // Update trigger text
+      const triggerLabel = sortTrigger.querySelector('.sort-label');
+      if (triggerLabel) {
+        triggerLabel.textContent = sortLabel;
+      }
+      
+      // Close dropdown
+      sortMenu.classList.remove('active');
+      sortTrigger.classList.remove('active');
+      
+      // Apply sorting
+      applyHomepageSorting(sortType);
+    });
+  });
+}
+
+function applyHomepageSorting(sortType) {
+  const productCards = Array.from(document.querySelectorAll('.featured-products .product-card'));
+  const productsGrid = document.querySelector('.featured-products .products-grid');
+  
+  if (!productCards.length || !productsGrid) return;
+  
+  console.log(`🔄 Sorting homepage products by: ${sortType}`);
+  
+  let sortedCards = [...productCards];
+  
+  switch (sortType) {
+    case 'price-low':
+      sortedCards.sort((a, b) => {
+        const priceA = getHomepagePrice(a);
+        const priceB = getHomepagePrice(b);
+        return priceA - priceB;
+      });
+      break;
+    case 'price-high':
+      sortedCards.sort((a, b) => {
+        const priceA = getHomepagePrice(a);
+        const priceB = getHomepagePrice(b);
+        return priceB - priceA;
+      });
+      break;
+    case 'title-a':
+      sortedCards.sort((a, b) => {
+        const titleA = getHomepageTitle(a);
+        const titleB = getHomepageTitle(b);
+        return titleA.localeCompare(titleB);
+      });
+      break;
+    case 'title-z':
+      sortedCards.sort((a, b) => {
+        const titleA = getHomepageTitle(a);
+        const titleB = getHomepageTitle(b);
+        return titleB.localeCompare(titleA);
+      });
+      break;
+    case 'created-new':
+      sortedCards.sort((a, b) => {
+        const idA = getHomepageProductId(a);
+        const idB = getHomepageProductId(b);
+        return idB - idA; // Newer products have higher IDs typically
+      });
+      break;
+    default: // featured - preserve original order (manual admin order)
+      sortedCards = restoreHomepageOriginalOrder(productCards);
+      break;
+  }
+  
+  // Apply sorting animation
+  productsGrid.style.transition = 'opacity 0.2s ease';
+  productsGrid.style.opacity = '0.6';
+  
+  setTimeout(() => {
+    // Reorder the DOM elements
+    sortedCards.forEach(card => {
+      productsGrid.appendChild(card);
+    });
+    
+    // Restore opacity
+    productsGrid.style.opacity = '1';
+    
+    console.log(`✅ Sorted ${sortedCards.length} homepage products by ${sortType}`);
+  }, 100);
+}
+
+// Helper functions for homepage sorting
+function getHomepagePrice(card) {
+  const priceElement = card.querySelector('.price-sale, .price');
+  if (!priceElement) return 0;
+  
+  const priceText = priceElement.textContent.replace(/[^0-9.]/g, '');
+  return parseFloat(priceText) || 0;
+}
+
+function getHomepageTitle(card) {
+  const titleElement = card.querySelector('.product-title a');
+  return titleElement ? titleElement.textContent.trim().toLowerCase() : '';
+}
+
+function getHomepageProductId(card) {
+  const button = card.querySelector('.quick-view-btn');
+  if (button && button.dataset.productId) {
+    return parseInt(button.dataset.productId) || 0;
+  }
+  return 0;
+}
+
+function restoreHomepageOriginalOrder(cards) {
+  // Return cards in their original DOM order
+  return cards.sort((a, b) => {
+    const indexA = Array.from(a.parentNode.children).indexOf(a);
+    const indexB = Array.from(b.parentNode.children).indexOf(b);
+    return indexA - indexB;
+  });
+}
+
 async function openQuickView(productData) {
   console.log('🚀 openQuickView called with:', productData);
   const modal = document.getElementById('quickViewModal');
@@ -1237,6 +1544,9 @@ document.addEventListener('DOMContentLoaded', function() {
       }, 2000);
     });
   }
+  
+  // Initialize homepage sorting
+  initHomepageSorting();
 });
 </script>
 
@@ -1283,6 +1593,42 @@ document.addEventListener('DOMContentLoaded', function() {
       "id": "view_all_text",
       "label": "View All Button Text",
       "default": "View All Coffee"
+    },
+    {
+      "type": "select",
+      "id": "sort_by",
+      "label": "Sort Products By",
+      "options": [
+        {
+          "value": "featured",
+          "label": "Featured (Manual Order)"
+        },
+        {
+          "value": "created",
+          "label": "Date Created"
+        },
+        {
+          "value": "best-selling",
+          "label": "Best Selling"
+        },
+        {
+          "value": "title-ascending",
+          "label": "Alphabetically, A-Z"
+        },
+        {
+          "value": "title-descending",
+          "label": "Alphabetically, Z-A"
+        },
+        {
+          "value": "price-ascending",
+          "label": "Price, Low to High"
+        },
+        {
+          "value": "price-descending",
+          "label": "Price, High to Low"
+        }
+      ],
+      "default": "featured"
     }
   ],
   "presets": [

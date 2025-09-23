@@ -2949,9 +2949,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     resultsGrid.innerHTML = products.map((product, index) => {
       // Enhanced product data extraction
-      const price = product.price ? `₱${(product.price / 100).toFixed(2)}` : '';
+      // Price is already in peso format, no need to divide by 100
+      const price = product.price ? `₱${Math.round(product.price)}` : '';
       const comparePrice = product.compare_at_price && product.compare_at_price > product.price 
-        ? `₱${(product.compare_at_price / 100).toFixed(2)}` : '';
+        ? `₱${Math.round(product.compare_at_price)}` : '';
       const image = product.image || product.featured_image || '/assets/no-image.svg';
       const vendor = product.vendor || 'wideawakeph';
       const productType = product.product_type || '';

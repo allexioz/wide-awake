@@ -10,7 +10,12 @@
   - Alternative format: vibe:smooth-sweet, segment:daily-driver
 {% endcomment %}
 
-{% assign all_products = collections.all.products %}
+{% comment %} Use coffee collection for manual ordering, fallback to all {% endcomment %}
+{% if collections.coffee.products.size > 0 %}
+  {% assign all_products = collections.coffee.products %}
+{% else %}
+  {% assign all_products = collections.all.products %}
+{% endif %}
 {% assign daily_driver_products = collections.daily-driver.products %}
 {% assign premium_brews_products = collections.premium-brews.products %}
 {% assign direct_trade_products = collections.direct-trade.products %}
@@ -118,10 +123,42 @@
               </div>
             </div>
             <div class="filter-header-right">
-              <button class="filter-toggle-mobile" id="filterToggle" aria-expanded="false" aria-controls="filterContent">
-                <span class="filter-toggle-text">Filters</span>
-                <i data-lucide="chevron-down" class="filter-toggle-icon" aria-hidden="true"></i>
-              </button>
+              <!-- Sort Controls -->
+              <div class="sort-controls-new">
+                <div class="sort-dropdown">
+                  <button class="sort-trigger" id="discoverySortTrigger">
+                    <i data-lucide="arrow-up-down" class="sort-icon"></i>
+                    <span class="sort-label">Featured</span>
+                    <i data-lucide="chevron-down" class="dropdown-icon"></i>
+                  </button>
+                  <div class="sort-menu" id="discoverySortMenu">
+                    <div class="sort-option active" data-sort="featured">
+                      <i data-lucide="star" class="option-icon"></i>
+                      Featured
+                    </div>
+                    <div class="sort-option" data-sort="price-low">
+                      <i data-lucide="trending-up" class="option-icon"></i>
+                      Price: Low to High
+                    </div>
+                    <div class="sort-option" data-sort="price-high">
+                      <i data-lucide="trending-down" class="option-icon"></i>
+                      Price: High to Low
+                    </div>
+                    <div class="sort-option" data-sort="title-a">
+                      <i data-lucide="a-arrow-down" class="option-icon"></i>
+                      Name: A to Z
+                    </div>
+                    <div class="sort-option" data-sort="title-z">
+                      <i data-lucide="arrow-down" class="option-icon"></i>
+                      Name: Z to A
+                    </div>
+                    <div class="sort-option" data-sort="created-new">
+                      <i data-lucide="calendar-plus" class="option-icon"></i>
+                      Newest First
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -241,7 +278,7 @@
               </p>
               <div class="empty-state-actions">
                 <button class="btn-secondary" onclick="resetAllFilters()">Reset Filters</button>
-                <a href="{{ collections.all.url }}" class="btn-primary">View All Coffee</a>
+                <a href="{{ collections.coffee.url | default: collections.all.url }}" class="btn-primary">View All Coffee</a>
               </div>
             </div>
           </div>
@@ -2148,6 +2185,113 @@
       max-width: 160px !important;
     }
   }
+
+  /* Sort Controls - Discovery Section */
+  .sort-controls-new {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sort-controls-new .sort-dropdown {
+    position: relative;
+  }
+
+  .sort-controls-new .sort-trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+    font-family: var(--font-primary--family);
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #495057;
+    min-width: 110px;
+    white-space: nowrap;
+  }
+
+  .sort-controls-new .sort-trigger:hover {
+    border-color: #5CBFEE;
+  }
+
+  .sort-controls-new .sort-icon {
+    width: 14px;
+    height: 14px;
+    color: #6c757d;
+  }
+
+  .sort-controls-new .dropdown-icon {
+    width: 14px;
+    height: 14px;
+    color: #6c757d;
+    transition: transform 0.2s ease;
+    margin-left: auto;
+  }
+
+  .sort-controls-new .sort-trigger.active .dropdown-icon {
+    transform: rotate(180deg);
+  }
+
+  .sort-controls-new .sort-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: all 0.2s ease;
+    margin-top: 2px;
+  }
+
+  .sort-controls-new .sort-menu.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .sort-controls-new .sort-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #495057;
+    font-family: var(--font-primary--family);
+    font-size: 0.8rem;
+    border-bottom: 1px solid #f8f9fa;
+  }
+
+  .sort-controls-new .sort-option:last-child {
+    border-bottom: none;
+  }
+
+  .sort-controls-new .sort-option:hover {
+    background: #f8f9fa;
+    color: #5CBFEE;
+  }
+
+  .sort-controls-new .sort-option.active {
+    background: rgba(92, 191, 238, 0.1);
+    color: #5CBFEE;
+  }
+
+  .sort-controls-new .option-icon {
+    width: 14px;
+    height: 14px;
+    color: currentColor;
+  }
 {% endstylesheet %}
 
 <!-- Performance Optimized Quick View JavaScript -->
@@ -2459,8 +2603,176 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   
+  // Discovery Section Sorting Functionality
+  function initDiscoverySorting() {
+    const sortTrigger = document.getElementById('discoverySortTrigger');
+    const sortMenu = document.getElementById('discoverySortMenu');
+    const sortOptions = document.querySelectorAll('#discoverySortMenu .sort-option');
+    
+    if (!sortTrigger || !sortMenu) return;
+
+    // Toggle dropdown
+    sortTrigger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      sortTrigger.classList.toggle('active');
+      sortMenu.classList.toggle('active');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!sortTrigger.contains(e.target) && !sortMenu.contains(e.target)) {
+        sortTrigger.classList.remove('active');
+        sortMenu.classList.remove('active');
+      }
+    });
+
+    // Handle sort option selection
+    sortOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        const sortType = this.dataset.sort;
+        const sortLabel = this.textContent.trim();
+        
+        // Update active state
+        sortOptions.forEach(opt => opt.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update trigger text
+        const triggerLabel = sortTrigger.querySelector('.sort-label');
+        if (triggerLabel) {
+          triggerLabel.textContent = sortLabel;
+        }
+        
+        // Close dropdown
+        sortMenu.classList.remove('active');
+        sortTrigger.classList.remove('active');
+        
+        // Apply sorting
+        applyDiscoverySorting(sortType);
+      });
+    });
+  }
+
+  function applyDiscoverySorting(sortType) {
+    const productCards = Array.from(document.querySelectorAll('.product-discovery-hero .product-card, .discovery-products .product-card'));
+    const productsGrid = document.querySelector('.discovery-products, .product-grid');
+    
+    if (!productCards.length || !productsGrid) {
+      console.log('⚠️ No product cards found in discovery section');
+      return;
+    }
+    
+    console.log(`🔄 Sorting discovery products by: ${sortType}`);
+    
+    let sortedCards = [...productCards];
+    
+    switch (sortType) {
+      case 'price-low':
+        sortedCards.sort((a, b) => {
+          const priceA = getDiscoveryPrice(a);
+          const priceB = getDiscoveryPrice(b);
+          return priceA - priceB;
+        });
+        break;
+      case 'price-high':
+        sortedCards.sort((a, b) => {
+          const priceA = getDiscoveryPrice(a);
+          const priceB = getDiscoveryPrice(b);
+          return priceB - priceA;
+        });
+        break;
+      case 'title-a':
+        sortedCards.sort((a, b) => {
+          const titleA = getDiscoveryTitle(a);
+          const titleB = getDiscoveryTitle(b);
+          return titleA.localeCompare(titleB);
+        });
+        break;
+      case 'title-z':
+        sortedCards.sort((a, b) => {
+          const titleA = getDiscoveryTitle(a);
+          const titleB = getDiscoveryTitle(b);
+          return titleB.localeCompare(titleA);
+        });
+        break;
+      case 'created-new':
+        sortedCards.sort((a, b) => {
+          const idA = getDiscoveryProductId(a);
+          const idB = getDiscoveryProductId(b);
+          return idB - idA; // Newer products have higher IDs typically
+        });
+        break;
+      default: // featured - preserve original order (manual admin order)
+        sortedCards = restoreDiscoveryOriginalOrder(productCards);
+        break;
+    }
+    
+    // Apply sorting animation
+    productsGrid.style.transition = 'opacity 0.2s ease';
+    productsGrid.style.opacity = '0.6';
+    
+    setTimeout(() => {
+      // Reorder the DOM elements
+      sortedCards.forEach(card => {
+        productsGrid.appendChild(card);
+      });
+      
+      // Restore opacity
+      productsGrid.style.opacity = '1';
+      
+      console.log(`✅ Sorted ${sortedCards.length} discovery products by ${sortType}`);
+    }, 100);
+  }
+
+  // Helper functions for discovery section sorting
+  function getDiscoveryPrice(card) {
+    const priceElement = card.querySelector('.price-sale, .price, .product-price .price');
+    if (!priceElement) return 0;
+    
+    const priceText = priceElement.textContent.replace(/[^0-9.]/g, '');
+    return parseFloat(priceText) || 0;
+  }
+
+  function getDiscoveryTitle(card) {
+    const titleElement = card.querySelector('.product-title a, .product-title, h3 a');
+    return titleElement ? titleElement.textContent.trim().toLowerCase() : '';
+  }
+
+  function getDiscoveryProductId(card) {
+    const button = card.querySelector('.quick-view-btn, [data-product-id]');
+    if (button && button.dataset.productId) {
+      return parseInt(button.dataset.productId) || 0;
+    }
+    
+    // Fallback: try to extract from links
+    const productLink = card.querySelector('a[href*="/products/"]');
+    if (productLink) {
+      const href = productLink.getAttribute('href');
+      const match = href.match(/\/products\/([^\/\?]+)/);
+      if (match) {
+        // Convert product handle to a number for sorting (hash of the string)
+        return match[1].split('').reduce((hash, char) => {
+          return ((hash << 5) - hash) + char.charCodeAt(0);
+        }, 0);
+      }
+    }
+    
+    return 0;
+  }
+
+  function restoreDiscoveryOriginalOrder(cards) {
+    // Return cards in their original DOM order
+    return cards.sort((a, b) => {
+      const indexA = Array.from(a.parentNode.children).indexOf(a);
+      const indexB = Array.from(b.parentNode.children).indexOf(b);
+      return indexA - indexB;
+    });
+  }
+
   // Start initialization
   initializeProductDiscovery();
+  
+  // Initialize discovery sorting
+  initDiscoverySorting();
 });
 </script>
 
