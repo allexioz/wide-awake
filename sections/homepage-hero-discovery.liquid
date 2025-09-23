@@ -1,9 +1,26 @@
 {% comment %}
-  Wide Awake Product Discovery Hero
-  Modern ecommerce experience prioritizing immediate product access
-  Now with tag-based product categorization system
+  HOMEPAGE HERO DISCOVERY SECTION
   
-  Admin Tagging System:
+  PURPOSE: Main hero section on homepage with product filtering and discovery
+  USED ON: Homepage only (templates/index.json)
+  
+  FEATURES:
+  - Product filtering by vibes (smooth-sweet, light-bright, complex-expressive)
+  - Product filtering by segments (daily-driver, premium-brews, direct-trade, equipment)
+  - Sorting dropdown with price/title/date options
+  - Tag-based product categorization system
+  
+  JAVASCRIPT FUNCTIONS:
+  - initDiscoverySorting() - initializes sorting dropdown
+  - applyDiscoverySorting() - applies sorting logic
+  - getDiscoveryPrice() - extracts price for sorting
+  
+  CSS CLASSES:
+  - .product-grid - main product grid container (HERO SECTION)
+  - .sort-controls-new - sorting dropdown controls (HERO SECTION)
+  - .smart-filters - filter controls (HERO SECTION)
+  
+  ADMIN TAGGING SYSTEM:
   Add these tags to products in Shopify Admin:
   - Coffee Vibes: smooth-sweet, light-bright, complex-expressive
   - Coffee Segments: daily-driver, premium-brews, direct-trade, equipment
@@ -249,13 +266,13 @@
           {% comment %} Set vibe display {% endcomment %}
           {% case product_vibe %}
             {% when 'smooth-sweet' %}
-              {% assign vibe_display = '🍯 Smooth and Sweet' %}
+              {% assign vibe_display = 'Smooth and Sweet' %}
             {% when 'light-bright' %}
-              {% assign vibe_display = '🍋 Light and Bright' %}
+              {% assign vibe_display = 'Light and Bright' %}
             {% when 'complex-expressive' %}
-              {% assign vibe_display = '🎭 Complex and Expressive' %}
+              {% assign vibe_display = 'Complex and Expressive' %}
             {% else %}
-              {% assign vibe_display = '☕ Great Coffee' %}
+              {% assign vibe_display = 'Great Coffee' %}
           {% endcase %}
 
           {% render 'product-card', 
@@ -429,7 +446,7 @@
             <div class="quantity-section quick-view-quantity">
               <label class="quantity-label">Quantity</label>
               <div class="quantity-controls">
-                <button type="button" class="quantity-btn quantity-decrease" onclick="updateQuantity(-1)" aria-label="Decrease quantity">−</button>
+                <button type="button" class="quantity-btn quantity-decrease" onclick="updateQuantity(-1)" aria-label="Decrease quantity">-</button>
                 <input type="number" class="quantity-input" id="quickViewQuantity" value="1" min="1" max="99">
                 <button type="button" class="quantity-btn quantity-increase" onclick="updateQuantity(1)" aria-label="Increase quantity">+</button>
               </div>
@@ -1941,7 +1958,7 @@
   }
 
   .description-title::before {
-    content: '☕';
+    content: '';
     font-size: 1.1rem;
   }
 
@@ -1973,7 +1990,7 @@
   }
 
   .highlights-title::before {
-    content: '✨';
+    content: '';
     font-size: 1rem;
   }
 
@@ -1995,7 +2012,7 @@
   }
 
   .highlights-list li::before {
-    content: '•';
+    content: '-';
     color: #2ECC71;
     font-weight: bold;
     position: absolute;
@@ -2023,7 +2040,7 @@
   }
 
   .brewing-title::before {
-    content: '🔥';
+    content: '';
     font-size: 1rem;
   }
 
@@ -2349,11 +2366,11 @@ async function openQuickView(productData) {
   const stockText = document.getElementById('stockText');
   const stockIcon = document.querySelector('.stock-icon');
   
-  console.log('🔍 Populating enhanced sections with product:', product);
-  console.log('🔍 Description element found:', descriptionElement);
-  console.log('🔍 Highlights section found:', highlightsSection);
-  console.log('🔍 Brewing section found:', brewingSection);
-  console.log('🔍 Stock section found:', stockSection);
+  console.log('[DEBUG] Populating enhanced sections with product:', product);
+  console.log('[DEBUG] Description element found:', descriptionElement);
+  console.log('[DEBUG] Highlights section found:', highlightsSection);
+  console.log('[DEBUG] Brewing section found:', brewingSection);
+  console.log('[DEBUG] Stock section found:', stockSection);
   
   // Basic product info
   if (titleElement) titleElement.textContent = productData.title || 'Product Name';
@@ -2372,10 +2389,10 @@ async function openQuickView(productData) {
   // Product Description
   if (descriptionElement && product?.description) {
     descriptionElement.textContent = product.description.replace(/(<([^>]+)>)/gi, "").substring(0, 200) + "...";
-    console.log('✅ Updated description with product data');
+    console.log('[SUCCESS] Updated description with product data');
   } else if (descriptionElement) {
     descriptionElement.textContent = "Get the full product details and brewing recommendations by viewing the complete product page.";
-    console.log('✅ Updated description with default text');
+    console.log('[SUCCESS] Updated description with default text');
   }
   
   // Product Highlights - show if metafields exist or use defaults
@@ -2400,11 +2417,11 @@ async function openQuickView(productData) {
       if (highlightsList) {
         highlightsList.innerHTML = highlights.map(highlight => `<li>${highlight}</li>`).join('');
         highlightsSection.style.display = 'block';
-        console.log('✅ Updated highlights:', highlights);
-        console.log('✅ Highlights section now visible');
+        console.log('[SUCCESS] Updated highlights:', highlights);
+        console.log('[SUCCESS] Highlights section now visible');
       }
     } else {
-      console.log('⚠️ No highlights found for product');
+      console.log('[WARN] No highlights found for product');
     }
   }
   
@@ -2429,8 +2446,8 @@ async function openQuickView(productData) {
     if (brewingMethod) brewingMethod.textContent = method;
     if (intensityLevel) intensityLevel.textContent = intensity;
     brewingSection.style.display = 'block';
-    console.log('✅ Updated brewing info - Method:', method, 'Intensity:', intensity);
-    console.log('✅ Brewing section now visible');
+    console.log('[SUCCESS] Updated brewing info - Method:', method, 'Intensity:', intensity);
+    console.log('[SUCCESS] Brewing section now visible');
   }
   
   // Stock Status
@@ -2511,10 +2528,10 @@ async function openQuickView(productData) {
 
 // Global close function that works across all templates
 window.closeQuickView = function() {
-  console.log('🔴 closeQuickView called');
+  console.log('[CLOSE] closeQuickView called');
   const modal = document.getElementById('quickViewModal');
   if (modal) {
-    console.log('✅ Modal found, closing...');
+    console.log('[SUCCESS] Modal found, closing...');
     modal.classList.add('closing');
     modal.classList.remove('active');
     
@@ -2522,10 +2539,10 @@ window.closeQuickView = function() {
       modal.style.display = 'none';
       modal.classList.remove('closing');
       document.body.style.overflow = '';
-      console.log('✅ Modal closed');
+      console.log('[SUCCESS] Modal closed');
     }, 200);
   } else {
-    console.warn('⚠️ No modal found with ID quickViewModal');
+    console.warn('[WARN] No modal found with ID quickViewModal');
   }
 }
 
@@ -2584,27 +2601,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize simplified homepage controls with ProductDiscovery
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Product Discovery Hero initialized');
+  console.log('[INIT] Product Discovery Hero initialized');
   
   // Wait for ProductDiscovery to be available and create instance
   function initializeProductDiscovery() {
     if (typeof ProductDiscovery !== 'undefined') {
-      console.log('✅ ProductDiscovery class available');
+      console.log('[SUCCESS] ProductDiscovery class available');
       
       // Create ProductDiscovery instance to handle add to cart
       if (!window.productDiscovery) {
         window.productDiscovery = new ProductDiscovery();
-        console.log('✅ ProductDiscovery instance created and initialized');
+        console.log('[SUCCESS] ProductDiscovery instance created and initialized');
       }
       
     } else {
-      console.log('⏳ Waiting for ProductDiscovery class to load...');
+      console.log('[WAIT] Waiting for ProductDiscovery class to load...');
       setTimeout(initializeProductDiscovery, 100);
     }
   }
   
   // Discovery Section Sorting Functionality
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
   function initDiscoverySorting() {
+=======
+  function initHomePageHeroSorting() {
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     const sortTrigger = document.getElementById('discoverySortTrigger');
     const sortMenu = document.getElementById('discoverySortMenu');
     const sortOptions = document.querySelectorAll('#discoverySortMenu .sort-option');
@@ -2647,36 +2668,62 @@ document.addEventListener('DOMContentLoaded', () => {
         sortTrigger.classList.remove('active');
         
         // Apply sorting
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
         applyDiscoverySorting(sortType);
+=======
+        applyHomePageHeroSorting(sortType);
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
       });
     });
   }
 
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
   function applyDiscoverySorting(sortType) {
+=======
+  function applyHomePageHeroSorting(sortType) {
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     const productCards = Array.from(document.querySelectorAll('.product-discovery-hero .product-card, .discovery-products .product-card'));
     const productsGrid = document.querySelector('.discovery-products, .product-grid');
     
     if (!productCards.length || !productsGrid) {
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
       console.log('⚠️ No product cards found in discovery section');
       return;
     }
     
     console.log(`🔄 Sorting discovery products by: ${sortType}`);
+=======
+      console.log('[WARN] No product cards found in discovery section');
+      return;
+    }
+    
+    console.log(`[SORT] Sorting discovery products by: ${sortType}`);
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     
     let sortedCards = [...productCards];
     
     switch (sortType) {
       case 'price-low':
         sortedCards.sort((a, b) => {
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
           const priceA = getDiscoveryPrice(a);
           const priceB = getDiscoveryPrice(b);
+=======
+          const priceA = getHomePageHeroPrice(a);
+          const priceB = getHomePageHeroPrice(b);
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
           return priceA - priceB;
         });
         break;
       case 'price-high':
         sortedCards.sort((a, b) => {
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
           const priceA = getDiscoveryPrice(a);
           const priceB = getDiscoveryPrice(b);
+=======
+          const priceA = getHomePageHeroPrice(a);
+          const priceB = getHomePageHeroPrice(b);
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
           return priceB - priceA;
         });
         break;
@@ -2719,17 +2766,56 @@ document.addEventListener('DOMContentLoaded', () => {
       // Restore opacity
       productsGrid.style.opacity = '1';
       
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
       console.log(`✅ Sorted ${sortedCards.length} discovery products by ${sortType}`);
+=======
+      console.log(`[SUCCESS] Sorted ${sortedCards.length} discovery products by ${sortType}`);
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     }, 100);
   }
 
   // Helper functions for discovery section sorting
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
   function getDiscoveryPrice(card) {
     const priceElement = card.querySelector('.price-sale, .price, .product-price .price');
     if (!priceElement) return 0;
     
     const priceText = priceElement.textContent.replace(/[^0-9.]/g, '');
     return parseFloat(priceText) || 0;
+=======
+  function getHomePageHeroPrice(card) {
+    // Try data attribute first (most reliable)
+    const dataPrice = card.querySelector('[data-product-price]');
+    if (dataPrice) {
+      const price = parseFloat(dataPrice.dataset.productPrice) / 100; // Convert from cents
+      console.log(`[DISCOVERY-PRICE] EXTRACTED from data-attribute: ${price}`);
+      return price;
+    }
+    
+    // Fallback to price elements with correct selectors
+    const priceSelectors = [
+      '.price-sale',        // Sale price (highest priority if on sale)
+      '.price-regular',     // Regular price
+      '.price-from-amount', // Variable price (lowest price)
+      '.price-current',     // Generic current price
+      '.price'              // Legacy fallback
+    ];
+    
+    for (const selector of priceSelectors) {
+      const priceElement = card.querySelector(selector);
+      if (priceElement) {
+        // Extract numeric value from price text (handles ₱, $, commas, etc.)
+        const priceText = priceElement.textContent.replace(/[^0-9.]/g, '');
+        const price = parseFloat(priceText) || 0;
+        
+        console.log(`[DISCOVERY-PRICE] EXTRACTED from ${selector}: ${price} (text: "${priceElement.textContent}")`);
+        return price;
+      }
+    }
+    
+    console.log('[DISCOVERY-PRICE] No price found for card, using fallback');
+    return 0;
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
   }
 
   function getDiscoveryTitle(card) {
@@ -2771,8 +2857,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start initialization
   initializeProductDiscovery();
   
+<<<<<<< HEAD:sections/product-discovery-hero.liquid
   // Initialize discovery sorting
   initDiscoverySorting();
+=======
+  // Initialize homepage hero sorting
+  initHomePageHeroSorting();
+>>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
 });
 </script>
 

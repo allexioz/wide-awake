@@ -136,6 +136,7 @@
  * CartManager - Simplified, robust cart management
  * No dependency waiting, no race conditions, just works.
  */
+if (typeof CartManager === 'undefined') {
 class CartManager {
   constructor() {
     this.isProcessing = false;
@@ -510,7 +511,9 @@ class CartManager {
 
 // Initialize immediately - no waiting, no dependencies
 document.addEventListener('DOMContentLoaded', () => {
-  window.cartManager = new CartManager();
+  if (!window.cartManager) {
+    window.cartManager = new CartManager();
+  }
 });
 
 // Also initialize if DOM is already loaded
@@ -521,6 +524,10 @@ if (document.readyState === 'loading') {
     }
   });
 } else {
-  window.cartManager = new CartManager();
+  if (!window.cartManager) {
+    window.cartManager = new CartManager();
+  }
 }
+
+} // End CartManager class declaration guard
 </script> 
