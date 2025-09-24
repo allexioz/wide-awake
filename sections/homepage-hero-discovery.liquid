@@ -2621,11 +2621,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   // Discovery Section Sorting Functionality
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
   function initDiscoverySorting() {
-=======
-  function initHomePageHeroSorting() {
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     const sortTrigger = document.getElementById('discoverySortTrigger');
     const sortMenu = document.getElementById('discoverySortMenu');
     const sortOptions = document.querySelectorAll('#discoverySortMenu .sort-option');
@@ -2668,62 +2664,36 @@ document.addEventListener('DOMContentLoaded', () => {
         sortTrigger.classList.remove('active');
         
         // Apply sorting
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
         applyDiscoverySorting(sortType);
-=======
-        applyHomePageHeroSorting(sortType);
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
       });
     });
   }
 
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
   function applyDiscoverySorting(sortType) {
-=======
-  function applyHomePageHeroSorting(sortType) {
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     const productCards = Array.from(document.querySelectorAll('.product-discovery-hero .product-card, .discovery-products .product-card'));
     const productsGrid = document.querySelector('.discovery-products, .product-grid');
     
     if (!productCards.length || !productsGrid) {
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
-      console.log('⚠️ No product cards found in discovery section');
-      return;
-    }
-    
-    console.log(`🔄 Sorting discovery products by: ${sortType}`);
-=======
       console.log('[WARN] No product cards found in discovery section');
       return;
     }
     
     console.log(`[SORT] Sorting discovery products by: ${sortType}`);
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     
     let sortedCards = [...productCards];
     
     switch (sortType) {
       case 'price-low':
         sortedCards.sort((a, b) => {
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
           const priceA = getDiscoveryPrice(a);
           const priceB = getDiscoveryPrice(b);
-=======
-          const priceA = getHomePageHeroPrice(a);
-          const priceB = getHomePageHeroPrice(b);
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
           return priceA - priceB;
         });
         break;
       case 'price-high':
         sortedCards.sort((a, b) => {
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
           const priceA = getDiscoveryPrice(a);
           const priceB = getDiscoveryPrice(b);
-=======
-          const priceA = getHomePageHeroPrice(a);
-          const priceB = getHomePageHeroPrice(b);
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
           return priceB - priceA;
         });
         break;
@@ -2766,24 +2736,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // Restore opacity
       productsGrid.style.opacity = '1';
       
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
-      console.log(`✅ Sorted ${sortedCards.length} discovery products by ${sortType}`);
-=======
       console.log(`[SUCCESS] Sorted ${sortedCards.length} discovery products by ${sortType}`);
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
     }, 100);
   }
 
   // Helper functions for discovery section sorting
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
   function getDiscoveryPrice(card) {
-    const priceElement = card.querySelector('.price-sale, .price, .product-price .price');
-    if (!priceElement) return 0;
-    
-    const priceText = priceElement.textContent.replace(/[^0-9.]/g, '');
-    return parseFloat(priceText) || 0;
-=======
-  function getHomePageHeroPrice(card) {
     // Try data attribute first (most reliable)
     const dataPrice = card.querySelector('[data-product-price]');
     if (dataPrice) {
@@ -2815,7 +2773,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     console.log('[DISCOVERY-PRICE] No price found for card, using fallback');
     return 0;
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
   }
 
   function getDiscoveryTitle(card) {
@@ -2857,13 +2814,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start initialization
   initializeProductDiscovery();
   
-<<<<<<< HEAD:sections/product-discovery-hero.liquid
   // Initialize discovery sorting
   initDiscoverySorting();
-=======
-  // Initialize homepage hero sorting
-  initHomePageHeroSorting();
->>>>>>> b44d131 (fix: homepage price sorting and implement file naming strategy):sections/homepage-hero-discovery.liquid
 });
 </script>
 
