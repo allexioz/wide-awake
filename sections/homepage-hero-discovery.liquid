@@ -2366,6 +2366,8 @@ async function openQuickView(productData) {
   const stockText = document.getElementById('stockText');
   const stockIcon = document.querySelector('.stock-icon');
   
+  // Enhanced sections - use full product data if available
+  const product = window.currentQuickViewProduct;
   console.log('[DEBUG] Populating enhanced sections with product:', product);
   console.log('[DEBUG] Description element found:', descriptionElement);
   console.log('[DEBUG] Highlights section found:', highlightsSection);
@@ -2373,6 +2375,8 @@ async function openQuickView(productData) {
   console.log('[DEBUG] Stock section found:', stockSection);
   
   // Basic product info
+  console.log('[QUICKVIEW-DEBUG] productData:', productData);
+  
   if (titleElement) titleElement.textContent = productData.title || 'Product Name';
   if (imageElement) {
     imageElement.src = productData.image || '';
@@ -2380,11 +2384,12 @@ async function openQuickView(productData) {
   }
   if (linkElement) linkElement.href = productData.url || '#';
   if (priceElement) {
-    priceElement.textContent = '₱' + (parseInt(productData.price) / 100).toFixed(2);
+    const rawPrice = productData.price;
+    const numericPrice = parseInt(rawPrice) || 0;
+    const finalPrice = numericPrice / 100;
+    console.log(`[QUICKVIEW-PRICE] Raw: "${rawPrice}", Numeric: ${numericPrice}, Final: ${finalPrice}`);
+    priceElement.textContent = '₱' + finalPrice.toFixed(2);
   }
-  
-  // Enhanced sections - use full product data if available
-  const product = window.currentQuickViewProduct;
   
   // Product Description
   if (descriptionElement && product?.description) {
