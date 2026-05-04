@@ -54,7 +54,8 @@
     
     {{ content_for_header }}
   {% capture boostersnippet %}{% include "booster-apps-common" %}{% endcapture %}{% unless boostersnippet contains "Liquid error" %}{{ boostersnippet }}{% endunless %}
-<meta name="google-site-verification" content="Ufho2DwANy0kM2Rx5wJfe-xeK1GBrF4mswegnOw0k9Q" /></head>
+  <meta name="google-site-verification" content="Ufho2DwANy0kM2Rx5wJfe-xeK1GBrF4mswegnOw0k9Q" />
+</head>
 
   <body class="template-{{ request.page_type }}" style="margin: 0 !important; padding: 0 !important;">
     {% sections 'header-group' %}
